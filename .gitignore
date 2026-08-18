@@ -1,0 +1,26 @@
+# Environment & Secrets
+.env
+.env.local
+
+# Databases & Logs
+*.db
+*.sqlite
+*.sqlite3
+diverge_raw.db
+*.log
+diverge_scraper.log
+
+# Python Cache & Virtual Environments
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+env/
+
+# IDE & OS Files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

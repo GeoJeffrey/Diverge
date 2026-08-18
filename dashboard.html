@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Diverge — Phase 1 + 2 Intelligence Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --bg:        #0a0d14;
+  --surface:   #111623;
+  --surface2:  #1a2035;
+  --border:    #1e2d4a;
+  --accent:    #4f8ef7;
+  --accent2:   #7c5cfc;
+  --green:     #22d3a0;
+  --red:       #f75f5f;
+  --yellow:    #f7c948;
+  --purple:    #b48ef7;
+  --orange:    #f7894f;
+  --muted:     #4a5878;
+  --text:      #e2e8f8;
+  --text2:     #8899bb;
+  --mono:      'JetBrains Mono', monospace;
+  --radius:    10px;
+  --radius-lg: 16px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;min-height:100vh;overflow-x:hidden}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--surface)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* ── Header ── */
+header{background:linear-gradient(135deg,#0d1526 0%,#111e38 100%);border-bottom:1px solid var(--border);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px)}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;letter-spacing:-.3px}
+.logo-dot{width:10px;height:10px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 0 10px var(--accent)}
+.header-right{display:flex;align-items:center;gap:12px}
+.db-status{font-size:11px;color:var(--text2);background:var(--surface2);padding:4px 10px;border-radius:20px;border:1px solid var(--border)}
+.db-status span{color:var(--green)}
+.run-btn{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;padding:7px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;transition:opacity .2s,transform .1s}
+.run-btn:hover{opacity:.85}
+.run-btn:active{transform:scale(.97)}
+.run-btn.secondary{background:var(--surface2);border:1px solid var(--border);color:var(--text)}
+
+/* ── Stats Strip ── */
+.stats-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;padding:20px 28px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px;position:relative;overflow:hidden;transition:border-color .2s,transform .2s}
+.stat-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent-grad,linear-gradient(90deg,var(--accent),var(--accent2)))}
+.stat-label{font-size:11px;color:var(--text2);font-weight:500;text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px}
+.stat-value{font-size:26px;font-weight:700;font-family:var(--mono);color:var(--text)}
+.stat-sub{font-size:11px;color:var(--text2);margin-top:4px}
+.stat-card.green::before{background:linear-gradient(90deg,var(--green),var(--accent))}
+.stat-card.red::before{background:linear-gradient(90deg,var(--red),var(--orange))}
+.stat-card.purple::before{background:linear-gradient(90deg,var(--purple),var(--accent2))}
+.stat-card.yellow::before{background:linear-gradient(90deg,var(--yellow),var(--orange))}
+
+/* ── Tabs ── */
+.tabs-bar{display:flex;gap:2px;padding:0 28px;border-bottom:1px solid var(--border);background:var(--surface);overflow-x:auto}
+.tab-btn{background:none;border:none;color:var(--text2);font-family:'Inter',sans-serif;font-size:13px;font-weight:500;padding:12px 18px;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:color .2s,border-color .2s}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* ── Tab Panes ── */
+.tab-pane{display:none;padding:20px 28px}
+.tab-pane.active{display:block}
+
+/* ── Toolbar ── */
+.toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.search-box{flex:1;min-width:200px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 14px;color:var(--text);font-size:13px;outline:none;transition:border-color .2s}
+.search-box:focus{border-color:var(--accent)}
+.filter-select{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:13px;outline:none;cursor:pointer}
+.filter-select:focus{border-color:var(--accent)}
+.pill-filter{display:flex;gap:6px;flex-wrap:wrap}
+.pill{background:var(--surface2);border:1px solid var(--border);color:var(--text2);font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;cursor:pointer;transition:all .15s}
+.pill:hover{border-color:var(--accent);color:var(--accent)}
+.pill.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.count-badge{font-size:11px;color:var(--text2);margin-left:auto;white-space:nowrap}
+
+/* ── Table ── */
+.table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius-lg)}
+table{width:100%;border-collapse:collapse}
+thead{background:var(--surface2);position:sticky;top:0;z-index:2}
+th{padding:10px 14px;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;text-align:left;white-space:nowrap;border-bottom:1px solid var(--border)}
+td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:top;font-size:12.5px}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(79,142,247,.04)}
+.mono{font-family:var(--mono);font-size:11px}
+.truncate{max-width:280px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.truncate:hover{white-space:normal;word-break:break-word;max-width:280px}
+
+/* ── Sentiment Badges ── */
+.badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.badge-bullish{background:rgba(34,211,160,.15);color:var(--green)}
+.badge-bearish{background:rgba(247,95,95,.15);color:var(--red)}
+.badge-neutral{background:rgba(74,88,120,.3);color:var(--text2)}
+.badge-yes{background:rgba(247,201,72,.15);color:var(--yellow)}
+.badge-no{background:transparent;color:var(--muted)}
+.badge-sarcasm{background:rgba(180,142,247,.15);color:var(--purple)}
+.badge-mixed{background:rgba(247,137,79,.15);color:var(--orange)}
+
+/* ── Score Bar ── */
+.score-bar{display:flex;align-items:center;gap:6px}
+.score-track{flex:1;height:4px;background:var(--surface2);border-radius:2px;overflow:hidden;min-width:60px}
+.score-fill{height:100%;border-radius:2px;transition:width .3s}
+.score-val{font-family:var(--mono);font-size:10px;min-width:36px;color:var(--text2)}
+
+/* ── Platform Tags ── */
+.plat{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:6px;font-size:10px;font-weight:600}
+.plat-reddit{background:rgba(255,86,0,.12);color:#ff7a33}
+.plat-stocktwits{background:rgba(79,142,247,.12);color:#4f8ef7}
+.plat-telegram{background:rgba(37,180,255,.12);color:#25b4ff}
+.plat-google_trends{background:rgba(34,211,160,.12);color:#22d3a0}
+.plat-rss_news{background:rgba(247,201,72,.12);color:#f7c948}
+
+/* ── Pagination ── */
+.pagination{display:flex;align-items:center;justify-content:space-between;margin-top:14px;flex-wrap:wrap;gap:8px}
+.page-info{font-size:12px;color:var(--text2)}
+.page-btns{display:flex;gap:6px}
+.page-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer;transition:border-color .2s}
+.page-btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+.page-btn:disabled{opacity:.35;cursor:not-allowed}
+
+/* ── Detail Modal ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);width:100%;max-width:780px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.5)}
+.modal-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--surface);z-index:1}
+.modal-title{font-weight:600;font-size:15px}
+.modal-close{background:var(--surface2);border:1px solid var(--border);color:var(--text);width:30px;height:30px;border-radius:6px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
+.modal-close:hover{border-color:var(--red);color:var(--red)}
+.modal-body{padding:20px 24px}
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.field{display:flex;flex-direction:column;gap:4px}
+.field.wide{grid-column:1/-1}
+.field-label{font-size:10px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.6px}
+.field-value{font-family:var(--mono);font-size:12px;color:var(--text);background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;word-break:break-all;white-space:pre-wrap;line-height:1.5;max-height:180px;overflow-y:auto}
+
+/* ── Empty State ── */
+.empty-state{text-align:center;padding:60px 20px;color:var(--text2)}
+.empty-icon{font-size:40px;margin-bottom:12px}
+.empty-msg{font-size:14px}
+
+/* ── Loading ── */
+.loading{text-align:center;padding:40px;color:var(--text2);font-size:13px}
+.spinner{display:inline-block;width:24px;height:24px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin-bottom:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── Sentiment Mini Chart ── */
+.sent-chart{display:flex;height:8px;border-radius:4px;overflow:hidden;margin:8px 0}
+
+/* ── Responsive ── */
+@media(max-width:768px){
+  .stats-strip{grid-template-columns:repeat(2,1fr);padding:14px}
+  .tab-pane{padding:14px}
+  .field-grid{grid-template-columns:1fr}
+  .field.wide{grid-column:auto}
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <div class="logo">
+    <div class="logo-dot"></div>
+    <span>Diverge</span>
+    <span style="color:var(--text2);font-weight:400;font-size:14px">Intelligence</span>
+  </div>
+  <div class="header-right">
+    <div class="db-status">DB: <span id="total-rows">—</span> raw posts</div>
+    <button class="run-btn secondary" onclick="runPhase2()">Run Phase 2</button>
+    <button class="run-btn" onclick="runScraper()">Run Scrapers</button>
+  </div>
+</header>
+
+<!-- Stats Strip -->
+<div class="stats-strip" id="stats-strip">
+  <div class="stat-card">
+    <div class="stat-label">Raw Posts</div>
+    <div class="stat-value" id="s-raw">—</div>
+    <div class="stat-sub">Phase 1 collected</div>
+  </div>
+  <div class="stat-card green">
+    <div class="stat-label">Text Features</div>
+    <div class="stat-value" id="s-text">—</div>
+    <div class="stat-sub">FinBERT scored</div>
+  </div>
+  <div class="stat-card purple">
+    <div class="stat-label">Timing Rows</div>
+    <div class="stat-value" id="s-timing">—</div>
+    <div class="stat-sub">Inter-arrival deltas</div>
+  </div>
+  <div class="stat-card yellow">
+    <div class="stat-label">Time Bins</div>
+    <div class="stat-value" id="s-bins">—</div>
+    <div class="stat-sub">5-min buckets</div>
+  </div>
+  <div class="stat-card red">
+    <div class="stat-label">Periodicity</div>
+    <div class="stat-value" id="s-period">—</div>
+    <div class="stat-sub">KS/ACF windows</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Bullish</div>
+    <div class="stat-value" style="color:var(--green)" id="s-bull">—</div>
+    <div class="stat-sub" id="s-bear-sub">Bearish: —</div>
+  </div>
+  <div class="stat-card yellow">
+    <div class="stat-label">Capitulation</div>
+    <div class="stat-value" style="color:var(--yellow)" id="s-cap">—</div>
+    <div class="stat-sub">Posts flagged</div>
+  </div>
+  <div class="stat-card purple">
+    <div class="stat-label">Sarcastic</div>
+    <div class="stat-value" style="color:var(--purple)" id="s-sarc">—</div>
+    <div class="stat-sub">Irony detected</div>
+  </div>
+</div>
+
+<!-- Sentiment Distribution Bar -->
+<div style="padding:0 28px 16px">
+  <div style="font-size:11px;color:var(--text2);margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:.6px">Sentiment Distribution</div>
+  <div class="sent-chart" id="sent-bar"></div>
+  <div style="display:flex;gap:16px;margin-top:6px" id="sent-legend"></div>
+</div>
+
+<!-- Tabs -->
+<div class="tabs-bar">
+  <button class="tab-btn active" id="tab-raw"      onclick="switchTab('raw')">Raw Posts</button>
+  <button class="tab-btn"        id="tab-text"     onclick="switchTab('text')">Text Features</button>
+  <button class="tab-btn"        id="tab-timing"   onclick="switchTab('timing')">Timing</button>
+  <button class="tab-btn"        id="tab-bins"     onclick="switchTab('bins')">Time Bins</button>
+  <button class="tab-btn"        id="tab-period"   onclick="switchTab('period')">Periodicity</button>
+</div>
+
+<!-- ═══════════════════════════════════════════ TAB: RAW POSTS -->
+<div class="tab-pane active" id="pane-raw">
+  <div class="toolbar">
+    <input class="search-box" id="raw-search" placeholder="Search text, author, community..." oninput="debounce(loadRaw)" />
+    <select class="filter-select" id="raw-ticker" onchange="loadRaw()"><option value="ALL">All Tickers</option></select>
+    <select class="filter-select" id="raw-platform" onchange="loadRaw()">
+      <option value="all">All Platforms</option>
+      <option value="reddit">Reddit</option>
+      <option value="stocktwits">StockTwits</option>
+      <option value="telegram">Telegram</option>
+      <option value="google_trends">Google Trends</option>
+      <option value="rss_news">RSS News</option>
+    </select>
+    <select class="filter-select" id="raw-sentiment" onchange="loadRaw()">
+      <option value="all">All Sentiments</option>
+      <option value="bullish">Bullish</option>
+      <option value="neutral">Neutral</option>
+      <option value="bearish">Bearish</option>
+    </select>
+    <span class="count-badge" id="raw-count"></span>
+  </div>
+  <div class="table-wrap">
+    <table id="raw-table">
+      <thead><tr>
+        <th>Platform</th><th>Ticker</th><th>Sentiment</th><th>Score</th>
+        <th>Author</th><th>Community</th><th>Time (UTC)</th><th>Upvotes</th><th>Text</th>
+      </tr></thead>
+      <tbody id="raw-body"><tr><td colspan="9"><div class="loading"><div class="spinner"></div><br>Loading...</div></td></tr></tbody>
+    </table>
+  </div>
+  <div class="pagination">
+    <div class="page-info" id="raw-page-info"></div>
+    <div class="page-btns">
+      <button class="page-btn" id="raw-prev" onclick="changePage('raw',-1)" disabled>← Prev</button>
+      <button class="page-btn" id="raw-next" onclick="changePage('raw',1)">Next →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ TAB: TEXT FEATURES -->
+<div class="tab-pane" id="pane-text">
+  <div class="toolbar">
+    <select class="filter-select" id="text-ticker" onchange="loadText()"><option value="ALL">All Tickers</option></select>
+    <select class="filter-select" id="text-sentiment" onchange="loadText()">
+      <option value="all">All Sentiments</option>
+      <option value="bullish">Bullish</option>
+      <option value="neutral">Neutral</option>
+      <option value="bearish">Bearish</option>
+    </select>
+    <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2);cursor:pointer">
+      <input type="checkbox" id="text-cap" onchange="loadText()" style="accent-color:var(--yellow)" />
+      Capitulation only
+    </label>
+    <span class="count-badge" id="text-count"></span>
+  </div>
+  <div class="table-wrap">
+    <table id="text-table">
+      <thead><tr>
+        <th>Ticker</th><th>Platform</th><th>Sentiment</th><th>Score</th>
+        <th>Irony Adj.</th><th>Cap.</th><th>Conviction/Hedge</th><th>Sarcasm</th>
+        <th>Language</th><th>Time</th><th>Text Preview</th>
+      </tr></thead>
+      <tbody id="text-body"><tr><td colspan="11"><div class="loading"><div class="spinner"></div><br>Loading...</div></td></tr></tbody>
+    </table>
+  </div>
+  <div class="pagination">
+    <div class="page-info" id="text-page-info"></div>
+    <div class="page-btns">
+      <button class="page-btn" id="text-prev" onclick="changePage('text',-1)" disabled>← Prev</button>
+      <button class="page-btn" id="text-next" onclick="changePage('text',1)">Next →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ TAB: TIMING -->
+<div class="tab-pane" id="pane-timing">
+  <div class="toolbar">
+    <select class="filter-select" id="timing-ticker" onchange="loadTiming()"><option value="ALL">All Tickers</option></select>
+    <span class="count-badge" id="timing-count"></span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr>
+        <th>Post ID</th><th>Ticker</th><th>Platform</th><th>Author</th>
+        <th>Timestamp (UTC)</th><th>Delta (sec)</th><th>Delta (min)</th><th>First Mention</th>
+      </tr></thead>
+      <tbody id="timing-body"><tr><td colspan="8"><div class="loading"><div class="spinner"></div><br>Loading...</div></td></tr></tbody>
+    </table>
+  </div>
+  <div class="pagination">
+    <div class="page-info" id="timing-page-info"></div>
+    <div class="page-btns">
+      <button class="page-btn" id="timing-prev" onclick="changePage('timing',-1)" disabled>← Prev</button>
+      <button class="page-btn" id="timing-next" onclick="changePage('timing',1)">Next →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ TAB: TIME BINS -->
+<div class="tab-pane" id="pane-bins">
+  <div class="toolbar">
+    <select class="filter-select" id="bins-ticker" onchange="loadBins()"><option value="ALL">All Tickers</option></select>
+    <span class="count-badge" id="bins-count"></span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr>
+        <th>Ticker</th><th>5-Min Bin Start (UTC)</th><th>Post Count</th><th>Activity</th>
+      </tr></thead>
+      <tbody id="bins-body"><tr><td colspan="4"><div class="loading"><div class="spinner"></div><br>Loading...</div></td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ TAB: PERIODICITY -->
+<div class="tab-pane" id="pane-period">
+  <div class="toolbar">
+    <select class="filter-select" id="period-ticker" onchange="loadPeriod()"><option value="ALL">All Tickers</option></select>
+    <span class="count-badge" id="period-count"></span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr>
+        <th>Ticker</th><th>Window Start</th><th>Window End</th>
+        <th>KS Statistic</th><th>ACF Peak Lag (min)</th><th>ACF Strength</th>
+        <th>FFT Period (min)</th><th>Onset Dispersion</th>
+      </tr></thead>
+      <tbody id="period-body"><tr><td colspan="8"><div class="loading"><div class="spinner"></div><br>Loading...</div></td></tr></tbody>
+    </table>
+  </div>
+  <div class="pagination">
+    <div class="page-info" id="period-page-info"></div>
+    <div class="page-btns">
+      <button class="page-btn" id="period-prev" onclick="changePage('period',-1)" disabled>← Prev</button>
+      <button class="page-btn" id="period-next" onclick="changePage('period',1)">Next →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ DETAIL MODAL -->
+<div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Record Detail</div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+// ── State ────────────────────────────────────────────────────────
+const PAGE_SIZE = 100;
+const state = {
+  raw:    { page: 0, total: 0 },
+  text:   { page: 0, total: 0 },
+  timing: { page: 0, total: 0 },
+  period: { page: 0, total: 0 },
+};
+let activeTab = 'raw';
+let debounceTimer = null;
+
+// ── Utilities ────────────────────────────────────────────────────
+function debounce(fn, ms = 350) {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(() => fn(), ms);
+}
+function fmt(v, dp = 3) {
+  if (v === null || v === undefined) return '<span style="color:var(--muted)">—</span>';
+  return typeof v === 'number' ? v.toFixed(dp) : v;
+}
+function esc(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function ts(s) {
+  if (!s) return '—';
+  try { return new Date(s).toLocaleString('en-IN', { timeZone: 'UTC', hour12: false }); }
+  catch { return s; }
+}
+function platformBadge(p) {
+  return `<span class="plat plat-${p}">${p}</span>`;
+}
+function sentBadge(l) {
+  if (!l) return '<span style="color:var(--muted)">—</span>';
+  return `<span class="badge badge-${l}">${l}</span>`;
+}
+function scoreBar(v) {
+  if (v === null || v === undefined) return '<span style="color:var(--muted)">—</span>';
+  const pct = Math.abs(v) * 100;
+  const color = v > 0.05 ? 'var(--green)' : v < -0.05 ? 'var(--red)' : 'var(--muted)';
+  return `<div class="score-bar"><div class="score-track"><div class="score-fill" style="width:${pct}%;background:${color}"></div></div><span class="score-val">${v.toFixed(3)}</span></div>`;
+}
+function ksBar(v) {
+  if (v === null || v === undefined) return '<span style="color:var(--muted)">—</span>';
+  const pct = v * 100;
+  const color = v > 0.5 ? 'var(--red)' : v > 0.2 ? 'var(--yellow)' : 'var(--green)';
+  return `<div class="score-bar"><div class="score-track"><div class="score-fill" style="width:${pct}%;background:${color}"></div></div><span class="score-val">${v.toFixed(3)}</span></div>`;
+}
+function acfBar(v) {
+  if (v === null || v === undefined) return '<span style="color:var(--muted)">—</span>';
+  const pct = Math.min(v * 100, 100);
+  const color = v > 0.5 ? 'var(--purple)' : 'var(--accent)';
+  return `<div class="score-bar"><div class="score-track"><div class="score-fill" style="width:${pct}%;background:${color}"></div></div><span class="score-val">${v.toFixed(3)}</span></div>`;
+}
+function actBar(cnt, max) {
+  const pct = max > 0 ? (cnt / max * 100) : 0;
+  return `<div class="score-bar"><div class="score-track" style="min-width:80px"><div class="score-fill" style="width:${pct}%;background:var(--accent)"></div></div><span class="score-val">${cnt}</span></div>`;
+}
+
+// ── Populate Ticker Dropdowns ─────────────────────────────────────
+async function loadStats() {
+  const r = await fetch('/api/stats').then(r => r.json());
+  document.getElementById('total-rows').textContent = r.total_raw_posts?.toLocaleString() || '—';
+  document.getElementById('s-raw').textContent    = r.total_raw_posts?.toLocaleString() || '—';
+  document.getElementById('s-text').textContent   = (r.phase2?.text_features || 0).toLocaleString();
+  document.getElementById('s-timing').textContent = (r.phase2?.post_timing || 0).toLocaleString();
+  document.getElementById('s-bins').textContent   = (r.phase2?.ticker_time_bins || 0).toLocaleString();
+  document.getElementById('s-period').textContent = (r.phase2?.periodicity_stats || 0).toLocaleString();
+
+  const sd = r.phase2?.sentiment_distribution || {};
+  document.getElementById('s-bull').textContent = (sd.bullish || 0).toLocaleString();
+  document.getElementById('s-bear-sub').textContent = `Bearish: ${(sd.bearish || 0).toLocaleString()}`;
+  document.getElementById('s-cap').textContent  = (r.phase2?.capitulation_posts || 0).toLocaleString();
+  document.getElementById('s-sarc').textContent = (r.phase2?.sarcastic_posts || 0).toLocaleString();
+
+  // Sentiment bar
+  const total = (sd.bullish||0) + (sd.bearish||0) + (sd.neutral||0) || 1;
+  const bar = document.getElementById('sent-bar');
+  bar.innerHTML = `
+    <div style="width:${(sd.bullish||0)/total*100}%;background:var(--green)"></div>
+    <div style="width:${(sd.neutral||0)/total*100}%;background:var(--muted)"></div>
+    <div style="width:${(sd.bearish||0)/total*100}%;background:var(--red)"></div>
+  `;
+  document.getElementById('sent-legend').innerHTML = `
+    <span style="font-size:11px;color:var(--green)">▮ Bullish ${sd.bullish||0}</span>
+    <span style="font-size:11px;color:var(--text2)">▮ Neutral ${sd.neutral||0}</span>
+    <span style="font-size:11px;color:var(--red)">▮ Bearish ${sd.bearish||0}</span>
+  `;
+
+  // Populate ticker selects
+  const tickers = r.tickers || [];
+  ['raw-ticker','text-ticker','timing-ticker','bins-ticker','period-ticker'].forEach(id => {
+    const sel = document.getElementById(id);
+    const cur = sel.value;
+    sel.innerHTML = '<option value="ALL">All Tickers</option>' +
+      tickers.map(t => `<option value="${t}">${t}</option>`).join('');
+    sel.value = cur || 'ALL';
+  });
+}
+
+// ── Tab Switching ─────────────────────────────────────────────────
+function switchTab(tab) {
+  activeTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.getElementById('pane-' + tab).classList.add('active');
+  const loaders = { raw: loadRaw, text: loadText, timing: loadTiming, bins: loadBins, period: loadPeriod };
+  if (loaders[tab]) loaders[tab]();
+}
+
+function changePage(tab, dir) {
+  const s = state[tab];
+  s.page = Math.max(0, Math.min(s.page + dir, Math.floor((s.total - 1) / PAGE_SIZE)));
+  const loaders = { raw: loadRaw, text: loadText, timing: loadTiming, period: loadPeriod };
+  if (loaders[tab]) loaders[tab](false);
+}
+
+function updatePagination(tab, total) {
+  const s = state[tab];
+  s.total = total;
+  const from = s.page * PAGE_SIZE + 1;
+  const to   = Math.min((s.page + 1) * PAGE_SIZE, total);
+  const info = document.getElementById(tab + '-page-info');
+  if (info) info.textContent = total > 0 ? `${from}–${to} of ${total.toLocaleString()}` : '0 rows';
+  const prev = document.getElementById(tab + '-prev');
+  const next = document.getElementById(tab + '-next');
+  if (prev) prev.disabled = s.page === 0;
+  if (next) next.disabled = (s.page + 1) * PAGE_SIZE >= total;
+}
+
+// ── RAW POSTS ─────────────────────────────────────────────────────
+async function loadRaw(resetPage = true) {
+  if (resetPage) state.raw.page = 0;
+  const ticker   = document.getElementById('raw-ticker').value;
+  const platform = document.getElementById('raw-platform').value;
+  const search   = document.getElementById('raw-search').value;
+  const sentiment= document.getElementById('raw-sentiment').value;
+  const offset   = state.raw.page * PAGE_SIZE;
+  const params   = new URLSearchParams({ ticker, platform, search, sentiment, limit: PAGE_SIZE, offset });
+  const data = await fetch(`/api/posts?${params}`).then(r => r.json());
+  document.getElementById('raw-count').textContent = `${data.total?.toLocaleString() || 0} total`;
+  updatePagination('raw', data.total || 0);
+  const tbody = document.getElementById('raw-body');
+  if (!data.posts?.length) {
+    tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><div class="empty-icon">◎</div><div class="empty-msg">No posts found</div></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = data.posts.map(p => `
+    <tr onclick="showRawDetail(${JSON.stringify(esc(JSON.stringify(p)))})" style="cursor:pointer">
+      <td>${platformBadge(p.platform)}</td>
+      <td><span class="mono" style="color:var(--accent)">${p.ticker||'—'}</span></td>
+      <td>${sentBadge(p.sentiment_label)}</td>
+      <td>${p.sentiment_score !== null && p.sentiment_score !== undefined ? scoreBar(p.sentiment_score) : '<span style="color:var(--muted)">—</span>'}</td>
+      <td class="mono" style="color:var(--text2);font-size:11px">${esc(p.account_id)||'—'}</td>
+      <td style="color:var(--text2);font-size:11px">${esc(p.community)||'—'}</td>
+      <td class="mono" style="font-size:10px;color:var(--text2)">${ts(p.timestamp_utc)}</td>
+      <td class="mono" style="color:var(--text2)">${p.upvotes??0}</td>
+      <td><div class="truncate" style="color:var(--text)">${esc(p.raw_text||'').substring(0,120)}</div></td>
+    </tr>
+  `).join('');
+}
+
+function showRawDetail(escaped) {
+  const p = JSON.parse(JSON.parse(escaped));
+  openModal('Raw Post — ' + (p.platform||'') + ' / ' + (p.ticker||''), `
+    <div class="field-grid">
+      <div class="field"><div class="field-label">Post ID</div><div class="field-value">${esc(p.post_id)}</div></div>
+      <div class="field"><div class="field-label">Platform</div><div class="field-value">${esc(p.platform)}</div></div>
+      <div class="field"><div class="field-label">Ticker</div><div class="field-value">${esc(p.ticker)}</div></div>
+      <div class="field"><div class="field-label">Account ID</div><div class="field-value">${esc(p.account_id)}</div></div>
+      <div class="field"><div class="field-label">Community</div><div class="field-value">${esc(p.community)||'—'}</div></div>
+      <div class="field"><div class="field-label">Timestamp UTC</div><div class="field-value">${esc(p.timestamp_utc)}</div></div>
+      <div class="field"><div class="field-label">Upvotes</div><div class="field-value">${p.upvotes??0}</div></div>
+      <div class="field"><div class="field-label">Scraped At</div><div class="field-value">${esc(p.scraped_at)}</div></div>
+      <div class="field"><div class="field-label">Sentiment</div><div class="field-value">${p.sentiment_label||'—'} (${p.sentiment_score!==null&&p.sentiment_score!==undefined?p.sentiment_score.toFixed(4):'—'})</div></div>
+      <div class="field"><div class="field-label">Irony-Adjusted Sentiment</div><div class="field-value">${p.irony_adjusted_sentiment!==null&&p.irony_adjusted_sentiment!==undefined?p.irony_adjusted_sentiment.toFixed(4):'—'}</div></div>
+      <div class="field"><div class="field-label">Capitulation</div><div class="field-value">${p.capitulation_flag?'YES (conf: '+p.capitulation_confidence?.toFixed(3)+')':'No'}</div></div>
+      <div class="field"><div class="field-label">Sarcasm</div><div class="field-value">${p.is_sarcastic?'YES':'No'}</div></div>
+      <div class="field"><div class="field-label">Conviction/Hedge Ratio</div><div class="field-value">${p.conviction_hedge_ratio!==null&&p.conviction_hedge_ratio!==undefined?p.conviction_hedge_ratio.toFixed(3):'—'}</div></div>
+      <div class="field"><div class="field-label">Language</div><div class="field-value">${esc(p.language)||'—'}</div></div>
+      <div class="field wide"><div class="field-label">Raw Text</div><div class="field-value">${esc(p.raw_text||'[empty]')}</div></div>
+    </div>
+  `);
+}
+
+// ── TEXT FEATURES ─────────────────────────────────────────────────
+async function loadText(resetPage = true) {
+  if (resetPage) state.text.page = 0;
+  const ticker   = document.getElementById('text-ticker').value;
+  const sentiment= document.getElementById('text-sentiment').value;
+  const cap      = document.getElementById('text-cap').checked ? '1' : '0';
+  const offset   = state.text.page * PAGE_SIZE;
+  const params   = new URLSearchParams({ ticker, sentiment, capitulation: cap, limit: PAGE_SIZE, offset });
+  const data = await fetch(`/api/text-features?${params}`).then(r => r.json());
+  document.getElementById('text-count').textContent = `${data.total?.toLocaleString() || 0} total`;
+  updatePagination('text', data.total || 0);
+  const tbody = document.getElementById('text-body');
+  if (!data.features?.length) {
+    tbody.innerHTML = `<tr><td colspan="11"><div class="empty-state"><div class="empty-icon">◎</div><div class="empty-msg">No text features found</div></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = data.features.map(f => `
+    <tr onclick='showTextDetail(${JSON.stringify(esc(JSON.stringify(f)))})' style="cursor:pointer">
+      <td><span class="mono" style="color:var(--accent)">${f.ticker||'—'}</span></td>
+      <td>${platformBadge(f.platform)}</td>
+      <td>${sentBadge(f.sentiment_label)}</td>
+      <td>${f.sentiment_score!==null&&f.sentiment_score!==undefined?scoreBar(f.sentiment_score):'<span style="color:var(--muted)">—</span>'}</td>
+      <td>${f.irony_adjusted_sentiment!==null&&f.irony_adjusted_sentiment!==undefined?scoreBar(f.irony_adjusted_sentiment):'<span style="color:var(--muted)">—</span>'}</td>
+      <td>${f.capitulation_flag?'<span class="badge badge-yes">YES</span>':'<span class="badge badge-no">No</span>'}</td>
+      <td class="mono" style="font-size:11px">${f.conviction_hedge_ratio!==null&&f.conviction_hedge_ratio!==undefined?f.conviction_hedge_ratio.toFixed(2):'—'}</td>
+      <td>${f.is_sarcastic?'<span class="badge badge-sarcasm">YES</span>':'<span class="badge badge-no">No</span>'}</td>
+      <td><span class="badge ${f.language==='hi-en-mixed'?'badge-mixed':'badge-no'}" style="font-size:10px">${esc(f.language)||'—'}</span></td>
+      <td class="mono" style="font-size:10px;color:var(--text2)">${ts(f.timestamp_utc)}</td>
+      <td><div class="truncate">${esc((f.raw_text||'').substring(0,100))}</div></td>
+    </tr>
+  `).join('');
+}
+
+function showTextDetail(escaped) {
+  const f = JSON.parse(JSON.parse(escaped));
+  openModal('Text Features — ' + (f.ticker||'') + ' / ' + (f.sentiment_label||''), `
+    <div class="field-grid">
+      <div class="field"><div class="field-label">Post ID</div><div class="field-value">${esc(f.post_id)}</div></div>
+      <div class="field"><div class="field-label">Ticker / Platform</div><div class="field-value">${esc(f.ticker)} / ${esc(f.platform)}</div></div>
+      <div class="field"><div class="field-label">Sentiment Label</div><div class="field-value">${esc(f.sentiment_label)||'—'}</div></div>
+      <div class="field"><div class="field-label">Sentiment Score</div><div class="field-value">${f.sentiment_score!==null&&f.sentiment_score!==undefined?f.sentiment_score.toFixed(6):'—'}</div></div>
+      <div class="field"><div class="field-label">Irony-Adjusted Sentiment</div><div class="field-value">${f.irony_adjusted_sentiment!==null&&f.irony_adjusted_sentiment!==undefined?f.irony_adjusted_sentiment.toFixed(6):'—'}</div></div>
+      <div class="field"><div class="field-label">Is Sarcastic</div><div class="field-value">${f.is_sarcastic?'YES':'No'}</div></div>
+      <div class="field"><div class="field-label">Capitulation Flag</div><div class="field-value">${f.capitulation_flag?'YES':'No'}</div></div>
+      <div class="field"><div class="field-label">Capitulation Confidence</div><div class="field-value">${f.capitulation_confidence!==null&&f.capitulation_confidence!==undefined?f.capitulation_confidence.toFixed(4):'—'}</div></div>
+      <div class="field"><div class="field-label">Conviction/Hedge Ratio</div><div class="field-value">${f.conviction_hedge_ratio!==null&&f.conviction_hedge_ratio!==undefined?f.conviction_hedge_ratio.toFixed(4):'—'}</div></div>
+      <div class="field"><div class="field-label">Language</div><div class="field-value">${esc(f.language)||'—'}</div></div>
+      <div class="field"><div class="field-label">Author</div><div class="field-value">${esc(f.account_id)||'—'}</div></div>
+      <div class="field"><div class="field-label">Computed At</div><div class="field-value">${esc(f.computed_at)||'—'}</div></div>
+      <div class="field wide"><div class="field-label">Raw Text</div><div class="field-value">${esc(f.raw_text||'[empty]')}</div></div>
+    </div>
+  `);
+}
+
+// ── TIMING ────────────────────────────────────────────────────────
+async function loadTiming(resetPage = true) {
+  if (resetPage) state.timing.page = 0;
+  const ticker = document.getElementById('timing-ticker').value;
+  const offset = state.timing.page * PAGE_SIZE;
+  const params = new URLSearchParams({ ticker, limit: PAGE_SIZE, offset });
+  const data = await fetch(`/api/timing?${params}`).then(r => r.json());
+  document.getElementById('timing-count').textContent = `${data.total?.toLocaleString() || 0} total`;
+  updatePagination('timing', data.total || 0);
+  const tbody = document.getElementById('timing-body');
+  if (!data.timing?.length) {
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">◎</div><div class="empty-msg">No timing data</div></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = data.timing.map(r => {
+    const deltaMin = r.delta_seconds !== null && r.delta_seconds !== undefined ? (r.delta_seconds / 60).toFixed(2) : null;
+    return `<tr>
+      <td class="mono" style="font-size:10px;color:var(--text2)">${esc(r.post_id||'').substring(0,24)}…</td>
+      <td><span class="mono" style="color:var(--accent)">${r.ticker||'—'}</span></td>
+      <td>${platformBadge(r.platform)}</td>
+      <td class="mono" style="font-size:11px;color:var(--text2)">${esc(r.account_id)||'—'}</td>
+      <td class="mono" style="font-size:10px;color:var(--text2)">${ts(r.timestamp_utc)}</td>
+      <td class="mono">${r.delta_seconds!==null&&r.delta_seconds!==undefined?r.delta_seconds.toFixed(1):'<span style="color:var(--muted)">first</span>'}</td>
+      <td class="mono">${deltaMin!==null?deltaMin:'<span style="color:var(--muted)">—</span>'}</td>
+      <td>${r.is_first_mention?'<span class="badge badge-yes">YES</span>':'<span style="color:var(--muted);font-size:11px">No</span>'}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── TIME BINS ─────────────────────────────────────────────────────
+let maxBinCount = 1;
+async function loadBins() {
+  const ticker = document.getElementById('bins-ticker').value;
+  const params = new URLSearchParams({ ticker, limit: 500 });
+  const data = await fetch(`/api/time-bins?${params}`).then(r => r.json());
+  document.getElementById('bins-count').textContent = `${data.bins?.length || 0} bins`;
+  const bins = data.bins || [];
+  maxBinCount = Math.max(1, ...bins.map(b => b.post_count));
+  const tbody = document.getElementById('bins-body');
+  if (!bins.length) {
+    tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state"><div class="empty-icon">◎</div><div class="empty-msg">No time bin data</div></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = bins.map(b => `
+    <tr>
+      <td><span class="mono" style="color:var(--accent)">${b.ticker}</span></td>
+      <td class="mono" style="font-size:11px;color:var(--text2)">${ts(b.bin_start_utc)}</td>
+      <td class="mono" style="color:var(--text)">${b.post_count}</td>
+      <td style="min-width:200px">${actBar(b.post_count, maxBinCount)}</td>
+    </tr>
+  `).join('');
+}
+
+// ── PERIODICITY ───────────────────────────────────────────────────
+async function loadPeriod(resetPage = true) {
+  if (resetPage) state.period.page = 0;
+  const ticker = document.getElementById('period-ticker').value;
+  const offset = state.period.page * PAGE_SIZE;
+  const params = new URLSearchParams({ ticker, limit: PAGE_SIZE, offset });
+  const data = await fetch(`/api/periodicity?${params}`).then(r => r.json());
+  document.getElementById('period-count').textContent = `${data.total?.toLocaleString() || 0} total`;
+  updatePagination('period', data.total || 0);
+  const tbody = document.getElementById('period-body');
+  if (!data.periodicity?.length) {
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">◎</div><div class="empty-msg">No periodicity data — run Phase 2 or scrape more data for a ticker.</div></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = data.periodicity.map(r => `
+    <tr>
+      <td><span class="mono" style="color:var(--accent)">${r.ticker}</span></td>
+      <td class="mono" style="font-size:10px;color:var(--text2)">${ts(r.window_start_utc)}</td>
+      <td class="mono" style="font-size:10px;color:var(--text2)">${ts(r.window_end_utc)}</td>
+      <td>${ksBar(r.ks_statistic)}</td>
+      <td class="mono" style="font-size:11px">${r.acf_peak_lag_minutes!==null&&r.acf_peak_lag_minutes!==undefined?r.acf_peak_lag_minutes.toFixed(1)+'m':'<span style="color:var(--muted)">—</span>'}</td>
+      <td>${acfBar(r.acf_peak_strength)}</td>
+      <td class="mono" style="font-size:11px">${r.dominant_frequency_minutes!==null&&r.dominant_frequency_minutes!==undefined?r.dominant_frequency_minutes.toFixed(1)+'m':'<span style="color:var(--muted)">—</span>'}</td>
+      <td class="mono" style="font-size:11px">${r.onset_dispersion_index!==null&&r.onset_dispersion_index!==undefined?r.onset_dispersion_index.toFixed(3):'<span style="color:var(--muted)">—</span>'}</td>
+    </tr>
+  `).join('');
+}
+
+// ── Modal ─────────────────────────────────────────────────────────
+function openModal(title, body) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = body;
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// ── Scraper Actions ───────────────────────────────────────────────
+async function runScraper() {
+  const btn = event.currentTarget;
+  btn.textContent = 'Running…';
+  btn.disabled = true;
+  try {
+    await fetch('/api/run-scraper', { method: 'POST' });
+    await loadStats();
+    loadRaw();
+  } finally {
+    btn.textContent = 'Run Scrapers';
+    btn.disabled = false;
+  }
+}
+async function runPhase2() {
+  const btn = event.currentTarget;
+  btn.textContent = 'Running…';
+  btn.disabled = true;
+  try {
+    await fetch('/api/run-phase2', { method: 'POST' });
+    await loadStats();
+    if (activeTab === 'text')   loadText();
+    if (activeTab === 'timing') loadTiming();
+    if (activeTab === 'bins')   loadBins();
+    if (activeTab === 'period') loadPeriod();
+  } finally {
+    btn.textContent = 'Run Phase 2';
+    btn.disabled = false;
+  }
+}
+
+// ── Boot ──────────────────────────────────────────────────────────
+(async () => {
+  await loadStats();
+  loadRaw();
+})();
+</script>
+</body>
+</html>
