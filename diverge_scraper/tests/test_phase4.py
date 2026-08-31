@@ -91,6 +91,31 @@ class TestPhase4IntegrityScoring(unittest.TestCase):
         self.assertEqual(res_small["confidence_flag"], "insufficient_data")
         self.assertEqual(res_small["coordination_score"], 0.0)
 
+    def test_news_event_dampening(self):
+        # High onset dispersion due to news event should yield a lower score than un-dampened onset
+        res_normal = coordination_score.calculate_coordination_score(
+            ks_stat=0.20,
+            acf_strength=0.20,
+            onset_dispersion=0.95,  # high onset spike
+            duplicate_ratio=0.0,
+            sentiment_var=0.20,
+            total_posts=50,
+            news_event_present=False,
+        )
+        res_dampened = coordination_score.calculate_coordination_score(
+            ks_stat=0.20,
+            acf_strength=0.20,
+            onset_dispersion=0.95,  # high onset spike
+            duplicate_ratio=0.0,
+            sentiment_var=0.20,
+            total_posts=50,
+            news_event_present=True,  # News event present -> onset dampened
+        )
+
+        # Dampened score should be lower than normal score when onset is high
+        self.assertLess(res_dampened["coordination_score"], res_normal["coordination_score"])
+
 
 if __name__ == "__main__":
     unittest.main()
+
