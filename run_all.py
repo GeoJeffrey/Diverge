@@ -148,7 +148,8 @@ def print_master_summary(db_path: Path):
     print(f"  duplicate_pairs          {all_table_counts.get('duplicate_pairs', 0):>8,} rows")
     print(f"  reasoning_trace          {all_table_counts.get('reasoning_trace', 0):>8,} rows")
     print(f"  narrative_phylogeny      {all_table_counts.get('narrative_phylogeny', 0):>8,} rows")
-    print("=" * 70 + "\n")
+    print("=" * 70)
+    print("\nData pipeline complete. Run python run_server.py to view results.\n")
 
 
 if __name__ == "__main__":

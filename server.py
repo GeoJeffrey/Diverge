@@ -119,6 +119,44 @@ class DivergeDashboardHandler(BaseHTTPRequestHandler):
             })
             return
 
+        # ── Phase 7 Mode API Endpoints ────────────────────────────
+        if path.startswith("/api/simple/"):
+            parts = [p for p in path.split("/") if p]
+            # /api/simple/<ticker>/<window_start_utc>
+            if len(parts) >= 4:
+                t = parts[2]
+                w = unquote("/".join(parts[3:]))
+                from diverge_scraper import mode_api
+                status, data = mode_api.handle_get_simple(t, w, db_path=DB_PATH)
+                self.send_json(data, status=status)
+                return
+
+        if path.startswith("/api/advanced/"):
+            parts = [p for p in path.split("/") if p]
+            # /api/advanced/<ticker>/<window_start_utc>
+            if len(parts) >= 4:
+                t = parts[2]
+                w = unquote("/".join(parts[3:]))
+                from diverge_scraper import mode_api
+                status, data = mode_api.handle_get_advanced(t, w, db_path=DB_PATH)
+                self.send_json(data, status=status)
+                return
+
+        if path == "/api/tickers":
+            from diverge_scraper import mode_api
+            status, data = mode_api.handle_get_tickers(db_path=DB_PATH)
+            self.send_json(data, status=status)
+            return
+
+        if path.startswith("/api/phylogeny/"):
+            parts = [p for p in path.split("/") if p]
+            if len(parts) >= 3:
+                t = parts[2]
+                from diverge_scraper import mode_api
+                status, data = mode_api.handle_get_phylogeny(t, db_path=DB_PATH)
+                self.send_json(data, status=status)
+                return
+
         # ── /api/reasoning-trace (Phase 6 Audit Trail) ────────
         if path.startswith("/api/reasoning-trace"):
             query_params = parse_qs(parsed.query)
