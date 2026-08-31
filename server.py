@@ -105,7 +105,36 @@ class DivergeDashboardHandler(BaseHTTPRequestHandler):
                     "index_values": safe_count("index_values"),
                     "consumer_sentiment": safe_count("consumer_sentiment"),
                 },
+                "phase4": {
+                    "coordination_scores": safe_count("coordination_scores"),
+                },
+                "phase5": {
+                    "ticker_window_metrics": safe_count("ticker_window_metrics"),
+                },
             })
+            return
+
+        # ── /api/composite-metrics ──────────────────────────────
+        if path.startswith("/api/composite-metrics"):
+            query_params = parse_qs(parsed.query)
+            ticker_filter = query_params.get("ticker", [None])[0]
+
+            conn = sqlite3.connect(DB_PATH)
+            conn.row_factory = sqlite3.Row
+            query = "SELECT * FROM ticker_window_metrics WHERE 1=1"
+            params = []
+            if ticker_filter and ticker_filter.upper() != "ALL":
+                query += " AND ticker = ?"
+                params.append(ticker_filter.upper())
+            query += " ORDER BY ticker ASC, window_start_utc DESC LIMIT 200"
+
+            try:
+                rows = conn.execute(query, params).fetchall()
+                data = [dict(r) for r in rows]
+            except Exception as e:
+                data = []
+            conn.close()
+            self.send_json({"metrics": data})
             return
 
         # ── /api/posts (raw_posts + joined text_features) ──────
@@ -313,8 +342,15 @@ class DivergeDashboardHandler(BaseHTTPRequestHandler):
         elif self.path == "/api/run-phase3":
             try:
                 import run_phase3
-                inserted = run_phase3.run()
-                self.send_json({"status": "success", "message": "Phase 3 indices computed.", "index_rows": inserted})
+                inserted = run_phase3.run(db_path=DB_PATH)
+                self.send_json({"status": "success", "message": f"Phase 3 completed ({inserted} index_values rows)."})
+            except Exception as e:
+                self.send_json({"status": "error", "message": str(e)}, status=500)
+        elif self.path == "/api/run-phase5":
+            try:
+                import run_phase5
+                inserted = run_phase5.run(db_path=DB_PATH)
+                self.send_json({"status": "success", "message": f"Phase 5 completed ({inserted} ticker_window_metrics rows)."})
             except Exception as e:
                 self.send_json({"status": "error", "message": str(e)}, status=500)
         else:

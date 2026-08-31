@@ -173,6 +173,7 @@ tr:hover td{background:rgba(79,142,247,.04)}
   </div>
   <div class="header-right">
     <div class="db-status">DB: <span id="total-rows">—</span> raw posts</div>
+    <button class="run-btn secondary" onclick="runPhase5()">Run Phase 5</button>
     <button class="run-btn secondary" onclick="runPhase3()">Run Phase 3</button>
     <button class="run-btn secondary" onclick="runPhase2()">Run Phase 2</button>
     <button class="run-btn" onclick="runScraper()">Run Scrapers</button>
@@ -211,6 +212,11 @@ tr:hover td{background:rgba(79,142,247,.04)}
     <div class="stat-value" id="s-indices" style="color:var(--green)">—</div>
     <div class="stat-sub">Computed values</div>
   </div>
+  <div class="stat-card purple">
+    <div class="stat-label">Phase 5 Composite</div>
+    <div class="stat-value" id="s-composite" style="color:var(--purple)">—</div>
+    <div class="stat-sub">Aggregated windows</div>
+  </div>
   <div class="stat-card">
     <div class="stat-label">Bullish</div>
     <div class="stat-value" style="color:var(--green)" id="s-bull">—</div>
@@ -232,12 +238,13 @@ tr:hover td{background:rgba(79,142,247,.04)}
 
 <!-- Tabs -->
 <div class="tabs-bar">
-  <button class="tab-btn active" id="tab-raw"      onclick="switchTab('raw')">Raw Posts</button>
-  <button class="tab-btn"        id="tab-text"     onclick="switchTab('text')">Text Features</button>
-  <button class="tab-btn"        id="tab-timing"   onclick="switchTab('timing')">Timing</button>
-  <button class="tab-btn"        id="tab-bins"     onclick="switchTab('bins')">Time Bins</button>
-  <button class="tab-btn"        id="tab-period"   onclick="switchTab('period')">Periodicity</button>
-  <button class="tab-btn"        id="tab-indices"  onclick="switchTab('indices')">Phase 3: Financial Indices</button>
+  <button class="tab-btn active" id="tab-raw"       onclick="switchTab('raw')">Raw Posts</button>
+  <button class="tab-btn"        id="tab-text"      onclick="switchTab('text')">Text Features</button>
+  <button class="tab-btn"        id="tab-timing"    onclick="switchTab('timing')">Timing</button>
+  <button class="tab-btn"        id="tab-bins"      onclick="switchTab('bins')">Time Bins</button>
+  <button class="tab-btn"        id="tab-period"    onclick="switchTab('period')">Periodicity</button>
+  <button class="tab-btn"        id="tab-indices"   onclick="switchTab('indices')">Phase 3: Financial Indices</button>
+  <button class="tab-btn"        id="tab-composite" onclick="switchTab('composite')">Phase 5: Composite Metrics</button>
 </div>
 
 <!-- ═══════════════════════════════════════════ TAB: RAW POSTS -->
@@ -398,6 +405,32 @@ tr:hover td{background:rgba(79,142,247,.04)}
         <th>Computed At</th>
       </tr></thead>
       <tbody id="indices-body"><tr><td colspan="8"><div class="loading"><div class="spinner"></div><br>Loading Phase 3 indices...</div></td></tr></tbody>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ TAB: PHASE 5 COMPOSITE METRICS -->
+<div class="tab-pane" id="pane-composite">
+  <div class="toolbar">
+    <select class="filter-select" id="composite-ticker" onchange="loadCompositeMetrics()"><option value="ALL">All Tickers</option></select>
+    <button class="run-btn secondary" onclick="loadCompositeMetrics()">Refresh Metrics</button>
+    <span class="count-badge" id="composite-count"></span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr>
+        <th>Ticker</th>
+        <th>Composite Score</th>
+        <th>Dominant Index</th>
+        <th>Risk Flags</th>
+        <th>Trust Flag</th>
+        <th>Rn</th>
+        <th>CIRG</th>
+        <th>CLI</th>
+        <th>CASSI</th>
+        <th>VDI</th>
+        <th>Window Start</th>
+      </tr></thead>
+      <tbody id="composite-body"><tr><td colspan="11"><div class="loading"><div class="spinner"></div><br>Loading Phase 5 composite metrics...</div></td></tr></tbody>
     </table>
   </div>
 </div>
@@ -483,6 +516,7 @@ async function loadStats() {
   document.getElementById('s-bins').textContent   = (r.phase2?.ticker_time_bins || 0).toLocaleString();
   document.getElementById('s-period').textContent = (r.phase2?.periodicity_stats || 0).toLocaleString();
   document.getElementById('s-indices').textContent = (r.phase3?.index_values || 0).toLocaleString();
+  document.getElementById('s-composite').textContent = (r.phase5?.ticker_window_metrics || 0).toLocaleString();
 
   const sd = r.phase2?.sentiment_distribution || {};
   document.getElementById('s-bull').textContent = (sd.bullish || 0).toLocaleString();
@@ -505,7 +539,7 @@ async function loadStats() {
 
   // Populate ticker selects
   const tickers = r.tickers || [];
-  ['raw-ticker','text-ticker','timing-ticker','bins-ticker','period-ticker','indices-ticker'].forEach(id => {
+  ['raw-ticker','text-ticker','timing-ticker','bins-ticker','period-ticker','indices-ticker','composite-ticker'].forEach(id => {
     const sel = document.getElementById(id);
     if (!sel) return;
     const cur = sel.value;
@@ -522,7 +556,7 @@ function switchTab(tab) {
   document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
   document.getElementById('tab-' + tab).classList.add('active');
   document.getElementById('pane-' + tab).classList.add('active');
-  const loaders = { raw: loadRaw, text: loadText, timing: loadTiming, bins: loadBins, period: loadPeriod, indices: loadIndices };
+  const loaders = { raw: loadRaw, text: loadText, timing: loadTiming, bins: loadBins, period: loadPeriod, indices: loadIndices, composite: loadCompositeMetrics };
   if (loaders[tab]) loaders[tab]();
 }
 
@@ -779,6 +813,51 @@ async function loadIndices() {
   }).join('');
 }
 
+// ── COMPOSITE METRICS (PHASE 5) ──────────────────────────────────
+async function loadCompositeMetrics() {
+  const ticker = document.getElementById('composite-ticker').value;
+  const params = new URLSearchParams({ ticker });
+  const data = await fetch(`/api/composite-metrics?${params}`).then(r => r.json());
+  document.getElementById('composite-count').textContent = `${data.metrics?.length || 0} rows`;
+  const tbody = document.getElementById('composite-body');
+  if (!data.metrics?.length) {
+    tbody.innerHTML = `<tr><td colspan="11"><div class="empty-state"><div class="empty-icon">◎</div><div class="empty-msg">No composite metrics found — click "Run Phase 5" to aggregate metrics.</div></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = data.metrics.map(r => {
+    const compStr = r.composite_score !== null && r.composite_score !== undefined
+      ? `<span class="mono" style="font-size:14px;font-weight:700;color:${r.composite_score >= 50 ? 'var(--green)' : 'var(--red)'}">${r.composite_score.toFixed(1)}</span>`
+      : '<span class="badge badge-neutral">NULL (Insufficient Data)</span>';
+
+    const domStr = `<span class="badge badge-bullish">${esc(r.dominant_index)}</span>`;
+    const flagsList = JSON.parse(r.risk_flags || '[]');
+    const flagsStr = flagsList.length ? flagsList.map(f => `<span class="badge badge-bearish">${esc(f)}</span>`).join(' ') : '<span style="color:var(--text2)">None</span>';
+
+    const trustBadge = r.confidence_flag === 'high_trust'
+      ? '<span class="badge badge-bullish">high_trust</span>'
+      : r.confidence_flag === 'moderate'
+      ? '<span class="badge badge-neutral">moderate</span>'
+      : r.confidence_flag === 'low_trust'
+      ? '<span class="badge badge-bearish">low_trust</span>'
+      : '<span class="badge badge-neutral">insufficient_data</span>';
+
+    return `
+    <tr>
+      <td><span class="mono" style="color:var(--accent);font-weight:700">${r.ticker}</span></td>
+      <td>${compStr}</td>
+      <td>${domStr}</td>
+      <td>${flagsStr}</td>
+      <td>${trustBadge}</td>
+      <td class="mono">${r.rn !== null && r.rn !== undefined ? r.rn.toFixed(2) : '—'}</td>
+      <td class="mono">${r.cirg !== null && r.cirg !== undefined ? r.cirg.toFixed(2) : '—'}</td>
+      <td class="mono">${r.cli !== null && r.cli !== undefined ? r.cli.toFixed(4) : '—'}</td>
+      <td class="mono">${r.cassi !== null && r.cassi !== undefined ? r.cassi.toFixed(2) : '—'}</td>
+      <td class="mono">${r.vdi !== null && r.vdi !== undefined ? r.vdi.toFixed(2) : '—'}</td>
+      <td class="mono" style="font-size:10px;color:var(--text2)">${ts(r.window_start_utc)}</td>
+    </tr>`;
+  }).join('');
+}
+
 // ── Scraper Actions ───────────────────────────────────────────────
 async function runScraper() {
   const btn = event.currentTarget;
@@ -805,6 +884,7 @@ async function runPhase2() {
     if (activeTab === 'bins')   loadBins();
     if (activeTab === 'period') loadPeriod();
     if (activeTab === 'indices') loadIndices();
+    if (activeTab === 'composite') loadCompositeMetrics();
   } finally {
     btn.textContent = 'Run Phase 2';
     btn.disabled = false;
@@ -818,8 +898,22 @@ async function runPhase3() {
     await fetch('/api/run-phase3', { method: 'POST' });
     await loadStats();
     if (activeTab === 'indices') loadIndices();
+    if (activeTab === 'composite') loadCompositeMetrics();
   } finally {
     btn.textContent = 'Run Phase 3';
+    btn.disabled = false;
+  }
+}
+async function runPhase5() {
+  const btn = event.currentTarget;
+  btn.textContent = 'Running…';
+  btn.disabled = true;
+  try {
+    await fetch('/api/run-phase5', { method: 'POST' });
+    await loadStats();
+    if (activeTab === 'composite') loadCompositeMetrics();
+  } finally {
+    btn.textContent = 'Run Phase 5';
     btn.disabled = false;
   }
 }

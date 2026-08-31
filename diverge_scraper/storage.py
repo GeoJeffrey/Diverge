@@ -124,6 +124,29 @@ CREATE TABLE IF NOT EXISTS coordination_scores (
 
 CREATE INDEX IF NOT EXISTS idx_coord_ticker_time
     ON coordination_scores (ticker, window_start_utc);
+
+CREATE TABLE IF NOT EXISTS ticker_window_metrics (
+    ticker                 TEXT NOT NULL,
+    window_start_utc       TEXT NOT NULL,
+    window_end_utc         TEXT,
+    rn                     REAL,
+    rn_confidence          REAL,
+    cirg                   REAL,
+    cli                    REAL,
+    cassi                  REAL,
+    vdi                    REAL,
+    coordination_score     REAL,
+    confidence_flag        TEXT,
+    composite_score        REAL,       -- 0-100, nullable
+    dominant_index         TEXT,       -- 'rn' / 'cassi' / 'vdi' / 'insufficient_data'
+    risk_flags             TEXT,       -- JSON array string, e.g. '["hype_outrunning_reality"]'
+    aggregation_confidence TEXT,       -- mirrors confidence_flag post-dampening
+    computed_at            TEXT NOT NULL,
+    PRIMARY KEY (ticker, window_start_utc)
+);
+
+CREATE INDEX IF NOT EXISTS idx_twm_ticker_time
+    ON ticker_window_metrics (ticker, window_start_utc);
 """
 
 
@@ -574,7 +597,7 @@ def get_post_timing_for_ticker(
 
 
 def count_all_tables(db_path: Path = config.DB_PATH) -> Dict[str, int]:
-    """Return dictionary of row counts for all Phase 1, Phase 2, Phase 3, and Phase 4 tables."""
+    """Return dictionary of row counts for all Phase 1-5 tables."""
     conn = get_connection(db_path)
     tables = [
         "raw_posts",
@@ -585,6 +608,7 @@ def count_all_tables(db_path: Path = config.DB_PATH) -> Dict[str, int]:
         "consumer_sentiment",
         "index_values",
         "coordination_scores",
+        "ticker_window_metrics",
     ]
     counts = {}
     for t in tables:
@@ -692,9 +716,6 @@ def get_text_and_posts_for_window(
     query += " ORDER BY rp.timestamp_utc ASC"
     rows = conn.execute(query, params).fetchall()
     conn.close()
-    return [dict(r) for r in rows]
-
-
 def check_news_event_in_window(
     ticker: str,
     start_utc: str,
@@ -714,5 +735,98 @@ def check_news_event_in_window(
     count = conn.execute(query, (ticker.upper(), start_utc, end_utc)).fetchone()[0]
     conn.close()
     return count > 0
+
+
+# --- Phase 5 Storage & Query Functions ---
+
+def insert_ticker_window_metrics(rows: List[Dict[str, Any]], db_path: Path = config.DB_PATH) -> int:
+    """Insert or replace rows in ticker_window_metrics table."""
+    if not rows:
+        return 0
+    conn = get_connection(db_path)
+    before = conn.execute("SELECT COUNT(*) FROM ticker_window_metrics").fetchone()[0]
+    now_iso = datetime.now(timezone.utc).isoformat()
+    with conn:
+        for r in rows:
+            conn.execute(
+                """
+                INSERT OR REPLACE INTO ticker_window_metrics
+                    (ticker, window_start_utc, window_end_utc, rn, rn_confidence, cirg, cli, cassi, vdi,
+                     coordination_score, confidence_flag, composite_score, dominant_index, risk_flags,
+                     aggregation_confidence, computed_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    r["ticker"],
+                    r["window_start_utc"],
+                    r.get("window_end_utc"),
+                    r.get("rn"),
+                    r.get("rn_confidence"),
+                    r.get("cirg"),
+                    r.get("cli"),
+                    r.get("cassi"),
+                    r.get("vdi"),
+                    r.get("coordination_score"),
+                    r.get("confidence_flag"),
+                    r.get("composite_score"),
+                    r.get("dominant_index", "insufficient_data"),
+                    r.get("risk_flags", "[]"),
+                    r.get("aggregation_confidence", "insufficient_data"),
+                    r.get("computed_at", now_iso),
+                ),
+            )
+    after = conn.execute("SELECT COUNT(*) FROM ticker_window_metrics").fetchone()[0]
+    conn.close()
+    return after - before
+
+
+def get_index_values_and_coordination_for_window(
+    ticker: Optional[str] = None,
+    start_utc: Optional[str] = None,
+    end_utc: Optional[str] = None,
+    db_path: Path = config.DB_PATH,
+) -> List[Dict[str, Any]]:
+    """
+    Join index_values and coordination_scores on (ticker, window_start_utc).
+    Returns a list of dicts with all raw inputs needed for Phase 5 composite aggregation.
+    """
+    conn = get_connection(db_path)
+    conn.row_factory = sqlite3.Row
+
+    # Outer join approach to get all windows present in index_values OR coordination_scores
+    query = """
+        SELECT
+            COALESCE(iv.ticker, cs.ticker) AS ticker,
+            COALESCE(iv.window_start_utc, cs.window_start_utc) AS window_start_utc,
+            COALESCE(iv.window_end_utc, cs.window_end_utc) AS window_end_utc,
+            iv.rn,
+            iv.rn_confidence,
+            iv.cirg,
+            iv.cli,
+            iv.cassi,
+            iv.vdi,
+            cs.coordination_score,
+            cs.confidence_flag
+        FROM index_values iv
+        LEFT JOIN coordination_scores cs
+               ON iv.ticker = cs.ticker AND iv.window_start_utc = cs.window_start_utc
+        WHERE 1=1
+    """
+    params: List[Any] = []
+    if ticker and ticker.upper() != "ALL":
+        query += " AND COALESCE(iv.ticker, cs.ticker) = ?"
+        params.append(ticker.upper())
+    if start_utc:
+        query += " AND COALESCE(iv.window_start_utc, cs.window_start_utc) >= ?"
+        params.append(start_utc)
+    if end_utc:
+        query += " AND COALESCE(iv.window_end_utc, cs.window_end_utc) <= ?"
+        params.append(end_utc)
+    query += " ORDER BY ticker ASC, window_start_utc ASC"
+
+    rows = conn.execute(query, params).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
 
 
