@@ -14,7 +14,15 @@ This module gathers financial discussions, news, search trends, and social media
 pip install -r requirements.txt
 ```
 
-### 2. Execute End-to-End Master Pipeline (Phase 1 + 2 + 3)
+### 2. (Optional) Seed 60 Days of Historical Data
+
+To immediately populate 60 days of historical data for comprehensive offline testing of all 5 indices across all tickers and languages:
+
+```bash
+python seed_historical_data.py
+```
+
+### 3. Execute End-to-End Master Pipeline (Phase 1 + 2 + 3)
 
 Run the full end-to-end data ingestion, feature extraction, and financial indices pipeline in one command:
 
@@ -28,7 +36,7 @@ To run Phase 2 + Phase 3 feature processing against existing database data witho
 python run_all.py --skip-scrape
 ```
 
-### 3. Run Individual Phase Modules
+### 4. Run Individual Phase Modules
 
 - **Phase 1 Data Collection**:
   ```bash
@@ -43,7 +51,7 @@ python run_all.py --skip-scrape
   python run_phase3.py
   ```
 
-### 4. Launch the Web Dashboard Server
+### 5. Launch the Web Dashboard Server
 
 Start the local dashboard server and REST API:
 
@@ -51,7 +59,7 @@ Start the local dashboard server and REST API:
 python server.py [--port 8000]
 ```
 
-Open **[http://localhost:8000](http://localhost:8000)** in your browser to view live stats, platform breakdown, sentiment distribution, and trigger pipeline executions on-demand.
+Open **[http://localhost:8000](http://localhost:8000)** in your browser to view live stats, platform breakdown, sentiment distribution, and Phase 3 indices.
 
 ---
 
@@ -76,7 +84,9 @@ Diverge/
 ├── run_all.py                       # Master orchestrator (Phase 1 -> 2 -> 3)
 ├── run_phase3.py                    # Phase 3 financial indices orchestrator
 ├── run_phase2.py                    # Phase 2 feature extraction orchestrator
+├── seed_historical_data.py          # 60-day historical data seeder script
 ├── main.py                          # Phase 1 scraper orchestrator
+├── check_distribution.py            # Phase 1 & 2 data distribution verification script
 ├── diverge_raw.db                   # SQLite database
 ├── requirements.txt                 # Project python dependencies
 ├── README.md                        # Documentation
