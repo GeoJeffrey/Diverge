@@ -69,8 +69,8 @@ def compute_cassi_from_dataframe(df_sentiment: pd.DataFrame, max_lags: int = 2) 
 
         fevd = fitted_model.fevd(periods=5)
         # fevd.decomp is shape (steps, n_eq, n_eq)
-        # fevd.decomp[-1, i, j] is the proportion of variance of variable i explained by shock in variable j at step 5
-        last_decomp = fevd.decomp[-1]
+        step_idx = min(4, fevd.decomp.shape[0] - 1)
+        last_decomp = fevd.decomp[step_idx]
 
         for idx, col in enumerate(non_zero_cols):
             own_var = last_decomp[idx, idx]
