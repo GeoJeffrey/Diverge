@@ -79,6 +79,33 @@ CREATE TABLE IF NOT EXISTS periodicity_stats (
     onset_dispersion_index     REAL,            -- variance-to-mean ratio of first-mentions
     PRIMARY KEY (ticker, window_start_utc)
 );
+
+CREATE TABLE IF NOT EXISTS index_values (
+    ticker           TEXT NOT NULL,
+    window_start_utc TEXT NOT NULL,
+    window_end_utc   TEXT,
+    rn               REAL,
+    rn_confidence    REAL,
+    cirg             REAL,
+    cli              REAL,
+    cassi            REAL,
+    vdi              REAL,
+    computed_at      TEXT NOT NULL,
+    PRIMARY KEY (ticker, window_start_utc)
+);
+
+CREATE TABLE IF NOT EXISTS consumer_sentiment (
+    id                     TEXT PRIMARY KEY,
+    ticker                 TEXT NOT NULL,
+    timestamp_utc          TEXT NOT NULL,
+    review_sentiment_score REAL NOT NULL,
+    source                 TEXT NOT NULL,
+    raw_text               TEXT,
+    created_at             TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_consumer_ticker_time
+    ON consumer_sentiment (ticker, timestamp_utc);
 """
 
 
@@ -325,3 +352,228 @@ def count_phase2_tables(db_path: Path = config.DB_PATH) -> Dict[str, int]:
         counts[t] = c
     conn.close()
     return counts
+
+
+# --- Phase 3 Storage & Query Functions ---
+
+def insert_index_values(rows: List[Dict[str, Any]], db_path: Path = config.DB_PATH) -> int:
+    """
+    Insert or replace rows in index_values table.
+    Values get recomputed as data grows.
+    """
+    if not rows:
+        return 0
+    conn = get_connection(db_path)
+    before = conn.execute("SELECT COUNT(*) FROM index_values").fetchone()[0]
+    now_iso = datetime.now(timezone.utc).isoformat()
+    with conn:
+        for r in rows:
+            conn.execute(
+                """
+                INSERT OR REPLACE INTO index_values
+                    (ticker, window_start_utc, window_end_utc, rn, rn_confidence,
+                     cirg, cli, cassi, vdi, computed_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    r["ticker"],
+                    r["window_start_utc"],
+                    r.get("window_end_utc"),
+                    r.get("rn"),
+                    r.get("rn_confidence"),
+                    r.get("cirg"),
+                    r.get("cli"),
+                    r.get("cassi"),
+                    r.get("vdi"),
+                    r.get("computed_at", now_iso),
+                ),
+            )
+    after = conn.execute("SELECT COUNT(*) FROM index_values").fetchone()[0]
+    conn.close()
+    return after - before
+
+
+def insert_consumer_sentiment(rows: List[Dict[str, Any]], db_path: Path = config.DB_PATH) -> int:
+    """Insert rows into consumer_sentiment using INSERT OR IGNORE."""
+    if not rows:
+        return 0
+    conn = get_connection(db_path)
+    before = conn.execute("SELECT COUNT(*) FROM consumer_sentiment").fetchone()[0]
+    now_iso = datetime.now(timezone.utc).isoformat()
+    with conn:
+        for r in rows:
+            conn.execute(
+                """
+                INSERT OR IGNORE INTO consumer_sentiment
+                    (id, ticker, timestamp_utc, review_sentiment_score, source, raw_text, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    r["id"],
+                    r["ticker"],
+                    r["timestamp_utc"],
+                    r["review_sentiment_score"],
+                    r.get("source", "unknown"),
+                    r.get("raw_text", ""),
+                    r.get("created_at", now_iso),
+                ),
+            )
+    after = conn.execute("SELECT COUNT(*) FROM consumer_sentiment").fetchone()[0]
+    conn.close()
+    return after - before
+
+
+def get_text_features_for_window(
+    ticker: str,
+    start_utc: str = None,
+    end_utc: str = None,
+    db_path: Path = config.DB_PATH,
+) -> List[Dict[str, Any]]:
+    """
+    Fetch text_features joined with raw_posts for a given ticker and optional time window.
+    Returns list of dicts with: post_id, ticker, timestamp_utc, sentiment_score,
+    irony_adjusted_sentiment, capitulation_flag, language, etc.
+    """
+    conn = get_connection(db_path)
+    conn.row_factory = sqlite3.Row
+    query = """
+        SELECT tf.post_id, rp.ticker, rp.timestamp_utc, tf.sentiment_score,
+               tf.irony_adjusted_sentiment, tf.capitulation_flag, tf.language,
+               tf.is_sarcastic, tf.conviction_hedge_ratio
+        FROM text_features tf
+        JOIN raw_posts rp ON tf.post_id = rp.post_id
+        WHERE 1=1
+    """
+    params: List[Any] = []
+    if ticker and ticker.upper() != "ALL":
+        query += " AND rp.ticker = ?"
+        params.append(ticker.upper())
+    if start_utc:
+        query += " AND rp.timestamp_utc >= ?"
+        params.append(start_utc)
+    if end_utc:
+        query += " AND rp.timestamp_utc <= ?"
+        params.append(end_utc)
+
+    query += " ORDER BY rp.timestamp_utc ASC"
+    rows = conn.execute(query, params).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def get_multi_ticker_sentiment_series(
+    tickers: List[str] = None,
+    start_utc: str = None,
+    end_utc: str = None,
+    db_path: Path = config.DB_PATH,
+) -> Dict[str, List[Tuple[str, float]]]:
+    """
+    Pull daily average sentiment per ticker for specified tickers within optional time window.
+    Returns dictionary mapping ticker -> list of (date_str 'YYYY-MM-DD', avg_sentiment_score).
+    """
+    conn = get_connection(db_path)
+    query = """
+        SELECT rp.ticker,
+               SUBSTR(rp.timestamp_utc, 1, 10) as post_date,
+               AVG(COALESCE(tf.irony_adjusted_sentiment, tf.sentiment_score)) as avg_sentiment
+        FROM text_features tf
+        JOIN raw_posts rp ON tf.post_id = rp.post_id
+        WHERE 1=1
+    """
+    params: List[Any] = []
+    if tickers:
+        placeholders = ",".join("?" for _ in tickers)
+        query += f" AND rp.ticker IN ({placeholders})"
+        params.extend([t.upper() for t in tickers])
+    if start_utc:
+        query += " AND rp.timestamp_utc >= ?"
+        params.append(start_utc)
+    if end_utc:
+        query += " AND rp.timestamp_utc <= ?"
+        params.append(end_utc)
+
+    query += " GROUP BY rp.ticker, post_date ORDER BY post_date ASC"
+    rows = conn.execute(query, params).fetchall()
+    conn.close()
+
+    result: Dict[str, List[Tuple[str, float]]] = {}
+    for t, date_str, avg_sent in rows:
+        if t not in result:
+            result[t] = []
+        result[t].append((date_str, float(avg_sent) if avg_sent is not None else 0.0))
+    return result
+
+
+def get_consumer_sentiment_for_ticker(
+    ticker: str,
+    start_utc: str = None,
+    end_utc: str = None,
+    db_path: Path = config.DB_PATH,
+) -> List[Dict[str, Any]]:
+    """Fetch consumer_sentiment records for a ticker within an optional window."""
+    conn = get_connection(db_path)
+    conn.row_factory = sqlite3.Row
+    query = "SELECT * FROM consumer_sentiment WHERE ticker = ?"
+    params: List[Any] = [ticker.upper()]
+    if start_utc:
+        query += " AND timestamp_utc >= ?"
+        params.append(start_utc)
+    if end_utc:
+        query += " AND timestamp_utc <= ?"
+        params.append(end_utc)
+    query += " ORDER BY timestamp_utc ASC"
+    rows = conn.execute(query, params).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def get_post_timing_for_ticker(
+    ticker: str,
+    start_utc: str = None,
+    end_utc: str = None,
+    db_path: Path = config.DB_PATH,
+) -> List[Dict[str, Any]]:
+    """Fetch post_timing rows joined with raw_posts account_id for a ticker."""
+    conn = get_connection(db_path)
+    conn.row_factory = sqlite3.Row
+    query = """
+        SELECT pt.post_id, pt.ticker, pt.timestamp_utc, pt.delta_seconds, pt.is_first_mention, rp.account_id
+        FROM post_timing pt
+        JOIN raw_posts rp ON pt.post_id = rp.post_id
+        WHERE pt.ticker = ?
+    """
+    params: List[Any] = [ticker.upper()]
+    if start_utc:
+        query += " AND pt.timestamp_utc >= ?"
+        params.append(start_utc)
+    if end_utc:
+        query += " AND pt.timestamp_utc <= ?"
+        params.append(end_utc)
+    query += " ORDER BY pt.timestamp_utc ASC"
+    rows = conn.execute(query, params).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def count_all_tables(db_path: Path = config.DB_PATH) -> Dict[str, int]:
+    """Return dictionary of row counts for all Phase 1, Phase 2, and Phase 3 tables."""
+    conn = get_connection(db_path)
+    tables = [
+        "raw_posts",
+        "post_timing",
+        "ticker_time_bins",
+        "text_features",
+        "periodicity_stats",
+        "consumer_sentiment",
+        "index_values",
+    ]
+    counts = {}
+    for t in tables:
+        try:
+            c = conn.execute(f"SELECT COUNT(*) FROM {t}").fetchone()[0]
+            counts[t] = c
+        except Exception:
+            counts[t] = 0
+    conn.close()
+    return counts
+
