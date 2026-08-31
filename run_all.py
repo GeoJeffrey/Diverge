@@ -17,12 +17,10 @@ import argparse
 import sys
 from pathlib import Path
 
-# Ensure package root is importable
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-
-import run_phase2
-import run_phase3
-from diverge_scraper import config, main as phase1_main, storage, utils
+from diverge.features import run_phase2
+from diverge.indices import run_phase3
+from diverge import config, storage, utils
+from diverge.scrapers import run_phase1 as phase1_main
 
 logger = utils.setup_logger("run_all_master")
 
@@ -37,12 +35,12 @@ def main():
     args = parser.parse_args()
 
     logger.info("=" * 70)
-    logger.info("DIVERGE MASTER PIPELINE — END-TO-END EXECUTION")
+    logger.info("DIVERGE MASTER PIPELINE â€” END-TO-END EXECUTION")
     logger.info("=" * 70)
 
     db_path = config.DB_PATH
 
-    # ── Phase 1: Data Collection Scrapers ────────────────────
+    # â”€â”€ Phase 1: Data Collection Scrapers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if getattr(args, "skip_scrape", False):
         logger.info("[PHASE 1] --skip-scrape flag set. Skipping live scrapers execution.")
     else:
@@ -62,7 +60,7 @@ def main():
     else:
         logger.info(f"Database contains {total_raw} raw posts across {len(raw_count)} platforms.")
 
-    # ── Phase 2: Feature Extraction ───────────────────────────
+    # â”€â”€ Phase 2: Feature Extraction â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     logger.info("--- [PHASE 2] Executing Feature Extraction Pipeline ---")
     try:
         run_phase2.main()
@@ -75,7 +73,7 @@ def main():
     if phase2_counts.get("text_features", 0) == 0 and phase2_counts.get("post_timing", 0) == 0:
         logger.warning("WARNING: Phase 2 tables (text_features/post_timing) are empty. Phase 3 indices will return NULL.")
 
-    # ── Phase 3: Financial Indices ────────────────────────────
+    # â”€â”€ Phase 3: Financial Indices â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     logger.info("--- [PHASE 3] Executing Financial Indices Pipeline ---")
     try:
         run_phase3.run(db_path=db_path)
@@ -83,41 +81,41 @@ def main():
     except Exception as e:
         logger.error(f"[PHASE 3 FAILED]: {e}")
 
-    # ── Phase 4: Integrity & Coordination Scoring ───────────
+    # â”€â”€ Phase 4: Integrity & Coordination Scoring â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     logger.info("--- [PHASE 4] Executing Integrity & Coordination Scoring Pipeline ---")
     try:
-        import run_phase4
+        from diverge.integrity import run_phase4
         run_phase4.run(db_path=db_path)
         logger.info("[PHASE 4] Integrity & coordination scoring pipeline complete.")
     except Exception as e:
         logger.error(f"[PHASE 4 FAILED]: {e}")
 
-    # ── Phase 5: Composite Aggregation Pipeline ─────────────
+    # â”€â”€ Phase 5: Composite Aggregation Pipeline â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     logger.info("--- [PHASE 5] Executing Composite Aggregation Pipeline ---")
     try:
-        import run_phase5
+        from diverge.aggregation import run_phase5
         run_phase5.run(db_path=db_path)
         logger.info("[PHASE 5] Composite aggregation pipeline complete.")
     except Exception as e:
         logger.error(f"[PHASE 5 FAILED]: {e}")
 
-    # ── Phase 6: Explainability & Narrative Lineage Pipeline 
+    # â”€â”€ Phase 6: Explainability & Narrative Lineage Pipeline 
     logger.info("--- [PHASE 6] Executing Explainability & Narrative Lineage Pipeline ---")
     try:
-        import run_phase6
+        from diverge.explainability import run_phase6
         run_phase6.run(db_path=db_path)
         logger.info("[PHASE 6] Explainability & narrative lineage pipeline complete.")
     except Exception as e:
         logger.error(f"[PHASE 6 FAILED]: {e}")
 
-    # ── Final Combined Summary Report ─────────────────────────
+    # â”€â”€ Final Combined Summary Report â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     print_master_summary(db_path)
 
 
 def print_master_summary(db_path: Path):
     """Print single unified summary report across all 6 phases."""
     print("\n" + "=" * 70)
-    print("DIVERGE MASTER PIPELINE — COMBINED SUMMARY REPORT")
+    print("DIVERGE MASTER PIPELINE â€” COMBINED SUMMARY REPORT")
     print("=" * 70)
 
     # 1. Phase 1 Summary
@@ -154,3 +152,4 @@ def print_master_summary(db_path: Path):
 
 if __name__ == "__main__":
     main()
+

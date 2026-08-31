@@ -1,4 +1,4 @@
-# Diverge — Financial Narrative Sentiment, Timing, Indices, Integrity & Lineage Pipeline
+﻿# Diverge â€” Financial Narrative Sentiment, Timing, Indices, Integrity & Lineage Pipeline
 
 A zero-API, zero-auth financial narrative sentiment data collection, feature extraction, index calculation, integrity/coordination scoring, composite aggregation, explainability audit trail, and real-time dashboard framework for **Diverge**.
 
@@ -6,7 +6,7 @@ This module gathers financial discussions, news, search trends, and social media
 
 ---
 
-## 🚀 Quick Start & Usage
+## ðŸš€ Quick Start & Usage
 
 ### 1. Install Dependencies
 
@@ -75,7 +75,7 @@ Open **[http://localhost:8000](http://localhost:8000)** in your browser to view 
 
 ---
 
-## 🔍 Phase 6 Explainability & Lineage Engine
+## ðŸ” Phase 6 Explainability & Lineage Engine
 
 Phase 6 produces a complete **post-level audit trail** (`reasoning_trace`) and **narrative evolution lineage tree** (`narrative_phylogeny`) for every aggregated metric window:
 
@@ -95,61 +95,61 @@ Phase 6 produces a complete **post-level audit trail** (`reasoning_trace`) and *
 
 ---
 
-## 🏗️ Project Structure
+## ðŸ—ï¸ Project Structure
 
 ```
 Diverge/
-├── dashboard.html                  # Multi-tab interactive web dashboard (HTML/JS/CSS)
-├── server.py                        # HTTP dashboard server & REST API endpoints
-├── run_all.py                       # Master orchestrator (Phase 1 -> 2 -> 3 -> 4 -> 5 -> 6)
-├── run_phase6.py                    # Phase 6 explainability orchestrator
-├── run_phase5.py                    # Phase 5 composite aggregation orchestrator
-├── run_phase4.py                    # Phase 4 integrity scoring orchestrator
-├── run_phase3.py                    # Phase 3 financial indices orchestrator
-├── run_phase2.py                    # Phase 2 feature extraction orchestrator
-├── seed_historical_data.py          # 60-day historical data seeder script
-├── main.py                          # Phase 1 scraper orchestrator
-├── check_distribution.py            # Data distribution verification script
-├── diverge_raw.db                   # SQLite database
-├── requirements.txt                 # Project python dependencies
-├── README.md                        # Documentation
-└── diverge_scraper/                 # Core package
-    ├── config.py                    # Central configuration
-    ├── utils.py                     # Shared helpers
-    ├── storage.py                   # SQLite storage layer & schema migrations
-    ├── reasoning_trace_builder.py   # Phase 6: Post-level audit trail builder
-    ├── phylogeny_builder.py         # Phase 6: Narrative evolution lineage builder
-    ├── render_prototype.py          # Phase 6: Data contract JSON structure builders
-    ├── aggregate_composite.py       # Phase 5: Composite aggregation engine
-    ├── duplicate_detection.py       # Phase 4: MinHash near-duplicate post & pairs detection
-    ├── sentiment_variance.py        # Phase 4: Sentiment variance & baseline normalization
-    ├── coordination_score.py        # Phase 4: Combined coordination score calculator
-    ├── reddit_noapi_scraper.py      # Reddit public JSON scraper
-    ├── stocktwits_noapi_scraper.py    # StockTwits public stream scraper
-    ├── telegram_noapi_scraper.py    # Telegram public HTML web preview scraper
-    ├── trends_scraper.py            # Google Trends scraper (pytrends)
-    ├── rss_news_scraper.py          # Financial RSS feed parser
-    ├── consumer_reviews_scraper.py  # Consumer reviews rating scraper
-    ├── timing_features.py           # Phase 2: Post interval & time-bin aggregator
-    ├── periodicity_analysis.py      # Phase 2: KS-test, ACF peak lag, FFT periodicity
-    ├── text_features.py             # Phase 2: Sentiment scoring, sarcasm & capitulation flags
-    ├── cli_index.py                 # Phase 3: Capitulation Leak Index
-    ├── vdi_index.py                 # Phase 3: Vernacular Divergence Index
-    ├── cassi_index.py               # Phase 3: Cross-Asset Sentiment Spillover Index
-    ├── rn_index.py                  # Phase 3: Effective Reproduction Number Index
-    ├── cirg_index.py                # Phase 3: Consumer-Investor Rating Gap Index
-    └── tests/
-        ├── test_scrapers.py         # Phase 1 offline unit tests
-        ├── test_phase2.py           # Phase 2 unit tests
-        ├── test_phase3.py           # Phase 3 unit tests
-        ├── test_phase4.py           # Phase 4 unit tests
-        ├── test_phase5.py           # Phase 5 unit tests
-        └── test_phase6.py           # Phase 6 unit tests
+â”œâ”€â”€ dashboard.html                  # Multi-tab interactive web dashboard (HTML/JS/CSS)
+â”œâ”€â”€ server.py                        # HTTP dashboard server & REST API endpoints
+â”œâ”€â”€ run_all.py                       # Master orchestrator (Phase 1 -> 2 -> 3 -> 4 -> 5 -> 6)
+â”œâ”€â”€ run_phase6.py                    # Phase 6 explainability orchestrator
+â”œâ”€â”€ run_phase5.py                    # Phase 5 composite aggregation orchestrator
+â”œâ”€â”€ run_phase4.py                    # Phase 4 integrity scoring orchestrator
+â”œâ”€â”€ run_phase3.py                    # Phase 3 financial indices orchestrator
+â”œâ”€â”€ run_phase2.py                    # Phase 2 feature extraction orchestrator
+â”œâ”€â”€ seed_historical_data.py          # 60-day historical data seeder script
+â”œâ”€â”€ main.py                          # Phase 1 scraper orchestrator
+â”œâ”€â”€ check_distribution.py            # Data distribution verification script
+â”œâ”€â”€ diverge_raw.db                   # SQLite database
+â”œâ”€â”€ requirements.txt                 # Project python dependencies
+â”œâ”€â”€ README.md                        # Documentation
+â””â”€â”€ src/diverge/                 # Core package
+    â”œâ”€â”€ config.py                    # Central configuration
+    â”œâ”€â”€ utils.py                     # Shared helpers
+    â”œâ”€â”€ storage.py                   # SQLite storage layer & schema migrations
+    â”œâ”€â”€ reasoning_trace_builder.py   # Phase 6: Post-level audit trail builder
+    â”œâ”€â”€ phylogeny_builder.py         # Phase 6: Narrative evolution lineage builder
+    â”œâ”€â”€ render_prototype.py          # Phase 6: Data contract JSON structure builders
+    â”œâ”€â”€ aggregate_composite.py       # Phase 5: Composite aggregation engine
+    â”œâ”€â”€ duplicate_detection.py       # Phase 4: MinHash near-duplicate post & pairs detection
+    â”œâ”€â”€ sentiment_variance.py        # Phase 4: Sentiment variance & baseline normalization
+    â”œâ”€â”€ coordination_score.py        # Phase 4: Combined coordination score calculator
+    â”œâ”€â”€ reddit_noapi_scraper.py      # Reddit public JSON scraper
+    â”œâ”€â”€ stocktwits_noapi_scraper.py    # StockTwits public stream scraper
+    â”œâ”€â”€ telegram_noapi_scraper.py    # Telegram public HTML web preview scraper
+    â”œâ”€â”€ trends_scraper.py            # Google Trends scraper (pytrends)
+    â”œâ”€â”€ rss_news_scraper.py          # Financial RSS feed parser
+    â”œâ”€â”€ consumer_reviews_scraper.py  # Consumer reviews rating scraper
+    â”œâ”€â”€ timing_features.py           # Phase 2: Post interval & time-bin aggregator
+    â”œâ”€â”€ periodicity_analysis.py      # Phase 2: KS-test, ACF peak lag, FFT periodicity
+    â”œâ”€â”€ text_features.py             # Phase 2: Sentiment scoring, sarcasm & capitulation flags
+    â”œâ”€â”€ cli_index.py                 # Phase 3: Capitulation Leak Index
+    â”œâ”€â”€ vdi_index.py                 # Phase 3: Vernacular Divergence Index
+    â”œâ”€â”€ cassi_index.py               # Phase 3: Cross-Asset Sentiment Spillover Index
+    â”œâ”€â”€ rn_index.py                  # Phase 3: Effective Reproduction Number Index
+    â”œâ”€â”€ cirg_index.py                # Phase 3: Consumer-Investor Rating Gap Index
+    â””â”€â”€ tests/
+        â”œâ”€â”€ test_scrapers.py         # Phase 1 offline unit tests
+        â”œâ”€â”€ test_phase2.py           # Phase 2 unit tests
+        â”œâ”€â”€ test_phase3.py           # Phase 3 unit tests
+        â”œâ”€â”€ test_phase4.py           # Phase 4 unit tests
+        â”œâ”€â”€ test_phase5.py           # Phase 5 unit tests
+        â””â”€â”€ test_phase6.py           # Phase 6 unit tests
 ```
 
 ---
 
-## 📊 Database Schema
+## ðŸ“Š Database Schema
 
 All scrapers, feature engines, index calculators, integrity scorers, composite aggregators, and explainability builders write into a single SQLite database (`diverge_raw.db`):
 
@@ -170,10 +170,11 @@ All scrapers, feature engines, index calculators, integrity scorers, composite a
 
 ---
 
-## 🧪 Running Offline Unit Tests
+## ðŸ§ª Running Offline Unit Tests
 
 To run the complete 60-test suite without making external network requests:
 
 ```bash
-python -m unittest discover -s diverge_scraper/tests
+python -m unittest discover -s src/diverge/tests
 ```
+

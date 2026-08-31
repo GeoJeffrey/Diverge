@@ -1,0 +1,75 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diverge — Advanced Output Mode</title>
+  <meta name="description" content="Full Phase 3–6 diagnostic view with index breakdown, coordination scores, and reasoning trace audit.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/ui/styles.css">
+</head>
+<body data-page="advanced">
+  <div class="header">
+    <div>
+      <h1 id="title-ticker" style="font-family:'JetBrains Mono',monospace;color:var(--accent)">Diverge — Advanced Mode</h1>
+      <div class="sub" id="title-sub">Loading detailed index &amp; trace diagnostics…</div>
+    </div>
+    <div style="display:flex;gap:12px">
+      <a href="/ui/simple.html" class="nav-btn">← Back to Simple Mode Cards</a>
+      <a href="/dashboard.html" class="nav-btn">Main Dashboard</a>
+    </div>
+  </div>
+
+  <div class="grid-top">
+    <!-- Indices Breakdown -->
+    <div class="box">
+      <div class="box-title">Phase 3 Raw Financial Indices Breakdown</div>
+      <div class="indices-grid" id="indices-grid">
+        <div class="idx-card"><div class="idx-label">Rn (Virality)</div><div class="idx-val" id="val-rn">—</div></div>
+        <div class="idx-card"><div class="idx-label">CIRG (Rating)</div><div class="idx-val" id="val-cirg">—</div></div>
+        <div class="idx-card"><div class="idx-label">CLI (Capitulation)</div><div class="idx-val" id="val-cli">—</div></div>
+        <div class="idx-card"><div class="idx-label">CASSI (VAR)</div><div class="idx-val" id="val-cassi">—</div></div>
+        <div class="idx-card"><div class="idx-label">VDI (Divergence)</div><div class="idx-val" id="val-vdi">—</div></div>
+      </div>
+    </div>
+
+    <!-- Coordination & Trust -->
+    <div class="box">
+      <div class="box-title">Phase 4 Coordination &amp; Integrity</div>
+      <div style="font-size:28px;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--accent);margin-bottom:8px" id="val-coord">—</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:12px" id="val-trust">Trust Flag: —</div>
+      <div id="risk-flags-container"></div>
+    </div>
+  </div>
+
+  <!-- Recent Narrative Phylogeny History Strip -->
+  <div class="box" style="margin-bottom:24px">
+    <div class="box-title">Recent Narrative Phylogeny History (Last 3 Transitions)</div>
+    <div id="phylo-strip" style="display:flex;gap:12px;align-items:center">
+      <div style="color:var(--text2);font-size:13px">Loading narrative lineage strip…</div>
+    </div>
+  </div>
+
+  <!-- Reasoning Trace Audit Panel (Phase 6) -->
+  <div class="box">
+    <div class="box-title">Phase 6 Reasoning-Trace Audit Panel (Post-Level Traces)</div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:180px">Contributed To</th>
+          <th style="width:90px">Weight</th>
+          <th style="width:110px">Platform</th>
+          <th>Raw Post Preview (Truncated ~140 chars)</th>
+        </tr>
+      </thead>
+      <tbody id="traces-body">
+        <tr><td colspan="4" style="color:var(--text2)">Loading reasoning trace rows…</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script src="/ui/app.js"></script>
+</body>
+</html>

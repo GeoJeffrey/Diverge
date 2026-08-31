@@ -1,4 +1,4 @@
-"""
+﻿"""
 server.py
 
 Diverge Phase 1 + Phase 2 Web Dashboard Server.
@@ -12,11 +12,12 @@ import argparse
 import json
 import sqlite3
 import urllib.parse
+from urllib.parse import parse_qs, unquote
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 
-from diverge_scraper import config, storage
-from diverge_scraper.main import run_pipeline
+from diverge import config, storage
+from diverge.scrapers.run_phase1 import run_pipeline
 
 BASE_DIR = Path(__file__).parent
 DB_PATH = config.DB_PATH
@@ -45,11 +46,22 @@ class DivergeDashboardHandler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
     def do_GET(self):
+        try:
+            self._handle_get()
+        except Exception as exc:
+            import traceback
+            traceback.print_exc()
+            try:
+                self.send_json({"error": f"Internal server error: {exc}"}, status=500)
+            except Exception:
+                pass
+
+    def _handle_get(self):
         parsed_url = urllib.parse.urlparse(self.path)
         path = parsed_url.path
         params = urllib.parse.parse_qs(parsed_url.query)
 
-        # ── Serve HTML ─────────────────────────────────────────
+        # Ã¢â€â‚¬Ã¢â€â‚¬ Serve HTML & Static Files Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
         if path in ("/", "/dashboard.html"):
             if HTML_FILE.exists():
                 with open(HTML_FILE, "r", encoding="utf-8") as f:
@@ -58,7 +70,28 @@ class DivergeDashboardHandler(BaseHTTPRequestHandler):
                 self.send_html("<h1>dashboard.html missing</h1>", status=404)
             return
 
-        # ── /api/stats ─────────────────────────────────────────
+        if path.startswith("/ui/"):
+            file_path = BASE_DIR / path.lstrip("/")
+            if file_path.exists() and file_path.is_file():
+                content_type = "text/html"
+                if file_path.suffix == ".css":
+                    content_type = "text/css"
+                elif file_path.suffix == ".js":
+                    content_type = "application/javascript"
+                with open(file_path, "rb") as f:
+                    content = f.read()
+                self.send_response(200)
+                self.send_header("Content-Type", f"{content_type}; charset=utf-8")
+                self.send_header("Content-Length", str(len(content)))
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                self.wfile.write(content)
+                return
+            else:
+                self.send_html("<h1>Static file not found</h1>", status=404)
+                return
+
+        # Ã¢â€â‚¬Ã¢â€â‚¬ /api/stats Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
         if path == "/api/stats":
             conn = sqlite3.connect(DB_PATH)
             storage.get_connection(DB_PATH)  # ensure tables exist
@@ -119,66 +152,73 @@ class DivergeDashboardHandler(BaseHTTPRequestHandler):
             })
             return
 
-        # ── Phase 7 Mode API Endpoints ────────────────────────────
-        if path.startswith("/api/simple/"):
-            parts = [p for p in path.split("/") if p]
-            # /api/simple/<ticker>/<window_start_utc>
-            if len(parts) >= 4:
-                t = parts[2]
-                w = unquote("/".join(parts[3:]))
-                from diverge_scraper import mode_api
-                status, data = mode_api.handle_get_simple(t, w, db_path=DB_PATH)
-                self.send_json(data, status=status)
+        # Ã¢â€â‚¬Ã¢â€â‚¬ Phase 7 Mode API Endpoints Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+        # /api/simple?ticker=INFY&window=2026-06-02T...
+        if path == "/api/simple":
+            qp = parse_qs(parsed_url.query)
+            t = qp.get("ticker", [""])[0]
+            w = qp.get("window", [""])[0]
+            if not t or not w:
+                self.send_json({"error": "ticker and window query params required"}, status=400)
                 return
+            from diverge.output import mode_api
+            status, data = mode_api.handle_get_simple(t, w, db_path=DB_PATH)
+            self.send_json(data, status=status)
+            return
 
-        if path.startswith("/api/advanced/"):
-            parts = [p for p in path.split("/") if p]
-            # /api/advanced/<ticker>/<window_start_utc>
-            if len(parts) >= 4:
-                t = parts[2]
-                w = unquote("/".join(parts[3:]))
-                from diverge_scraper import mode_api
-                status, data = mode_api.handle_get_advanced(t, w, db_path=DB_PATH)
-                self.send_json(data, status=status)
+        # /api/advanced?ticker=INFY&window=2026-06-02T...
+        if path == "/api/advanced":
+            qp = parse_qs(parsed_url.query)
+            t = qp.get("ticker", [""])[0]
+            w = qp.get("window", [""])[0]
+            if not t or not w:
+                self.send_json({"error": "ticker and window query params required"}, status=400)
                 return
+            from diverge.output import mode_api
+            status, data = mode_api.handle_get_advanced(t, w, db_path=DB_PATH)
+            self.send_json(data, status=status)
+            return
 
         if path == "/api/tickers":
-            from diverge_scraper import mode_api
+            from diverge.output import mode_api
             status, data = mode_api.handle_get_tickers(db_path=DB_PATH)
             self.send_json(data, status=status)
             return
 
-        if path.startswith("/api/phylogeny/"):
-            parts = [p for p in path.split("/") if p]
-            if len(parts) >= 3:
-                t = parts[2]
-                from diverge_scraper import mode_api
-                status, data = mode_api.handle_get_phylogeny(t, db_path=DB_PATH)
-                self.send_json(data, status=status)
+        # /api/phylogeny?ticker=INFY
+        if path == "/api/phylogeny":
+            qp = parse_qs(parsed_url.query)
+            t = qp.get("ticker", [""])[0]
+            if not t:
+                self.send_json({"error": "ticker query param required"}, status=400)
                 return
+            from diverge.output import mode_api
+            status, data = mode_api.handle_get_phylogeny(t, db_path=DB_PATH)
+            self.send_json(data, status=status)
+            return
 
-        # ── /api/reasoning-trace (Phase 6 Audit Trail) ────────
+        # Ã¢â€â‚¬Ã¢â€â‚¬ /api/reasoning-trace (Phase 6 Audit Trail) Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
         if path.startswith("/api/reasoning-trace"):
-            query_params = parse_qs(parsed.query)
+            query_params = parse_qs(parsed_url.query)
             ticker = query_params.get("ticker", [""])[0]
             wstart = query_params.get("window_start", [""])[0]
-            from diverge_scraper import render_prototype
+            from diverge.explainability import render_prototype
             panel_data = render_prototype.reasoning_trace_panel(ticker, wstart, db_path=DB_PATH)
             self.send_json(panel_data)
             return
 
-        # ── /api/narrative-phylogeny (Phase 6 Narrative Lineage) ─
+        # Ã¢â€â‚¬Ã¢â€â‚¬ /api/narrative-phylogeny (Phase 6 Narrative Lineage) Ã¢â€â‚¬
         if path.startswith("/api/narrative-phylogeny"):
-            query_params = parse_qs(parsed.query)
+            query_params = parse_qs(parsed_url.query)
             ticker = query_params.get("ticker", [""])[0]
-            from diverge_scraper import render_prototype
+            from diverge.explainability import render_prototype
             tree_data = render_prototype.narrative_phylogeny_tree(ticker, db_path=DB_PATH)
             self.send_json(tree_data)
             return
 
-        # ── /api/composite-metrics ──────────────────────────────
+        # Ã¢â€â‚¬Ã¢â€â‚¬ /api/composite-metrics Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
         if path.startswith("/api/composite-metrics"):
-            query_params = parse_qs(parsed.query)
+            query_params = parse_qs(parsed_url.query)
             ticker_filter = query_params.get("ticker", [None])[0]
 
             conn = sqlite3.connect(DB_PATH)
@@ -199,7 +239,7 @@ class DivergeDashboardHandler(BaseHTTPRequestHandler):
             self.send_json({"metrics": data})
             return
 
-        # ── /api/posts (raw_posts + joined text_features) ──────
+        # Ã¢â€â‚¬Ã¢â€â‚¬ /api/posts (raw_posts + joined text_features) Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
         if path == "/api/posts":
             ticker  = params.get("ticker",   [None])[0]
             platform = params.get("platform", [None])[0]
@@ -248,7 +288,7 @@ class DivergeDashboardHandler(BaseHTTPRequestHandler):
             self.send_json({"posts": [dict(r) for r in rows], "total": total_row, "count": len(rows)})
             return
 
-        # ── /api/text-features ─────────────────────────────────
+        # Ã¢â€â‚¬Ã¢â€â‚¬ /api/text-features Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
         if path == "/api/text-features":
             ticker   = params.get("ticker",    [None])[0]
             sentiment = params.get("sentiment", [None])[0]
@@ -287,7 +327,7 @@ class DivergeDashboardHandler(BaseHTTPRequestHandler):
             self.send_json({"features": [dict(r) for r in rows], "total": total_row, "count": len(rows)})
             return
 
-        # ── /api/timing ────────────────────────────────────────
+        # Ã¢â€â‚¬Ã¢â€â‚¬ /api/timing Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
         if path == "/api/timing":
             ticker = params.get("ticker", [None])[0]
             limit  = int(params.get("limit", [100])[0])
@@ -315,7 +355,7 @@ class DivergeDashboardHandler(BaseHTTPRequestHandler):
             self.send_json({"timing": [dict(r) for r in rows], "total": total_row})
             return
 
-        # ── /api/time-bins ─────────────────────────────────────
+        # Ã¢â€â‚¬Ã¢â€â‚¬ /api/time-bins Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
         if path == "/api/time-bins":
             ticker = params.get("ticker", [None])[0]
             limit  = int(params.get("limit", [200])[0])
@@ -334,7 +374,7 @@ class DivergeDashboardHandler(BaseHTTPRequestHandler):
             self.send_json({"bins": [dict(r) for r in rows]})
             return
 
-        # ── /api/periodicity ───────────────────────────────────
+        # Ã¢â€â‚¬Ã¢â€â‚¬ /api/periodicity Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
         if path == "/api/periodicity":
             ticker = params.get("ticker", [None])[0]
             limit  = int(params.get("limit", [100])[0])
@@ -360,7 +400,7 @@ class DivergeDashboardHandler(BaseHTTPRequestHandler):
             self.send_json({"periodicity": [dict(r) for r in rows], "total": total_row})
             return
 
-        # ── /api/index-values (Phase 3 Financial Indices) ─────
+        # Ã¢â€â‚¬Ã¢â€â‚¬ /api/index-values (Phase 3 Financial Indices) Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
         if path == "/api/index-values":
             ticker = params.get("ticker", [None])[0]
 
@@ -394,7 +434,7 @@ class DivergeDashboardHandler(BaseHTTPRequestHandler):
                 self.send_json({"status": "error", "message": str(e)}, status=500)
         elif self.path == "/api/run-phase2":
             try:
-                from diverge_scraper import timing_features, periodicity_analysis, text_features
+                from diverge.features import timing_features, periodicity_analysis, text_features
                 t = timing_features.run()
                 p = periodicity_analysis.run()
                 tf = text_features.run()
@@ -403,21 +443,21 @@ class DivergeDashboardHandler(BaseHTTPRequestHandler):
                 self.send_json({"status": "error", "message": str(e)}, status=500)
         elif self.path == "/api/run-phase3":
             try:
-                import run_phase3
+                from diverge.indices import run_phase3
                 inserted = run_phase3.run(db_path=DB_PATH)
                 self.send_json({"status": "success", "message": f"Phase 3 completed ({inserted} index_values rows)."})
             except Exception as e:
                 self.send_json({"status": "error", "message": str(e)}, status=500)
         elif self.path == "/api/run-phase5":
             try:
-                import run_phase5
+                from diverge.aggregation import run_phase5
                 inserted = run_phase5.run(db_path=DB_PATH)
                 self.send_json({"status": "success", "message": f"Phase 5 completed ({inserted} ticker_window_metrics rows)."})
             except Exception as e:
                 self.send_json({"status": "error", "message": str(e)}, status=500)
         elif self.path == "/api/run-phase6":
             try:
-                import run_phase6
+                from diverge.explainability import run_phase6
                 inserted = run_phase6.run(db_path=DB_PATH)
                 self.send_json({"status": "success", "message": f"Phase 6 completed ({inserted} reasoning_trace rows)."})
             except Exception as e:
@@ -429,7 +469,7 @@ class DivergeDashboardHandler(BaseHTTPRequestHandler):
 def run_server(port=8000):
     httpd = HTTPServer(("", port), DivergeDashboardHandler)
     print(f"=======================================================")
-    print(f"Diverge Phase 1+2 Dashboard  ->  http://localhost:{port}")
+    print(f"Diverge Dashboard  ->  http://localhost:{port}")
     print(f"=======================================================\n")
     try:
         httpd.serve_forever()
@@ -438,8 +478,13 @@ def run_server(port=8000):
         httpd.server_close()
 
 
+run = run_server
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--port", type=int, default=8000)
     args = parser.parse_args()
     run_server(port=args.port)
+
+

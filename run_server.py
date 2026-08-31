@@ -4,8 +4,8 @@ run_server.py
 Phase 7 Server Launcher for Diverge.
 Starts the HTTP server and API endpoints on port 8000, serving:
   - Main Dashboard (dashboard.html)
-  - Simple Mode Prototype (ui_prototype/simple.html)
-  - Advanced Mode Prototype (ui_prototype/advanced.html)
+  - Simple Mode Prototype (ui/simple.html)
+  - Advanced Mode Prototype (ui/advanced.html)
   - Phase 7 Mode API (/api/simple, /api/advanced, /api/tickers, /api/phylogeny)
 
 Usage:
@@ -22,3 +22,4 @@ import server
 
 if __name__ == "__main__":
     server.run(port=8000)
+

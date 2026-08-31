@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Diverge — Phase 1 + 2 Intelligence Dashboard</title>
+<title>Diverge â€” Phase 1 + 2 Intelligence Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 <style>
@@ -29,12 +29,12 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;min-height:100vh;overflow-x:hidden}
 
-/* ── Scrollbar ── */
+/* â”€â”€ Scrollbar â”€â”€ */
 ::-webkit-scrollbar{width:6px;height:6px}
 ::-webkit-scrollbar-track{background:var(--surface)}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 
-/* ── Header ── */
+/* â”€â”€ Header â”€â”€ */
 header{background:linear-gradient(135deg,#0d1526 0%,#111e38 100%);border-bottom:1px solid var(--border);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px)}
 .logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;letter-spacing:-.3px}
 .logo-dot{width:10px;height:10px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 0 10px var(--accent)}
@@ -46,7 +46,7 @@ header{background:linear-gradient(135deg,#0d1526 0%,#111e38 100%);border-bottom:
 .run-btn:active{transform:scale(.97)}
 .run-btn.secondary{background:var(--surface2);border:1px solid var(--border);color:var(--text)}
 
-/* ── Stats Strip ── */
+/* â”€â”€ Stats Strip â”€â”€ */
 .stats-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;padding:20px 28px}
 .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px;position:relative;overflow:hidden;transition:border-color .2s,transform .2s}
 .stat-card:hover{border-color:var(--accent);transform:translateY(-2px)}
@@ -59,17 +59,17 @@ header{background:linear-gradient(135deg,#0d1526 0%,#111e38 100%);border-bottom:
 .stat-card.purple::before{background:linear-gradient(90deg,var(--purple),var(--accent2))}
 .stat-card.yellow::before{background:linear-gradient(90deg,var(--yellow),var(--orange))}
 
-/* ── Tabs ── */
+/* â”€â”€ Tabs â”€â”€ */
 .tabs-bar{display:flex;gap:2px;padding:0 28px;border-bottom:1px solid var(--border);background:var(--surface);overflow-x:auto}
 .tab-btn{background:none;border:none;color:var(--text2);font-family:'Inter',sans-serif;font-size:13px;font-weight:500;padding:12px 18px;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:color .2s,border-color .2s}
 .tab-btn:hover{color:var(--text)}
 .tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
 
-/* ── Tab Panes ── */
+/* â”€â”€ Tab Panes â”€â”€ */
 .tab-pane{display:none;padding:20px 28px}
 .tab-pane.active{display:block}
 
-/* ── Toolbar ── */
+/* â”€â”€ Toolbar â”€â”€ */
 .toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px}
 .search-box{flex:1;min-width:200px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 14px;color:var(--text);font-size:13px;outline:none;transition:border-color .2s}
 .search-box:focus{border-color:var(--accent)}
@@ -81,7 +81,7 @@ header{background:linear-gradient(135deg,#0d1526 0%,#111e38 100%);border-bottom:
 .pill.active{background:var(--accent);border-color:var(--accent);color:#fff}
 .count-badge{font-size:11px;color:var(--text2);margin-left:auto;white-space:nowrap}
 
-/* ── Table ── */
+/* â”€â”€ Table â”€â”€ */
 .table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius-lg)}
 table{width:100%;border-collapse:collapse}
 thead{background:var(--surface2);position:sticky;top:0;z-index:2}
@@ -93,7 +93,7 @@ tr:hover td{background:rgba(79,142,247,.04)}
 .truncate{max-width:280px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
 .truncate:hover{white-space:normal;word-break:break-word;max-width:280px}
 
-/* ── Sentiment Badges ── */
+/* â”€â”€ Sentiment Badges â”€â”€ */
 .badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
 .badge-bullish{background:rgba(34,211,160,.15);color:var(--green)}
 .badge-bearish{background:rgba(247,95,95,.15);color:var(--red)}
@@ -103,13 +103,13 @@ tr:hover td{background:rgba(79,142,247,.04)}
 .badge-sarcasm{background:rgba(180,142,247,.15);color:var(--purple)}
 .badge-mixed{background:rgba(247,137,79,.15);color:var(--orange)}
 
-/* ── Score Bar ── */
+/* â”€â”€ Score Bar â”€â”€ */
 .score-bar{display:flex;align-items:center;gap:6px}
 .score-track{flex:1;height:4px;background:var(--surface2);border-radius:2px;overflow:hidden;min-width:60px}
 .score-fill{height:100%;border-radius:2px;transition:width .3s}
 .score-val{font-family:var(--mono);font-size:10px;min-width:36px;color:var(--text2)}
 
-/* ── Platform Tags ── */
+/* â”€â”€ Platform Tags â”€â”€ */
 .plat{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:6px;font-size:10px;font-weight:600}
 .plat-reddit{background:rgba(255,86,0,.12);color:#ff7a33}
 .plat-stocktwits{background:rgba(79,142,247,.12);color:#4f8ef7}
@@ -117,7 +117,7 @@ tr:hover td{background:rgba(79,142,247,.04)}
 .plat-google_trends{background:rgba(34,211,160,.12);color:#22d3a0}
 .plat-rss_news{background:rgba(247,201,72,.12);color:#f7c948}
 
-/* ── Pagination ── */
+/* â”€â”€ Pagination â”€â”€ */
 .pagination{display:flex;align-items:center;justify-content:space-between;margin-top:14px;flex-wrap:wrap;gap:8px}
 .page-info{font-size:12px;color:var(--text2)}
 .page-btns{display:flex;gap:6px}
@@ -125,7 +125,7 @@ tr:hover td{background:rgba(79,142,247,.04)}
 .page-btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
 .page-btn:disabled{opacity:.35;cursor:not-allowed}
 
-/* ── Detail Modal ── */
+/* â”€â”€ Detail Modal â”€â”€ */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
 .modal-overlay.open{display:flex}
 .modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);width:100%;max-width:780px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.5)}
@@ -140,20 +140,20 @@ tr:hover td{background:rgba(79,142,247,.04)}
 .field-label{font-size:10px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.6px}
 .field-value{font-family:var(--mono);font-size:12px;color:var(--text);background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;word-break:break-all;white-space:pre-wrap;line-height:1.5;max-height:180px;overflow-y:auto}
 
-/* ── Empty State ── */
+/* â”€â”€ Empty State â”€â”€ */
 .empty-state{text-align:center;padding:60px 20px;color:var(--text2)}
 .empty-icon{font-size:40px;margin-bottom:12px}
 .empty-msg{font-size:14px}
 
-/* ── Loading ── */
+/* â”€â”€ Loading â”€â”€ */
 .loading{text-align:center;padding:40px;color:var(--text2);font-size:13px}
 .spinner{display:inline-block;width:24px;height:24px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin-bottom:8px}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* ── Sentiment Mini Chart ── */
+/* â”€â”€ Sentiment Mini Chart â”€â”€ */
 .sent-chart{display:flex;height:8px;border-radius:4px;overflow:hidden;margin:8px 0}
 
-/* ── Responsive ── */
+/* â”€â”€ Responsive â”€â”€ */
 @media(max-width:768px){
   .stats-strip{grid-template-columns:repeat(2,1fr);padding:14px}
   .tab-pane{padding:14px}
@@ -172,6 +172,8 @@ tr:hover td{background:rgba(79,142,247,.04)}
     <span style="color:var(--text2);font-weight:400;font-size:14px">Intelligence</span>
   </div>
   <div class="header-right">
+    <a href="/ui/simple.html" class="run-btn secondary" style="text-decoration:none">Simple Mode</a>
+    <a href="/ui/advanced.html" class="run-btn secondary" style="text-decoration:none">Advanced Mode</a>
     <div class="db-status">DB: <span id="total-rows">—</span> raw posts</div>
     <button class="run-btn secondary" onclick="runPhase6()">Run Phase 6</button>
     <button class="run-btn secondary" onclick="runPhase5()">Run Phase 5</button>
@@ -185,48 +187,48 @@ tr:hover td{background:rgba(79,142,247,.04)}
 <div class="stats-strip" id="stats-strip">
   <div class="stat-card">
     <div class="stat-label">Raw Posts</div>
-    <div class="stat-value" id="s-raw">—</div>
+    <div class="stat-value" id="s-raw">â€”</div>
     <div class="stat-sub">Phase 1 collected</div>
   </div>
   <div class="stat-card green">
     <div class="stat-label">Text Features</div>
-    <div class="stat-value" id="s-text">—</div>
+    <div class="stat-value" id="s-text">â€”</div>
     <div class="stat-sub">FinBERT scored</div>
   </div>
   <div class="stat-card purple">
     <div class="stat-label">Timing Rows</div>
-    <div class="stat-value" id="s-timing">—</div>
+    <div class="stat-value" id="s-timing">â€”</div>
     <div class="stat-sub">Inter-arrival deltas</div>
   </div>
   <div class="stat-card yellow">
     <div class="stat-label">Time Bins</div>
-    <div class="stat-value" id="s-bins">—</div>
+    <div class="stat-value" id="s-bins">â€”</div>
     <div class="stat-sub">5-min buckets</div>
   </div>
   <div class="stat-card red">
     <div class="stat-label">Periodicity</div>
-    <div class="stat-value" id="s-period">—</div>
+    <div class="stat-value" id="s-period">â€”</div>
     <div class="stat-sub">KS/ACF windows</div>
   </div>
   <div class="stat-card green">
     <div class="stat-label">Phase 3 Indices</div>
-    <div class="stat-value" id="s-indices" style="color:var(--green)">—</div>
+    <div class="stat-value" id="s-indices" style="color:var(--green)">â€”</div>
     <div class="stat-sub">Computed values</div>
   </div>
   <div class="stat-card purple">
     <div class="stat-label">Phase 5 Composite</div>
-    <div class="stat-value" id="s-composite" style="color:var(--purple)">—</div>
+    <div class="stat-value" id="s-composite" style="color:var(--purple)">â€”</div>
     <div class="stat-sub">Aggregated windows</div>
   </div>
   <div class="stat-card yellow">
     <div class="stat-label">Phase 6 Traces</div>
-    <div class="stat-value" id="s-traces" style="color:var(--yellow)">—</div>
+    <div class="stat-value" id="s-traces" style="color:var(--yellow)">â€”</div>
     <div class="stat-sub">Audit trail rows</div>
   </div>
   <div class="stat-card">
     <div class="stat-label">Bullish</div>
-    <div class="stat-value" style="color:var(--green)" id="s-bull">—</div>
-    <div class="stat-sub" id="s-bear-sub">Bearish: —</div>
+    <div class="stat-value" style="color:var(--green)" id="s-bull">â€”</div>
+    <div class="stat-sub" id="s-bear-sub">Bearish: â€”</div>
   </div>
 </div>
 
@@ -249,7 +251,7 @@ tr:hover td{background:rgba(79,142,247,.04)}
   <button class="tab-btn"        id="tab-explain"      onclick="switchTab('explain')">Phase 6: Lineage & Audit</button>
 </div>
 
-<!-- ═══════════════════════════════════════════ TAB: RAW POSTS -->
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• TAB: RAW POSTS -->
 <div class="tab-pane active" id="pane-raw">
   <div class="toolbar">
     <input class="search-box" id="raw-search" placeholder="Search text, author, community..." oninput="debounce(loadRaw)" />
@@ -282,13 +284,13 @@ tr:hover td{background:rgba(79,142,247,.04)}
   <div class="pagination">
     <div class="page-info" id="raw-page-info"></div>
     <div class="page-btns">
-      <button class="page-btn" id="raw-prev" onclick="changePage('raw',-1)" disabled>← Prev</button>
-      <button class="page-btn" id="raw-next" onclick="changePage('raw',1)">Next →</button>
+      <button class="page-btn" id="raw-prev" onclick="changePage('raw',-1)" disabled>â† Prev</button>
+      <button class="page-btn" id="raw-next" onclick="changePage('raw',1)">Next â†’</button>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════ TAB: TEXT FEATURES -->
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• TAB: TEXT FEATURES -->
 <div class="tab-pane" id="pane-text">
   <div class="toolbar">
     <select class="filter-select" id="text-ticker" onchange="loadText()"><option value="ALL">All Tickers</option></select>
@@ -317,13 +319,13 @@ tr:hover td{background:rgba(79,142,247,.04)}
   <div class="pagination">
     <div class="page-info" id="text-page-info"></div>
     <div class="page-btns">
-      <button class="page-btn" id="text-prev" onclick="changePage('text',-1)" disabled>← Prev</button>
-      <button class="page-btn" id="text-next" onclick="changePage('text',1)">Next →</button>
+      <button class="page-btn" id="text-prev" onclick="changePage('text',-1)" disabled>â† Prev</button>
+      <button class="page-btn" id="text-next" onclick="changePage('text',1)">Next â†’</button>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════ TAB: TIMING -->
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• TAB: TIMING -->
 <div class="tab-pane" id="pane-timing">
   <div class="toolbar">
     <select class="filter-select" id="timing-ticker" onchange="loadTiming()"><option value="ALL">All Tickers</option></select>
@@ -341,13 +343,13 @@ tr:hover td{background:rgba(79,142,247,.04)}
   <div class="pagination">
     <div class="page-info" id="timing-page-info"></div>
     <div class="page-btns">
-      <button class="page-btn" id="timing-prev" onclick="changePage('timing',-1)" disabled>← Prev</button>
-      <button class="page-btn" id="timing-next" onclick="changePage('timing',1)">Next →</button>
+      <button class="page-btn" id="timing-prev" onclick="changePage('timing',-1)" disabled>â† Prev</button>
+      <button class="page-btn" id="timing-next" onclick="changePage('timing',1)">Next â†’</button>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════ TAB: TIME BINS -->
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• TAB: TIME BINS -->
 <div class="tab-pane" id="pane-bins">
   <div class="toolbar">
     <select class="filter-select" id="bins-ticker" onchange="loadBins()"><option value="ALL">All Tickers</option></select>
@@ -363,7 +365,7 @@ tr:hover td{background:rgba(79,142,247,.04)}
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════ TAB: PERIODICITY -->
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• TAB: PERIODICITY -->
 <div class="tab-pane" id="pane-period">
   <div class="toolbar">
     <select class="filter-select" id="period-ticker" onchange="loadPeriod()"><option value="ALL">All Tickers</option></select>
@@ -382,13 +384,13 @@ tr:hover td{background:rgba(79,142,247,.04)}
   <div class="pagination">
     <div class="page-info" id="period-page-info"></div>
     <div class="page-btns">
-      <button class="page-btn" id="period-prev" onclick="changePage('period',-1)" disabled>← Prev</button>
-      <button class="page-btn" id="period-next" onclick="changePage('period',1)">Next →</button>
+      <button class="page-btn" id="period-prev" onclick="changePage('period',-1)" disabled>â† Prev</button>
+      <button class="page-btn" id="period-next" onclick="changePage('period',1)">Next â†’</button>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════ TAB: FINANCIAL INDICES -->
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• TAB: FINANCIAL INDICES -->
 <div class="tab-pane" id="pane-indices">
   <div class="toolbar">
     <select class="filter-select" id="indices-ticker" onchange="loadIndices()"><option value="ALL">All Tickers</option></select>
@@ -410,7 +412,7 @@ tr:hover td{background:rgba(79,142,247,.04)}
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════ TAB: PHASE 5 COMPOSITE METRICS -->
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• TAB: PHASE 5 COMPOSITE METRICS -->
 <div class="tab-pane" id="pane-composite">
   <div class="toolbar">
     <select class="filter-select" id="composite-ticker" onchange="loadCompositeMetrics()"><option value="ALL">All Tickers</option></select>
@@ -436,7 +438,7 @@ tr:hover td{background:rgba(79,142,247,.04)}
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════ TAB: PHASE 6 LINEAGE & AUDIT -->
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• TAB: PHASE 6 LINEAGE & AUDIT -->
 <div class="tab-pane" id="pane-explain">
   <div class="toolbar">
     <select class="filter-select" id="explain-ticker" onchange="loadExplainability()"><option value="ALL">All Tickers</option></select>
@@ -468,19 +470,19 @@ tr:hover td{background:rgba(79,142,247,.04)}
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════ DETAIL MODAL -->
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• DETAIL MODAL -->
 <div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
   <div class="modal">
     <div class="modal-header">
       <div class="modal-title" id="modal-title">Record Detail</div>
-      <button class="modal-close" onclick="closeModal()">×</button>
+      <button class="modal-close" onclick="closeModal()">Ã—</button>
     </div>
     <div class="modal-body" id="modal-body"></div>
   </div>
 </div>
 
 <script>
-// ── State ────────────────────────────────────────────────────────
+// â”€â”€ State â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const PAGE_SIZE = 100;
 const state = {
   raw:    { page: 0, total: 0 },
@@ -491,13 +493,13 @@ const state = {
 let activeTab = 'raw';
 let debounceTimer = null;
 
-// ── Utilities ────────────────────────────────────────────────────
+// â”€â”€ Utilities â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function debounce(fn, ms = 350) {
   clearTimeout(debounceTimer);
   debounceTimer = setTimeout(() => fn(), ms);
 }
 function fmt(v, dp = 3) {
-  if (v === null || v === undefined) return '<span style="color:var(--muted)">—</span>';
+  if (v === null || v === undefined) return '<span style="color:var(--muted)">â€”</span>';
   return typeof v === 'number' ? v.toFixed(dp) : v;
 }
 function esc(s) {
@@ -505,7 +507,7 @@ function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 function ts(s) {
-  if (!s) return '—';
+  if (!s) return 'â€”';
   try { return new Date(s).toLocaleString('en-IN', { timeZone: 'UTC', hour12: false }); }
   catch { return s; }
 }
@@ -513,23 +515,23 @@ function platformBadge(p) {
   return `<span class="plat plat-${p}">${p}</span>`;
 }
 function sentBadge(l) {
-  if (!l) return '<span style="color:var(--muted)">—</span>';
+  if (!l) return '<span style="color:var(--muted)">â€”</span>';
   return `<span class="badge badge-${l}">${l}</span>`;
 }
 function scoreBar(v) {
-  if (v === null || v === undefined) return '<span style="color:var(--muted)">—</span>';
+  if (v === null || v === undefined) return '<span style="color:var(--muted)">â€”</span>';
   const pct = Math.abs(v) * 100;
   const color = v > 0.05 ? 'var(--green)' : v < -0.05 ? 'var(--red)' : 'var(--muted)';
   return `<div class="score-bar"><div class="score-track"><div class="score-fill" style="width:${pct}%;background:${color}"></div></div><span class="score-val">${v.toFixed(3)}</span></div>`;
 }
 function ksBar(v) {
-  if (v === null || v === undefined) return '<span style="color:var(--muted)">—</span>';
+  if (v === null || v === undefined) return '<span style="color:var(--muted)">â€”</span>';
   const pct = v * 100;
   const color = v > 0.5 ? 'var(--red)' : v > 0.2 ? 'var(--yellow)' : 'var(--green)';
   return `<div class="score-bar"><div class="score-track"><div class="score-fill" style="width:${pct}%;background:${color}"></div></div><span class="score-val">${v.toFixed(3)}</span></div>`;
 }
 function acfBar(v) {
-  if (v === null || v === undefined) return '<span style="color:var(--muted)">—</span>';
+  if (v === null || v === undefined) return '<span style="color:var(--muted)">â€”</span>';
   const pct = Math.min(v * 100, 100);
   const color = v > 0.5 ? 'var(--purple)' : 'var(--accent)';
   return `<div class="score-bar"><div class="score-track"><div class="score-fill" style="width:${pct}%;background:${color}"></div></div><span class="score-val">${v.toFixed(3)}</span></div>`;
@@ -539,11 +541,11 @@ function actBar(cnt, max) {
   return `<div class="score-bar"><div class="score-track" style="min-width:80px"><div class="score-fill" style="width:${pct}%;background:var(--accent)"></div></div><span class="score-val">${cnt}</span></div>`;
 }
 
-// ── Populate Ticker Dropdowns ─────────────────────────────────────
+// â”€â”€ Populate Ticker Dropdowns â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function loadStats() {
   const r = await fetch('/api/stats').then(r => r.json());
-  document.getElementById('total-rows').textContent = r.total_raw_posts?.toLocaleString() || '—';
-  document.getElementById('s-raw').textContent    = r.total_raw_posts?.toLocaleString() || '—';
+  document.getElementById('total-rows').textContent = r.total_raw_posts?.toLocaleString() || 'â€”';
+  document.getElementById('s-raw').textContent    = r.total_raw_posts?.toLocaleString() || 'â€”';
   document.getElementById('s-text').textContent   = (r.phase2?.text_features || 0).toLocaleString();
   document.getElementById('s-timing').textContent = (r.phase2?.post_timing || 0).toLocaleString();
   document.getElementById('s-bins').textContent   = (r.phase2?.ticker_time_bins || 0).toLocaleString();
@@ -565,9 +567,9 @@ async function loadStats() {
     <div style="width:${(sd.bearish||0)/total*100}%;background:var(--red)"></div>
   `;
   document.getElementById('sent-legend').innerHTML = `
-    <span style="font-size:11px;color:var(--green)">▮ Bullish ${sd.bullish||0}</span>
-    <span style="font-size:11px;color:var(--text2)">▮ Neutral ${sd.neutral||0}</span>
-    <span style="font-size:11px;color:var(--red)">▮ Bearish ${sd.bearish||0}</span>
+    <span style="font-size:11px;color:var(--green)">â–® Bullish ${sd.bullish||0}</span>
+    <span style="font-size:11px;color:var(--text2)">â–® Neutral ${sd.neutral||0}</span>
+    <span style="font-size:11px;color:var(--red)">â–® Bearish ${sd.bearish||0}</span>
   `;
 
   // Populate ticker selects
@@ -582,7 +584,7 @@ async function loadStats() {
   });
 }
 
-// ── Tab Switching ─────────────────────────────────────────────────
+// â”€â”€ Tab Switching â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function switchTab(tab) {
   activeTab = tab;
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -606,14 +608,14 @@ function updatePagination(tab, total) {
   const from = s.page * PAGE_SIZE + 1;
   const to   = Math.min((s.page + 1) * PAGE_SIZE, total);
   const info = document.getElementById(tab + '-page-info');
-  if (info) info.textContent = total > 0 ? `${from}–${to} of ${total.toLocaleString()}` : '0 rows';
+  if (info) info.textContent = total > 0 ? `${from}â€“${to} of ${total.toLocaleString()}` : '0 rows';
   const prev = document.getElementById(tab + '-prev');
   const next = document.getElementById(tab + '-next');
   if (prev) prev.disabled = s.page === 0;
   if (next) next.disabled = (s.page + 1) * PAGE_SIZE >= total;
 }
 
-// ── RAW POSTS ─────────────────────────────────────────────────────
+// â”€â”€ RAW POSTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function loadRaw(resetPage = true) {
   if (resetPage) state.raw.page = 0;
   const ticker   = document.getElementById('raw-ticker').value;
@@ -627,17 +629,17 @@ async function loadRaw(resetPage = true) {
   updatePagination('raw', data.total || 0);
   const tbody = document.getElementById('raw-body');
   if (!data.posts?.length) {
-    tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><div class="empty-icon">◎</div><div class="empty-msg">No posts found</div></div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><div class="empty-icon">â—Ž</div><div class="empty-msg">No posts found</div></div></td></tr>`;
     return;
   }
   tbody.innerHTML = data.posts.map(p => `
     <tr onclick="showRawDetail(${JSON.stringify(esc(JSON.stringify(p)))})" style="cursor:pointer">
       <td>${platformBadge(p.platform)}</td>
-      <td><span class="mono" style="color:var(--accent)">${p.ticker||'—'}</span></td>
+      <td><span class="mono" style="color:var(--accent)">${p.ticker||'â€”'}</span></td>
       <td>${sentBadge(p.sentiment_label)}</td>
-      <td>${p.sentiment_score !== null && p.sentiment_score !== undefined ? scoreBar(p.sentiment_score) : '<span style="color:var(--muted)">—</span>'}</td>
-      <td class="mono" style="color:var(--text2);font-size:11px">${esc(p.account_id)||'—'}</td>
-      <td style="color:var(--text2);font-size:11px">${esc(p.community)||'—'}</td>
+      <td>${p.sentiment_score !== null && p.sentiment_score !== undefined ? scoreBar(p.sentiment_score) : '<span style="color:var(--muted)">â€”</span>'}</td>
+      <td class="mono" style="color:var(--text2);font-size:11px">${esc(p.account_id)||'â€”'}</td>
+      <td style="color:var(--text2);font-size:11px">${esc(p.community)||'â€”'}</td>
       <td class="mono" style="font-size:10px;color:var(--text2)">${ts(p.timestamp_utc)}</td>
       <td class="mono" style="color:var(--text2)">${p.upvotes??0}</td>
       <td><div class="truncate" style="color:var(--text)">${esc(p.raw_text||'').substring(0,120)}</div></td>
@@ -647,28 +649,28 @@ async function loadRaw(resetPage = true) {
 
 function showRawDetail(escaped) {
   const p = JSON.parse(JSON.parse(escaped));
-  openModal('Raw Post — ' + (p.platform||'') + ' / ' + (p.ticker||''), `
+  openModal('Raw Post â€” ' + (p.platform||'') + ' / ' + (p.ticker||''), `
     <div class="field-grid">
       <div class="field"><div class="field-label">Post ID</div><div class="field-value">${esc(p.post_id)}</div></div>
       <div class="field"><div class="field-label">Platform</div><div class="field-value">${esc(p.platform)}</div></div>
       <div class="field"><div class="field-label">Ticker</div><div class="field-value">${esc(p.ticker)}</div></div>
       <div class="field"><div class="field-label">Account ID</div><div class="field-value">${esc(p.account_id)}</div></div>
-      <div class="field"><div class="field-label">Community</div><div class="field-value">${esc(p.community)||'—'}</div></div>
+      <div class="field"><div class="field-label">Community</div><div class="field-value">${esc(p.community)||'â€”'}</div></div>
       <div class="field"><div class="field-label">Timestamp UTC</div><div class="field-value">${esc(p.timestamp_utc)}</div></div>
       <div class="field"><div class="field-label">Upvotes</div><div class="field-value">${p.upvotes??0}</div></div>
       <div class="field"><div class="field-label">Scraped At</div><div class="field-value">${esc(p.scraped_at)}</div></div>
-      <div class="field"><div class="field-label">Sentiment</div><div class="field-value">${p.sentiment_label||'—'} (${p.sentiment_score!==null&&p.sentiment_score!==undefined?p.sentiment_score.toFixed(4):'—'})</div></div>
-      <div class="field"><div class="field-label">Irony-Adjusted Sentiment</div><div class="field-value">${p.irony_adjusted_sentiment!==null&&p.irony_adjusted_sentiment!==undefined?p.irony_adjusted_sentiment.toFixed(4):'—'}</div></div>
+      <div class="field"><div class="field-label">Sentiment</div><div class="field-value">${p.sentiment_label||'â€”'} (${p.sentiment_score!==null&&p.sentiment_score!==undefined?p.sentiment_score.toFixed(4):'â€”'})</div></div>
+      <div class="field"><div class="field-label">Irony-Adjusted Sentiment</div><div class="field-value">${p.irony_adjusted_sentiment!==null&&p.irony_adjusted_sentiment!==undefined?p.irony_adjusted_sentiment.toFixed(4):'â€”'}</div></div>
       <div class="field"><div class="field-label">Capitulation</div><div class="field-value">${p.capitulation_flag?'YES (conf: '+p.capitulation_confidence?.toFixed(3)+')':'No'}</div></div>
       <div class="field"><div class="field-label">Sarcasm</div><div class="field-value">${p.is_sarcastic?'YES':'No'}</div></div>
-      <div class="field"><div class="field-label">Conviction/Hedge Ratio</div><div class="field-value">${p.conviction_hedge_ratio!==null&&p.conviction_hedge_ratio!==undefined?p.conviction_hedge_ratio.toFixed(3):'—'}</div></div>
-      <div class="field"><div class="field-label">Language</div><div class="field-value">${esc(p.language)||'—'}</div></div>
+      <div class="field"><div class="field-label">Conviction/Hedge Ratio</div><div class="field-value">${p.conviction_hedge_ratio!==null&&p.conviction_hedge_ratio!==undefined?p.conviction_hedge_ratio.toFixed(3):'â€”'}</div></div>
+      <div class="field"><div class="field-label">Language</div><div class="field-value">${esc(p.language)||'â€”'}</div></div>
       <div class="field wide"><div class="field-label">Raw Text</div><div class="field-value">${esc(p.raw_text||'[empty]')}</div></div>
     </div>
   `);
 }
 
-// ── TEXT FEATURES ─────────────────────────────────────────────────
+// â”€â”€ TEXT FEATURES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function loadText(resetPage = true) {
   if (resetPage) state.text.page = 0;
   const ticker   = document.getElementById('text-ticker').value;
@@ -681,20 +683,20 @@ async function loadText(resetPage = true) {
   updatePagination('text', data.total || 0);
   const tbody = document.getElementById('text-body');
   if (!data.features?.length) {
-    tbody.innerHTML = `<tr><td colspan="11"><div class="empty-state"><div class="empty-icon">◎</div><div class="empty-msg">No text features found</div></div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="11"><div class="empty-state"><div class="empty-icon">â—Ž</div><div class="empty-msg">No text features found</div></div></td></tr>`;
     return;
   }
   tbody.innerHTML = data.features.map(f => `
     <tr onclick='showTextDetail(${JSON.stringify(esc(JSON.stringify(f)))})' style="cursor:pointer">
-      <td><span class="mono" style="color:var(--accent)">${f.ticker||'—'}</span></td>
+      <td><span class="mono" style="color:var(--accent)">${f.ticker||'â€”'}</span></td>
       <td>${platformBadge(f.platform)}</td>
       <td>${sentBadge(f.sentiment_label)}</td>
-      <td>${f.sentiment_score!==null&&f.sentiment_score!==undefined?scoreBar(f.sentiment_score):'<span style="color:var(--muted)">—</span>'}</td>
-      <td>${f.irony_adjusted_sentiment!==null&&f.irony_adjusted_sentiment!==undefined?scoreBar(f.irony_adjusted_sentiment):'<span style="color:var(--muted)">—</span>'}</td>
+      <td>${f.sentiment_score!==null&&f.sentiment_score!==undefined?scoreBar(f.sentiment_score):'<span style="color:var(--muted)">â€”</span>'}</td>
+      <td>${f.irony_adjusted_sentiment!==null&&f.irony_adjusted_sentiment!==undefined?scoreBar(f.irony_adjusted_sentiment):'<span style="color:var(--muted)">â€”</span>'}</td>
       <td>${f.capitulation_flag?'<span class="badge badge-yes">YES</span>':'<span class="badge badge-no">No</span>'}</td>
-      <td class="mono" style="font-size:11px">${f.conviction_hedge_ratio!==null&&f.conviction_hedge_ratio!==undefined?f.conviction_hedge_ratio.toFixed(2):'—'}</td>
+      <td class="mono" style="font-size:11px">${f.conviction_hedge_ratio!==null&&f.conviction_hedge_ratio!==undefined?f.conviction_hedge_ratio.toFixed(2):'â€”'}</td>
       <td>${f.is_sarcastic?'<span class="badge badge-sarcasm">YES</span>':'<span class="badge badge-no">No</span>'}</td>
-      <td><span class="badge ${f.language==='hi-en-mixed'?'badge-mixed':'badge-no'}" style="font-size:10px">${esc(f.language)||'—'}</span></td>
+      <td><span class="badge ${f.language==='hi-en-mixed'?'badge-mixed':'badge-no'}" style="font-size:10px">${esc(f.language)||'â€”'}</span></td>
       <td class="mono" style="font-size:10px;color:var(--text2)">${ts(f.timestamp_utc)}</td>
       <td><div class="truncate">${esc((f.raw_text||'').substring(0,100))}</div></td>
     </tr>
@@ -703,26 +705,26 @@ async function loadText(resetPage = true) {
 
 function showTextDetail(escaped) {
   const f = JSON.parse(JSON.parse(escaped));
-  openModal('Text Features — ' + (f.ticker||'') + ' / ' + (f.sentiment_label||''), `
+  openModal('Text Features â€” ' + (f.ticker||'') + ' / ' + (f.sentiment_label||''), `
     <div class="field-grid">
       <div class="field"><div class="field-label">Post ID</div><div class="field-value">${esc(f.post_id)}</div></div>
       <div class="field"><div class="field-label">Ticker / Platform</div><div class="field-value">${esc(f.ticker)} / ${esc(f.platform)}</div></div>
-      <div class="field"><div class="field-label">Sentiment Label</div><div class="field-value">${esc(f.sentiment_label)||'—'}</div></div>
-      <div class="field"><div class="field-label">Sentiment Score</div><div class="field-value">${f.sentiment_score!==null&&f.sentiment_score!==undefined?f.sentiment_score.toFixed(6):'—'}</div></div>
-      <div class="field"><div class="field-label">Irony-Adjusted Sentiment</div><div class="field-value">${f.irony_adjusted_sentiment!==null&&f.irony_adjusted_sentiment!==undefined?f.irony_adjusted_sentiment.toFixed(6):'—'}</div></div>
+      <div class="field"><div class="field-label">Sentiment Label</div><div class="field-value">${esc(f.sentiment_label)||'â€”'}</div></div>
+      <div class="field"><div class="field-label">Sentiment Score</div><div class="field-value">${f.sentiment_score!==null&&f.sentiment_score!==undefined?f.sentiment_score.toFixed(6):'â€”'}</div></div>
+      <div class="field"><div class="field-label">Irony-Adjusted Sentiment</div><div class="field-value">${f.irony_adjusted_sentiment!==null&&f.irony_adjusted_sentiment!==undefined?f.irony_adjusted_sentiment.toFixed(6):'â€”'}</div></div>
       <div class="field"><div class="field-label">Is Sarcastic</div><div class="field-value">${f.is_sarcastic?'YES':'No'}</div></div>
       <div class="field"><div class="field-label">Capitulation Flag</div><div class="field-value">${f.capitulation_flag?'YES':'No'}</div></div>
-      <div class="field"><div class="field-label">Capitulation Confidence</div><div class="field-value">${f.capitulation_confidence!==null&&f.capitulation_confidence!==undefined?f.capitulation_confidence.toFixed(4):'—'}</div></div>
-      <div class="field"><div class="field-label">Conviction/Hedge Ratio</div><div class="field-value">${f.conviction_hedge_ratio!==null&&f.conviction_hedge_ratio!==undefined?f.conviction_hedge_ratio.toFixed(4):'—'}</div></div>
-      <div class="field"><div class="field-label">Language</div><div class="field-value">${esc(f.language)||'—'}</div></div>
-      <div class="field"><div class="field-label">Author</div><div class="field-value">${esc(f.account_id)||'—'}</div></div>
-      <div class="field"><div class="field-label">Computed At</div><div class="field-value">${esc(f.computed_at)||'—'}</div></div>
+      <div class="field"><div class="field-label">Capitulation Confidence</div><div class="field-value">${f.capitulation_confidence!==null&&f.capitulation_confidence!==undefined?f.capitulation_confidence.toFixed(4):'â€”'}</div></div>
+      <div class="field"><div class="field-label">Conviction/Hedge Ratio</div><div class="field-value">${f.conviction_hedge_ratio!==null&&f.conviction_hedge_ratio!==undefined?f.conviction_hedge_ratio.toFixed(4):'â€”'}</div></div>
+      <div class="field"><div class="field-label">Language</div><div class="field-value">${esc(f.language)||'â€”'}</div></div>
+      <div class="field"><div class="field-label">Author</div><div class="field-value">${esc(f.account_id)||'â€”'}</div></div>
+      <div class="field"><div class="field-label">Computed At</div><div class="field-value">${esc(f.computed_at)||'â€”'}</div></div>
       <div class="field wide"><div class="field-label">Raw Text</div><div class="field-value">${esc(f.raw_text||'[empty]')}</div></div>
     </div>
   `);
 }
 
-// ── TIMING ────────────────────────────────────────────────────────
+// â”€â”€ TIMING â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function loadTiming(resetPage = true) {
   if (resetPage) state.timing.page = 0;
   const ticker = document.getElementById('timing-ticker').value;
@@ -733,25 +735,25 @@ async function loadTiming(resetPage = true) {
   updatePagination('timing', data.total || 0);
   const tbody = document.getElementById('timing-body');
   if (!data.timing?.length) {
-    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">◎</div><div class="empty-msg">No timing data</div></div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">â—Ž</div><div class="empty-msg">No timing data</div></div></td></tr>`;
     return;
   }
   tbody.innerHTML = data.timing.map(r => {
     const deltaMin = r.delta_seconds !== null && r.delta_seconds !== undefined ? (r.delta_seconds / 60).toFixed(2) : null;
     return `<tr>
-      <td class="mono" style="font-size:10px;color:var(--text2)">${esc(r.post_id||'').substring(0,24)}…</td>
-      <td><span class="mono" style="color:var(--accent)">${r.ticker||'—'}</span></td>
+      <td class="mono" style="font-size:10px;color:var(--text2)">${esc(r.post_id||'').substring(0,24)}â€¦</td>
+      <td><span class="mono" style="color:var(--accent)">${r.ticker||'â€”'}</span></td>
       <td>${platformBadge(r.platform)}</td>
-      <td class="mono" style="font-size:11px;color:var(--text2)">${esc(r.account_id)||'—'}</td>
+      <td class="mono" style="font-size:11px;color:var(--text2)">${esc(r.account_id)||'â€”'}</td>
       <td class="mono" style="font-size:10px;color:var(--text2)">${ts(r.timestamp_utc)}</td>
       <td class="mono">${r.delta_seconds!==null&&r.delta_seconds!==undefined?r.delta_seconds.toFixed(1):'<span style="color:var(--muted)">first</span>'}</td>
-      <td class="mono">${deltaMin!==null?deltaMin:'<span style="color:var(--muted)">—</span>'}</td>
+      <td class="mono">${deltaMin!==null?deltaMin:'<span style="color:var(--muted)">â€”</span>'}</td>
       <td>${r.is_first_mention?'<span class="badge badge-yes">YES</span>':'<span style="color:var(--muted);font-size:11px">No</span>'}</td>
     </tr>`;
   }).join('');
 }
 
-// ── TIME BINS ─────────────────────────────────────────────────────
+// â”€â”€ TIME BINS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 let maxBinCount = 1;
 async function loadBins() {
   const ticker = document.getElementById('bins-ticker').value;
@@ -762,7 +764,7 @@ async function loadBins() {
   maxBinCount = Math.max(1, ...bins.map(b => b.post_count));
   const tbody = document.getElementById('bins-body');
   if (!bins.length) {
-    tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state"><div class="empty-icon">◎</div><div class="empty-msg">No time bin data</div></div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state"><div class="empty-icon">â—Ž</div><div class="empty-msg">No time bin data</div></div></td></tr>`;
     return;
   }
   tbody.innerHTML = bins.map(b => `
@@ -775,7 +777,7 @@ async function loadBins() {
   `).join('');
 }
 
-// ── PERIODICITY ───────────────────────────────────────────────────
+// â”€â”€ PERIODICITY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function loadPeriod(resetPage = true) {
   if (resetPage) state.period.page = 0;
   const ticker = document.getElementById('period-ticker').value;
@@ -786,7 +788,7 @@ async function loadPeriod(resetPage = true) {
   updatePagination('period', data.total || 0);
   const tbody = document.getElementById('period-body');
   if (!data.periodicity?.length) {
-    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">◎</div><div class="empty-msg">No periodicity data — run Phase 2 or scrape more data for a ticker.</div></div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">â—Ž</div><div class="empty-msg">No periodicity data â€” run Phase 2 or scrape more data for a ticker.</div></div></td></tr>`;
     return;
   }
   tbody.innerHTML = data.periodicity.map(r => `
@@ -795,15 +797,15 @@ async function loadPeriod(resetPage = true) {
       <td class="mono" style="font-size:10px;color:var(--text2)">${ts(r.window_start_utc)}</td>
       <td class="mono" style="font-size:10px;color:var(--text2)">${ts(r.window_end_utc)}</td>
       <td>${ksBar(r.ks_statistic)}</td>
-      <td class="mono" style="font-size:11px">${r.acf_peak_lag_minutes!==null&&r.acf_peak_lag_minutes!==undefined?r.acf_peak_lag_minutes.toFixed(1)+'m':'<span style="color:var(--muted)">—</span>'}</td>
+      <td class="mono" style="font-size:11px">${r.acf_peak_lag_minutes!==null&&r.acf_peak_lag_minutes!==undefined?r.acf_peak_lag_minutes.toFixed(1)+'m':'<span style="color:var(--muted)">â€”</span>'}</td>
       <td>${acfBar(r.acf_peak_strength)}</td>
-      <td class="mono" style="font-size:11px">${r.dominant_frequency_minutes!==null&&r.dominant_frequency_minutes!==undefined?r.dominant_frequency_minutes.toFixed(1)+'m':'<span style="color:var(--muted)">—</span>'}</td>
-      <td class="mono" style="font-size:11px">${r.onset_dispersion_index!==null&&r.onset_dispersion_index!==undefined?r.onset_dispersion_index.toFixed(3):'<span style="color:var(--muted)">—</span>'}</td>
+      <td class="mono" style="font-size:11px">${r.dominant_frequency_minutes!==null&&r.dominant_frequency_minutes!==undefined?r.dominant_frequency_minutes.toFixed(1)+'m':'<span style="color:var(--muted)">â€”</span>'}</td>
+      <td class="mono" style="font-size:11px">${r.onset_dispersion_index!==null&&r.onset_dispersion_index!==undefined?r.onset_dispersion_index.toFixed(3):'<span style="color:var(--muted)">â€”</span>'}</td>
     </tr>
   `).join('');
 }
 
-// ── Modal ─────────────────────────────────────────────────────────
+// â”€â”€ Modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function openModal(title, body) {
   document.getElementById('modal-title').textContent = title;
   document.getElementById('modal-body').innerHTML = body;
@@ -814,7 +816,7 @@ function closeModal() {
 }
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
-// ── FINANCIAL INDICES (PHASE 3) ───────────────────────────────────
+// â”€â”€ FINANCIAL INDICES (PHASE 3) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function loadIndices() {
   const ticker = document.getElementById('indices-ticker').value;
   const params = new URLSearchParams({ ticker });
@@ -822,7 +824,7 @@ async function loadIndices() {
   document.getElementById('indices-count').textContent = `${data.indices?.length || 0} rows`;
   const tbody = document.getElementById('indices-body');
   if (!data.indices?.length) {
-    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">◎</div><div class="empty-msg">No index values found — click "Run Phase 3" to compute indices.</div></div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">â—Ž</div><div class="empty-msg">No index values found â€” click "Run Phase 3" to compute indices.</div></div></td></tr>`;
     return;
   }
   tbody.innerHTML = data.indices.map(r => {
@@ -846,7 +848,7 @@ async function loadIndices() {
   }).join('');
 }
 
-// ── COMPOSITE METRICS (PHASE 5) ──────────────────────────────────
+// â”€â”€ COMPOSITE METRICS (PHASE 5) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function loadCompositeMetrics() {
   const ticker = document.getElementById('composite-ticker').value;
   const params = new URLSearchParams({ ticker });
@@ -854,7 +856,7 @@ async function loadCompositeMetrics() {
   document.getElementById('composite-count').textContent = `${data.metrics?.length || 0} rows`;
   const tbody = document.getElementById('composite-body');
   if (!data.metrics?.length) {
-    tbody.innerHTML = `<tr><td colspan="11"><div class="empty-state"><div class="empty-icon">◎</div><div class="empty-msg">No composite metrics found — click "Run Phase 5" to aggregate metrics.</div></div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="11"><div class="empty-state"><div class="empty-icon">â—Ž</div><div class="empty-msg">No composite metrics found â€” click "Run Phase 5" to aggregate metrics.</div></div></td></tr>`;
     return;
   }
   tbody.innerHTML = data.metrics.map(r => {
@@ -881,17 +883,17 @@ async function loadCompositeMetrics() {
       <td>${domStr}</td>
       <td>${flagsStr}</td>
       <td>${trustBadge}</td>
-      <td class="mono">${r.rn !== null && r.rn !== undefined ? r.rn.toFixed(2) : '—'}</td>
-      <td class="mono">${r.cirg !== null && r.cirg !== undefined ? r.cirg.toFixed(2) : '—'}</td>
-      <td class="mono">${r.cli !== null && r.cli !== undefined ? r.cli.toFixed(4) : '—'}</td>
-      <td class="mono">${r.cassi !== null && r.cassi !== undefined ? r.cassi.toFixed(2) : '—'}</td>
-      <td class="mono">${r.vdi !== null && r.vdi !== undefined ? r.vdi.toFixed(2) : '—'}</td>
+      <td class="mono">${r.rn !== null && r.rn !== undefined ? r.rn.toFixed(2) : 'â€”'}</td>
+      <td class="mono">${r.cirg !== null && r.cirg !== undefined ? r.cirg.toFixed(2) : 'â€”'}</td>
+      <td class="mono">${r.cli !== null && r.cli !== undefined ? r.cli.toFixed(4) : 'â€”'}</td>
+      <td class="mono">${r.cassi !== null && r.cassi !== undefined ? r.cassi.toFixed(2) : 'â€”'}</td>
+      <td class="mono">${r.vdi !== null && r.vdi !== undefined ? r.vdi.toFixed(2) : 'â€”'}</td>
       <td class="mono" style="font-size:10px;color:var(--text2)">${ts(r.window_start_utc)}</td>
     </tr>`;
   }).join('');
 }
 
-// ── EXPLAINABILITY & LINEAGE (PHASE 6) ────────────────────────────
+// â”€â”€ EXPLAINABILITY & LINEAGE (PHASE 6) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function loadExplainability() {
   const ticker = document.getElementById('explain-ticker').value || 'AAPL';
   const phyloData = await fetch(`/api/narrative-phylogeny?ticker=${ticker}`).then(r => r.json());
@@ -904,7 +906,7 @@ async function loadExplainability() {
       <tr>
         <td class="mono" style="font-size:10px">${ts(n.window_start_utc)}</td>
         <td><span class="badge badge-bullish">${esc(n.mutation_type)}</span></td>
-        <td class="mono" style="color:${n.composite_delta >= 0 ? 'var(--green)' : 'var(--red)'}">${n.composite_delta !== null ? (n.composite_delta > 0 ? '+' : '') + n.composite_delta : '—'}</td>
+        <td class="mono" style="color:${n.composite_delta >= 0 ? 'var(--green)' : 'var(--red)'}">${n.composite_delta !== null ? (n.composite_delta > 0 ? '+' : '') + n.composite_delta : 'â€”'}</td>
         <td class="mono" style="font-size:11px">${esc(JSON.stringify(n.mutation_detail))}</td>
       </tr>
     `).join('');
@@ -938,10 +940,10 @@ async function loadExplainability() {
   }
 }
 
-// ── Scraper Actions ───────────────────────────────────────────────
+// â”€â”€ Scraper Actions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function runScraper() {
   const btn = event.currentTarget;
-  btn.textContent = 'Running…';
+  btn.textContent = 'Runningâ€¦';
   btn.disabled = true;
   try {
     await fetch('/api/run-scraper', { method: 'POST' });
@@ -954,7 +956,7 @@ async function runScraper() {
 }
 async function runPhase2() {
   const btn = event.currentTarget;
-  btn.textContent = 'Running…';
+  btn.textContent = 'Runningâ€¦';
   btn.disabled = true;
   try {
     await fetch('/api/run-phase2', { method: 'POST' });
@@ -972,7 +974,7 @@ async function runPhase2() {
 }
 async function runPhase3() {
   const btn = event.currentTarget;
-  btn.textContent = 'Running…';
+  btn.textContent = 'Runningâ€¦';
   btn.disabled = true;
   try {
     await fetch('/api/run-phase3', { method: 'POST' });
@@ -986,7 +988,7 @@ async function runPhase3() {
 }
 async function runPhase5() {
   const btn = event.currentTarget;
-  btn.textContent = 'Running…';
+  btn.textContent = 'Runningâ€¦';
   btn.disabled = true;
   try {
     await fetch('/api/run-phase5', { method: 'POST' });
@@ -999,7 +1001,7 @@ async function runPhase5() {
 }
 async function runPhase6() {
   const btn = event.currentTarget;
-  btn.textContent = 'Running…';
+  btn.textContent = 'Runningâ€¦';
   btn.disabled = true;
   try {
     await fetch('/api/run-phase6', { method: 'POST' });
@@ -1011,7 +1013,7 @@ async function runPhase6() {
   }
 }
 
-// ── Boot ──────────────────────────────────────────────────────────
+// â”€â”€ Boot â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 (async () => {
   await loadStats();
   loadRaw();
@@ -1019,3 +1021,5 @@ async function runPhase6() {
 </script>
 </body>
 </html>
+
+

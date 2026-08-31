@@ -1,11 +1,9 @@
 """
 main.py
 
-Root entrypoint for running the Diverge Phase 1 data collection pipeline.
-Delegates to diverge_scraper.main.run_pipeline().
+Root launcher delegating to diverge.scrapers.run_phase1.
 """
-
-from diverge_scraper.main import run_pipeline
+from diverge.scrapers import run_phase1
 
 if __name__ == "__main__":
-    run_pipeline()
+    run_phase1.run_pipeline()

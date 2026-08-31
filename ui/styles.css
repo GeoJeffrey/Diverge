@@ -1,0 +1,67 @@
+﻿/*
+ * styles.css
+ * Shared design tokens and component styles for Diverge UI.
+ * Used by simple.html and advanced.html.
+ */
+
+/* ── Design Tokens ─────────────────────────────────────── */
+:root {
+  --bg: #090c15; --panel: #111625; --border: #1e2638;
+  --text: #e2e8f0; --text2: #94a3b8; --accent: #3b82f6;
+  --green: #10b981; --amber: #f59e0b; --red: #ef4444;
+  --gray: #64748b; --purple: #8b5cf6;
+}
+
+/* ── Reset ──────────────────────────────────────────────── */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; padding: 32px; }
+
+/* ── Layout ─────────────────────────────────────────────── */
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+.grid-top { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 24px; }
+
+/* ── Typography ─────────────────────────────────────────── */
+h1 { font-size: 24px; font-weight: 800; }
+.sub { font-size: 13px; color: var(--text2); }
+.mono { font-family: 'JetBrains Mono', monospace; }
+
+/* ── Navigation ─────────────────────────────────────────── */
+.nav-btn { background: var(--panel); border: 1px solid var(--border); color: var(--text); padding: 8px 16px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 13px; }
+.nav-btn:hover { border-color: var(--accent); }
+
+/* ── Card Grid (simple mode) ─────────────────────────────── */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+.card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 24px; cursor: pointer; transition: all 0.2s ease; }
+.card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+.card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+.ticker { font-size: 20px; font-weight: 800; color: var(--accent); font-family: 'JetBrains Mono', monospace; }
+.score { font-size: 36px; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
+.why { font-size: 13px; color: var(--text); line-height: 1.5; margin-bottom: 16px; }
+.trust { font-size: 11px; color: var(--text2); display: flex; align-items: center; gap: 6px; }
+
+/* ── Verdict Pills ───────────────────────────────────────── */
+.pill { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+.pill-building    { background: rgba(16,185,129,0.15); color: var(--green); border: 1px solid var(--green); }
+.pill-mixed       { background: rgba(100,116,139,0.15); color: var(--gray);  border: 1px solid var(--gray); }
+.pill-fading      { background: rgba(245,158,11,0.15);  color: var(--amber); border: 1px solid var(--amber); }
+.pill-insufficient_data { background: rgba(148,163,184,0.1); color: var(--text2); border: 1px solid var(--border); }
+
+/* ── Advanced Mode Boxes ─────────────────────────────────── */
+.box { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+.box-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text2); margin-bottom: 14px; }
+
+/* ── Index Cards ─────────────────────────────────────────── */
+.indices-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+.idx-card  { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px; text-align: center; }
+.idx-label { font-size: 11px; color: var(--text2); font-weight: 600; margin-bottom: 4px; }
+.idx-val   { font-size: 18px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+
+/* ── Chips ───────────────────────────────────────────────── */
+.chip          { display: inline-block; padding: 4px 10px; border-radius: 16px; font-size: 11px; font-weight: 600; margin-right: 6px; margin-bottom: 6px; background: rgba(59,130,246,0.15); color: var(--accent); border: 1px solid var(--accent); }
+.chip-reversal { background: rgba(239,68,68,0.15);   color: var(--red);    border-color: var(--red); }
+.chip-shift    { background: rgba(139,92,246,0.15);  color: var(--purple); border-color: var(--purple); }
+
+/* ── Trace Table ─────────────────────────────────────────── */
+table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 13px; }
+th { text-align: left; padding: 10px 12px; font-size: 11px; text-transform: uppercase; color: var(--text2); border-bottom: 1px solid var(--border); }
+td { padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
