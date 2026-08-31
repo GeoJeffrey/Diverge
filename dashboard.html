@@ -173,6 +173,7 @@ tr:hover td{background:rgba(79,142,247,.04)}
   </div>
   <div class="header-right">
     <div class="db-status">DB: <span id="total-rows">—</span> raw posts</div>
+    <button class="run-btn secondary" onclick="runPhase3()">Run Phase 3</button>
     <button class="run-btn secondary" onclick="runPhase2()">Run Phase 2</button>
     <button class="run-btn" onclick="runScraper()">Run Scrapers</button>
   </div>
@@ -205,6 +206,11 @@ tr:hover td{background:rgba(79,142,247,.04)}
     <div class="stat-value" id="s-period">—</div>
     <div class="stat-sub">KS/ACF windows</div>
   </div>
+  <div class="stat-card green">
+    <div class="stat-label">Phase 3 Indices</div>
+    <div class="stat-value" id="s-indices" style="color:var(--green)">—</div>
+    <div class="stat-sub">Computed values</div>
+  </div>
   <div class="stat-card">
     <div class="stat-label">Bullish</div>
     <div class="stat-value" style="color:var(--green)" id="s-bull">—</div>
@@ -214,11 +220,6 @@ tr:hover td{background:rgba(79,142,247,.04)}
     <div class="stat-label">Capitulation</div>
     <div class="stat-value" style="color:var(--yellow)" id="s-cap">—</div>
     <div class="stat-sub">Posts flagged</div>
-  </div>
-  <div class="stat-card purple">
-    <div class="stat-label">Sarcastic</div>
-    <div class="stat-value" style="color:var(--purple)" id="s-sarc">—</div>
-    <div class="stat-sub">Irony detected</div>
   </div>
 </div>
 
@@ -236,6 +237,7 @@ tr:hover td{background:rgba(79,142,247,.04)}
   <button class="tab-btn"        id="tab-timing"   onclick="switchTab('timing')">Timing</button>
   <button class="tab-btn"        id="tab-bins"     onclick="switchTab('bins')">Time Bins</button>
   <button class="tab-btn"        id="tab-period"   onclick="switchTab('period')">Periodicity</button>
+  <button class="tab-btn"        id="tab-indices"  onclick="switchTab('indices')">Phase 3: Financial Indices</button>
 </div>
 
 <!-- ═══════════════════════════════════════════ TAB: RAW POSTS -->
@@ -377,6 +379,29 @@ tr:hover td{background:rgba(79,142,247,.04)}
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════ TAB: FINANCIAL INDICES -->
+<div class="tab-pane" id="pane-indices">
+  <div class="toolbar">
+    <select class="filter-select" id="indices-ticker" onchange="loadIndices()"><option value="ALL">All Tickers</option></select>
+    <div class="count-badge" id="indices-count">0 rows</div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr>
+        <th>Ticker</th>
+        <th>CLI (Capitulation Leak)</th>
+        <th>VDI (Vernacular Div.)</th>
+        <th>CASSI (Spillover)</th>
+        <th>Rn (Reproduction No.)</th>
+        <th>CIRG (Rating Gap)</th>
+        <th>Window Start</th>
+        <th>Computed At</th>
+      </tr></thead>
+      <tbody id="indices-body"><tr><td colspan="8"><div class="loading"><div class="spinner"></div><br>Loading Phase 3 indices...</div></td></tr></tbody>
+    </table>
+  </div>
+</div>
+
 <!-- ═══════════════════════════════════════════ DETAIL MODAL -->
 <div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
   <div class="modal">
@@ -457,12 +482,12 @@ async function loadStats() {
   document.getElementById('s-timing').textContent = (r.phase2?.post_timing || 0).toLocaleString();
   document.getElementById('s-bins').textContent   = (r.phase2?.ticker_time_bins || 0).toLocaleString();
   document.getElementById('s-period').textContent = (r.phase2?.periodicity_stats || 0).toLocaleString();
+  document.getElementById('s-indices').textContent = (r.phase3?.index_values || 0).toLocaleString();
 
   const sd = r.phase2?.sentiment_distribution || {};
   document.getElementById('s-bull').textContent = (sd.bullish || 0).toLocaleString();
   document.getElementById('s-bear-sub').textContent = `Bearish: ${(sd.bearish || 0).toLocaleString()}`;
   document.getElementById('s-cap').textContent  = (r.phase2?.capitulation_posts || 0).toLocaleString();
-  document.getElementById('s-sarc').textContent = (r.phase2?.sarcastic_posts || 0).toLocaleString();
 
   // Sentiment bar
   const total = (sd.bullish||0) + (sd.bearish||0) + (sd.neutral||0) || 1;
@@ -480,8 +505,9 @@ async function loadStats() {
 
   // Populate ticker selects
   const tickers = r.tickers || [];
-  ['raw-ticker','text-ticker','timing-ticker','bins-ticker','period-ticker'].forEach(id => {
+  ['raw-ticker','text-ticker','timing-ticker','bins-ticker','period-ticker','indices-ticker'].forEach(id => {
     const sel = document.getElementById(id);
+    if (!sel) return;
     const cur = sel.value;
     sel.innerHTML = '<option value="ALL">All Tickers</option>' +
       tickers.map(t => `<option value="${t}">${t}</option>`).join('');
@@ -496,7 +522,7 @@ function switchTab(tab) {
   document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
   document.getElementById('tab-' + tab).classList.add('active');
   document.getElementById('pane-' + tab).classList.add('active');
-  const loaders = { raw: loadRaw, text: loadText, timing: loadTiming, bins: loadBins, period: loadPeriod };
+  const loaders = { raw: loadRaw, text: loadText, timing: loadTiming, bins: loadBins, period: loadPeriod, indices: loadIndices };
   if (loaders[tab]) loaders[tab]();
 }
 
@@ -721,6 +747,38 @@ function closeModal() {
 }
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
+// ── FINANCIAL INDICES (PHASE 3) ───────────────────────────────────
+async function loadIndices() {
+  const ticker = document.getElementById('indices-ticker').value;
+  const params = new URLSearchParams({ ticker });
+  const data = await fetch(`/api/index-values?${params}`).then(r => r.json());
+  document.getElementById('indices-count').textContent = `${data.indices?.length || 0} rows`;
+  const tbody = document.getElementById('indices-body');
+  if (!data.indices?.length) {
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">◎</div><div class="empty-msg">No index values found — click "Run Phase 3" to compute indices.</div></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = data.indices.map(r => {
+    const cliStr = r.cli !== null && r.cli !== undefined ? r.cli.toFixed(4) : '<span class="badge badge-neutral">NULL (Guard)</span>';
+    const vdiStr = r.vdi !== null && r.vdi !== undefined ? r.vdi.toFixed(4) : '<span class="badge badge-neutral">NULL (Guard)</span>';
+    const cassiStr = r.cassi !== null && r.cassi !== undefined ? r.cassi.toFixed(4) : '<span class="badge badge-neutral">NULL (Guard)</span>';
+    const rnStr = r.rn !== null && r.rn !== undefined ? `${r.rn.toFixed(2)} <span style="font-size:10px;color:var(--text2)">(conf ${r.rn_confidence?.toFixed(1)})</span>` : '<span class="badge badge-neutral">NULL (Guard)</span>';
+    const cirgStr = r.cirg !== null && r.cirg !== undefined ? r.cirg.toFixed(4) : '<span class="badge badge-neutral">NULL (No Review Data)</span>';
+
+    return `
+    <tr>
+      <td><span class="mono" style="color:var(--accent);font-weight:700">${r.ticker}</span></td>
+      <td class="mono">${cliStr}</td>
+      <td class="mono">${vdiStr}</td>
+      <td class="mono">${cassiStr}</td>
+      <td class="mono">${rnStr}</td>
+      <td class="mono">${cirgStr}</td>
+      <td class="mono" style="font-size:10px;color:var(--text2)">${ts(r.window_start_utc)}</td>
+      <td class="mono" style="font-size:10px;color:var(--text2)">${ts(r.computed_at)}</td>
+    </tr>`;
+  }).join('');
+}
+
 // ── Scraper Actions ───────────────────────────────────────────────
 async function runScraper() {
   const btn = event.currentTarget;
@@ -746,8 +804,22 @@ async function runPhase2() {
     if (activeTab === 'timing') loadTiming();
     if (activeTab === 'bins')   loadBins();
     if (activeTab === 'period') loadPeriod();
+    if (activeTab === 'indices') loadIndices();
   } finally {
     btn.textContent = 'Run Phase 2';
+    btn.disabled = false;
+  }
+}
+async function runPhase3() {
+  const btn = event.currentTarget;
+  btn.textContent = 'Running…';
+  btn.disabled = true;
+  try {
+    await fetch('/api/run-phase3', { method: 'POST' });
+    await loadStats();
+    if (activeTab === 'indices') loadIndices();
+  } finally {
+    btn.textContent = 'Run Phase 3';
     btn.disabled = false;
   }
 }

@@ -101,6 +101,10 @@ class DivergeDashboardHandler(BaseHTTPRequestHandler):
                     "capitulation_posts": cap_count,
                     "sarcastic_posts": sarcasm_count,
                 },
+                "phase3": {
+                    "index_values": safe_count("index_values"),
+                    "consumer_sentiment": safe_count("consumer_sentiment"),
+                },
             })
             return
 
@@ -265,6 +269,28 @@ class DivergeDashboardHandler(BaseHTTPRequestHandler):
             self.send_json({"periodicity": [dict(r) for r in rows], "total": total_row})
             return
 
+        # ── /api/index-values (Phase 3 Financial Indices) ─────
+        if path == "/api/index-values":
+            ticker = params.get("ticker", [None])[0]
+
+            conn = sqlite3.connect(DB_PATH)
+            conn.row_factory = sqlite3.Row
+            query = """
+                SELECT ticker, window_start_utc, window_end_utc,
+                       rn, rn_confidence, cirg, cli, cassi, vdi, computed_at
+                FROM index_values WHERE 1=1
+            """
+            args = []
+            if ticker and ticker.upper() != "ALL":
+                query += " AND ticker = ?"
+                args.append(ticker.upper())
+
+            query += " ORDER BY ticker ASC, window_start_utc DESC"
+            rows = conn.execute(query, args).fetchall()
+            conn.close()
+            self.send_json({"indices": [dict(r) for r in rows], "total": len(rows)})
+            return
+
         self.send_json({"error": "Endpoint not found"}, status=404)
 
     def do_POST(self):
@@ -282,6 +308,13 @@ class DivergeDashboardHandler(BaseHTTPRequestHandler):
                 p = periodicity_analysis.run()
                 tf = text_features.run()
                 self.send_json({"status": "success", "timing_rows": t, "periodicity_rows": p, "text_rows": tf})
+            except Exception as e:
+                self.send_json({"status": "error", "message": str(e)}, status=500)
+        elif self.path == "/api/run-phase3":
+            try:
+                import run_phase3
+                inserted = run_phase3.run()
+                self.send_json({"status": "success", "message": "Phase 3 indices computed.", "index_rows": inserted})
             except Exception as e:
                 self.send_json({"status": "error", "message": str(e)}, status=500)
         else:
