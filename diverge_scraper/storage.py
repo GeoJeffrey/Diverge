@@ -106,6 +106,24 @@ CREATE TABLE IF NOT EXISTS consumer_sentiment (
 
 CREATE INDEX IF NOT EXISTS idx_consumer_ticker_time
     ON consumer_sentiment (ticker, timestamp_utc);
+
+CREATE TABLE IF NOT EXISTS coordination_scores (
+    ticker             TEXT NOT NULL,
+    window_start_utc   TEXT NOT NULL,
+    window_end_utc     TEXT,
+    ks_component       REAL,           -- normalized 0-1, from periodicity_stats.ks_statistic
+    acf_component      REAL,           -- normalized 0-1, from periodicity_stats.acf_peak_strength
+    onset_component    REAL,           -- normalized 0-1, from periodicity_stats.onset_dispersion_index
+    duplicate_ratio    REAL,           -- fraction of near-duplicate posts in window
+    sentiment_variance REAL,           -- variance of sentiment_score in window (low = suspicious)
+    coordination_score REAL,           -- 0-100 combined score
+    confidence_flag    TEXT,           -- 'high_trust' / 'moderate' / 'low_trust' / 'insufficient_data'
+    computed_at        TEXT NOT NULL,
+    PRIMARY KEY (ticker, window_start_utc)
+);
+
+CREATE INDEX IF NOT EXISTS idx_coord_ticker_time
+    ON coordination_scores (ticker, window_start_utc);
 """
 
 
@@ -556,7 +574,7 @@ def get_post_timing_for_ticker(
 
 
 def count_all_tables(db_path: Path = config.DB_PATH) -> Dict[str, int]:
-    """Return dictionary of row counts for all Phase 1, Phase 2, and Phase 3 tables."""
+    """Return dictionary of row counts for all Phase 1, Phase 2, Phase 3, and Phase 4 tables."""
     conn = get_connection(db_path)
     tables = [
         "raw_posts",
@@ -566,6 +584,7 @@ def count_all_tables(db_path: Path = config.DB_PATH) -> Dict[str, int]:
         "periodicity_stats",
         "consumer_sentiment",
         "index_values",
+        "coordination_scores",
     ]
     counts = {}
     for t in tables:
@@ -576,4 +595,124 @@ def count_all_tables(db_path: Path = config.DB_PATH) -> Dict[str, int]:
             counts[t] = 0
     conn.close()
     return counts
+
+
+# --- Phase 4 Storage & Query Functions ---
+
+def insert_coordination_scores(rows: List[Dict[str, Any]], db_path: Path = config.DB_PATH) -> int:
+    """
+    Insert or replace rows in coordination_scores table.
+    """
+    if not rows:
+        return 0
+    conn = get_connection(db_path)
+    before = conn.execute("SELECT COUNT(*) FROM coordination_scores").fetchone()[0]
+    now_iso = datetime.now(timezone.utc).isoformat()
+    with conn:
+        for r in rows:
+            conn.execute(
+                """
+                INSERT OR REPLACE INTO coordination_scores
+                    (ticker, window_start_utc, window_end_utc, ks_component, acf_component,
+                     onset_component, duplicate_ratio, sentiment_variance, coordination_score,
+                     confidence_flag, computed_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    r["ticker"],
+                    r["window_start_utc"],
+                    r.get("window_end_utc"),
+                    r.get("ks_component"),
+                    r.get("acf_component"),
+                    r.get("onset_component"),
+                    r.get("duplicate_ratio"),
+                    r.get("sentiment_variance"),
+                    r.get("coordination_score"),
+                    r.get("confidence_flag", "insufficient_data"),
+                    r.get("computed_at", now_iso),
+                ),
+            )
+    after = conn.execute("SELECT COUNT(*) FROM coordination_scores").fetchone()[0]
+    conn.close()
+    return after - before
+
+
+def get_periodicity_stats_for_window(
+    ticker: Optional[str] = None,
+    start_utc: Optional[str] = None,
+    end_utc: Optional[str] = None,
+    db_path: Path = config.DB_PATH,
+) -> List[Dict[str, Any]]:
+    """Fetch periodicity_stats rows for ticker and optional time window."""
+    conn = get_connection(db_path)
+    conn.row_factory = sqlite3.Row
+    query = "SELECT * FROM periodicity_stats WHERE 1=1"
+    params: List[Any] = []
+    if ticker and ticker.upper() != "ALL":
+        query += " AND ticker = ?"
+        params.append(ticker.upper())
+    if start_utc:
+        query += " AND window_start_utc >= ?"
+        params.append(start_utc)
+    if end_utc:
+        query += " AND window_end_utc <= ?"
+        params.append(end_utc)
+    query += " ORDER BY ticker ASC, window_start_utc ASC"
+    rows = conn.execute(query, params).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def get_text_and_posts_for_window(
+    ticker: str,
+    start_utc: Optional[str] = None,
+    end_utc: Optional[str] = None,
+    db_path: Path = config.DB_PATH,
+) -> List[Dict[str, Any]]:
+    """
+    Fetch joined raw_posts and text_features records for a given ticker and window.
+    Returns post_id, account_id, raw_text, sentiment_score, platform, timestamp_utc, ticker.
+    """
+    conn = get_connection(db_path)
+    conn.row_factory = sqlite3.Row
+    query = """
+        SELECT rp.post_id, rp.account_id, rp.ticker, rp.raw_text, rp.platform,
+               rp.timestamp_utc, tf.sentiment_score, tf.irony_adjusted_sentiment, tf.language
+        FROM raw_posts rp
+        LEFT JOIN text_features tf ON rp.post_id = tf.post_id
+        WHERE rp.ticker = ?
+    """
+    params: List[Any] = [ticker.upper()]
+    if start_utc:
+        query += " AND rp.timestamp_utc >= ?"
+        params.append(start_utc)
+    if end_utc:
+        query += " AND rp.timestamp_utc <= ?"
+        params.append(end_utc)
+    query += " ORDER BY rp.timestamp_utc ASC"
+    rows = conn.execute(query, params).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def check_news_event_in_window(
+    ticker: str,
+    start_utc: str,
+    end_utc: str,
+    db_path: Path = config.DB_PATH,
+) -> bool:
+    """
+    Check if an RSS news article or Google Trends spike exists for ticker in the given window.
+    Used to dampen onset_component weight when legitimate news causes synchronized reactions.
+    """
+    conn = get_connection(db_path)
+    query = """
+        SELECT COUNT(*) FROM raw_posts
+        WHERE ticker = ? AND platform IN ('rss_news', 'google_trends')
+          AND timestamp_utc >= ? AND timestamp_utc <= ?
+    """
+    count = conn.execute(query, (ticker.upper(), start_utc, end_utc)).fetchone()[0]
+    conn.close()
+    return count > 0
+
 

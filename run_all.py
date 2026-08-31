@@ -83,12 +83,21 @@ def main():
     except Exception as e:
         logger.error(f"[PHASE 3 FAILED]: {e}")
 
+    # ── Phase 4: Integrity & Coordination Scoring ───────────
+    logger.info("--- [PHASE 4] Executing Integrity & Coordination Scoring Pipeline ---")
+    try:
+        import run_phase4
+        run_phase4.run(db_path=db_path)
+        logger.info("[PHASE 4] Integrity & coordination scoring pipeline complete.")
+    except Exception as e:
+        logger.error(f"[PHASE 4 FAILED]: {e}")
+
     # ── Final Combined Summary Report ─────────────────────────
     print_master_summary(db_path)
 
 
 def print_master_summary(db_path: Path):
-    """Print single unified summary report across all 3 phases."""
+    """Print single unified summary report across all 4 phases."""
     print("\n" + "=" * 70)
     print("DIVERGE MASTER PIPELINE — COMBINED SUMMARY REPORT")
     print("=" * 70)
@@ -111,11 +120,12 @@ def print_master_summary(db_path: Path):
     for t in phase2_tables:
         print(f"  {t:<25} {all_table_counts.get(t, 0):>8,} rows")
 
-    # 3. Phase 3 Summary
-    print("\n3. PHASE 3: FINANCIAL INDICES STORAGE & COVERAGE")
+    # 3. Phase 3 & 4 Summary
+    print("\n3. PHASE 3 & 4: INDICES & INTEGRITY STORAGE")
     print("-" * 40)
     print(f"  consumer_sentiment       {all_table_counts.get('consumer_sentiment', 0):>8,} rows")
     print(f"  index_values             {all_table_counts.get('index_values', 0):>8,} rows")
+    print(f"  coordination_scores      {all_table_counts.get('coordination_scores', 0):>8,} rows")
     print("=" * 70 + "\n")
 
 
