@@ -173,6 +173,7 @@ tr:hover td{background:rgba(79,142,247,.04)}
   </div>
   <div class="header-right">
     <div class="db-status">DB: <span id="total-rows">—</span> raw posts</div>
+    <button class="run-btn secondary" onclick="runPhase6()">Run Phase 6</button>
     <button class="run-btn secondary" onclick="runPhase5()">Run Phase 5</button>
     <button class="run-btn secondary" onclick="runPhase3()">Run Phase 3</button>
     <button class="run-btn secondary" onclick="runPhase2()">Run Phase 2</button>
@@ -217,15 +218,15 @@ tr:hover td{background:rgba(79,142,247,.04)}
     <div class="stat-value" id="s-composite" style="color:var(--purple)">—</div>
     <div class="stat-sub">Aggregated windows</div>
   </div>
+  <div class="stat-card yellow">
+    <div class="stat-label">Phase 6 Traces</div>
+    <div class="stat-value" id="s-traces" style="color:var(--yellow)">—</div>
+    <div class="stat-sub">Audit trail rows</div>
+  </div>
   <div class="stat-card">
     <div class="stat-label">Bullish</div>
     <div class="stat-value" style="color:var(--green)" id="s-bull">—</div>
     <div class="stat-sub" id="s-bear-sub">Bearish: —</div>
-  </div>
-  <div class="stat-card yellow">
-    <div class="stat-label">Capitulation</div>
-    <div class="stat-value" style="color:var(--yellow)" id="s-cap">—</div>
-    <div class="stat-sub">Posts flagged</div>
   </div>
 </div>
 
@@ -238,13 +239,14 @@ tr:hover td{background:rgba(79,142,247,.04)}
 
 <!-- Tabs -->
 <div class="tabs-bar">
-  <button class="tab-btn active" id="tab-raw"       onclick="switchTab('raw')">Raw Posts</button>
-  <button class="tab-btn"        id="tab-text"      onclick="switchTab('text')">Text Features</button>
-  <button class="tab-btn"        id="tab-timing"    onclick="switchTab('timing')">Timing</button>
-  <button class="tab-btn"        id="tab-bins"      onclick="switchTab('bins')">Time Bins</button>
-  <button class="tab-btn"        id="tab-period"    onclick="switchTab('period')">Periodicity</button>
-  <button class="tab-btn"        id="tab-indices"   onclick="switchTab('indices')">Phase 3: Financial Indices</button>
-  <button class="tab-btn"        id="tab-composite" onclick="switchTab('composite')">Phase 5: Composite Metrics</button>
+  <button class="tab-btn active" id="tab-raw"          onclick="switchTab('raw')">Raw Posts</button>
+  <button class="tab-btn"        id="tab-text"         onclick="switchTab('text')">Text Features</button>
+  <button class="tab-btn"        id="tab-timing"       onclick="switchTab('timing')">Timing</button>
+  <button class="tab-btn"        id="tab-bins"         onclick="switchTab('bins')">Time Bins</button>
+  <button class="tab-btn"        id="tab-period"       onclick="switchTab('period')">Periodicity</button>
+  <button class="tab-btn"        id="tab-indices"      onclick="switchTab('indices')">Phase 3: Financial Indices</button>
+  <button class="tab-btn"        id="tab-composite"    onclick="switchTab('composite')">Phase 5: Composite Metrics</button>
+  <button class="tab-btn"        id="tab-explain"      onclick="switchTab('explain')">Phase 6: Lineage & Audit</button>
 </div>
 
 <!-- ═══════════════════════════════════════════ TAB: RAW POSTS -->
@@ -431,7 +433,38 @@ tr:hover td{background:rgba(79,142,247,.04)}
         <th>Window Start</th>
       </tr></thead>
       <tbody id="composite-body"><tr><td colspan="11"><div class="loading"><div class="spinner"></div><br>Loading Phase 5 composite metrics...</div></td></tr></tbody>
-    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ TAB: PHASE 6 LINEAGE & AUDIT -->
+<div class="tab-pane" id="pane-explain">
+  <div class="toolbar">
+    <select class="filter-select" id="explain-ticker" onchange="loadExplainability()"><option value="ALL">All Tickers</option></select>
+    <button class="run-btn secondary" onclick="loadExplainability()">Refresh Lineage</button>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+    <div>
+      <h3 style="font-size:14px;margin-bottom:10px;color:var(--text)">Narrative Phylogeny Tree (Lineage)</h3>
+      <div class="table-wrap" style="max-height:500px;overflow-y:auto">
+        <table>
+          <thead><tr>
+            <th>Window Start</th><th>Mutation Type</th><th>Delta</th><th>Mutation Detail</th>
+          </tr></thead>
+          <tbody id="phylo-body"><tr><td colspan="4"><div class="loading"><div class="spinner"></div><br>Loading narrative lineage tree...</div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+    <div>
+      <h3 style="font-size:14px;margin-bottom:10px;color:var(--text)">Reasoning Trace Panel (Audit Trail)</h3>
+      <div class="table-wrap" style="max-height:500px;overflow-y:auto">
+        <table>
+          <thead><tr>
+            <th>Category</th><th>Weight</th><th>Platform</th><th>Text Preview</th>
+          </tr></thead>
+          <tbody id="trace-body"><tr><td colspan="4"><div class="loading"><div class="spinner"></div><br>Loading audit reasoning traces...</div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -517,11 +550,11 @@ async function loadStats() {
   document.getElementById('s-period').textContent = (r.phase2?.periodicity_stats || 0).toLocaleString();
   document.getElementById('s-indices').textContent = (r.phase3?.index_values || 0).toLocaleString();
   document.getElementById('s-composite').textContent = (r.phase5?.ticker_window_metrics || 0).toLocaleString();
+  document.getElementById('s-traces').textContent = (r.phase6?.reasoning_trace || 0).toLocaleString();
 
   const sd = r.phase2?.sentiment_distribution || {};
   document.getElementById('s-bull').textContent = (sd.bullish || 0).toLocaleString();
   document.getElementById('s-bear-sub').textContent = `Bearish: ${(sd.bearish || 0).toLocaleString()}`;
-  document.getElementById('s-cap').textContent  = (r.phase2?.capitulation_posts || 0).toLocaleString();
 
   // Sentiment bar
   const total = (sd.bullish||0) + (sd.bearish||0) + (sd.neutral||0) || 1;
@@ -539,13 +572,13 @@ async function loadStats() {
 
   // Populate ticker selects
   const tickers = r.tickers || [];
-  ['raw-ticker','text-ticker','timing-ticker','bins-ticker','period-ticker','indices-ticker','composite-ticker'].forEach(id => {
+  ['raw-ticker','text-ticker','timing-ticker','bins-ticker','period-ticker','indices-ticker','composite-ticker','explain-ticker'].forEach(id => {
     const sel = document.getElementById(id);
     if (!sel) return;
     const cur = sel.value;
-    sel.innerHTML = '<option value="ALL">All Tickers</option>' +
+    sel.innerHTML = (id === 'explain-ticker' ? '' : '<option value="ALL">All Tickers</option>') +
       tickers.map(t => `<option value="${t}">${t}</option>`).join('');
-    sel.value = cur || 'ALL';
+    sel.value = cur || (id === 'explain-ticker' ? tickers[0] || 'AAPL' : 'ALL');
   });
 }
 
@@ -556,7 +589,7 @@ function switchTab(tab) {
   document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
   document.getElementById('tab-' + tab).classList.add('active');
   document.getElementById('pane-' + tab).classList.add('active');
-  const loaders = { raw: loadRaw, text: loadText, timing: loadTiming, bins: loadBins, period: loadPeriod, indices: loadIndices, composite: loadCompositeMetrics };
+  const loaders = { raw: loadRaw, text: loadText, timing: loadTiming, bins: loadBins, period: loadPeriod, indices: loadIndices, composite: loadCompositeMetrics, explain: loadExplainability };
   if (loaders[tab]) loaders[tab]();
 }
 
@@ -858,6 +891,53 @@ async function loadCompositeMetrics() {
   }).join('');
 }
 
+// ── EXPLAINABILITY & LINEAGE (PHASE 6) ────────────────────────────
+async function loadExplainability() {
+  const ticker = document.getElementById('explain-ticker').value || 'AAPL';
+  const phyloData = await fetch(`/api/narrative-phylogeny?ticker=${ticker}`).then(r => r.json());
+
+  const phyloBody = document.getElementById('phylo-body');
+  if (!phyloData.nodes?.length) {
+    phyloBody.innerHTML = `<tr><td colspan="4"><div class="empty-state"><div class="empty-msg">No narrative lineage found for ${ticker}.</div></div></td></tr>`;
+  } else {
+    phyloBody.innerHTML = phyloData.nodes.map(n => `
+      <tr>
+        <td class="mono" style="font-size:10px">${ts(n.window_start_utc)}</td>
+        <td><span class="badge badge-bullish">${esc(n.mutation_type)}</span></td>
+        <td class="mono" style="color:${n.composite_delta >= 0 ? 'var(--green)' : 'var(--red)'}">${n.composite_delta !== null ? (n.composite_delta > 0 ? '+' : '') + n.composite_delta : '—'}</td>
+        <td class="mono" style="font-size:11px">${esc(JSON.stringify(n.mutation_detail))}</td>
+      </tr>
+    `).join('');
+  }
+
+  // Load trace panel for first window
+  const wstart = phyloData.nodes?.[0]?.window_start_utc || '';
+  const traceData = await fetch(`/api/reasoning-trace?ticker=${ticker}&window_start=${wstart}`).then(r => r.json());
+
+  const traceBody = document.getElementById('trace-body');
+  const allItems = [];
+  if (traceData.categories) {
+    Object.keys(traceData.categories).forEach(cat => {
+      traceData.categories[cat].forEach(item => {
+        allItems.push({ category: cat, ...item });
+      });
+    });
+  }
+
+  if (!allItems.length) {
+    traceBody.innerHTML = `<tr><td colspan="4"><div class="empty-state"><div class="empty-msg">No audit traces for ${ticker}.</div></div></td></tr>`;
+  } else {
+    traceBody.innerHTML = allItems.slice(0, 50).map(t => `
+      <tr>
+        <td><span class="badge badge-neutral">${esc(t.category)}</span></td>
+        <td class="mono">${t.weight}</td>
+        <td><span class="badge badge-bullish">${esc(t.platform)}</span></td>
+        <td style="font-size:11px">${esc(t.text_preview)}</td>
+      </tr>
+    `).join('');
+  }
+}
+
 // ── Scraper Actions ───────────────────────────────────────────────
 async function runScraper() {
   const btn = event.currentTarget;
@@ -914,6 +994,19 @@ async function runPhase5() {
     if (activeTab === 'composite') loadCompositeMetrics();
   } finally {
     btn.textContent = 'Run Phase 5';
+    btn.disabled = false;
+  }
+}
+async function runPhase6() {
+  const btn = event.currentTarget;
+  btn.textContent = 'Running…';
+  btn.disabled = true;
+  try {
+    await fetch('/api/run-phase6', { method: 'POST' });
+    await loadStats();
+    if (activeTab === 'explain') loadExplainability();
+  } finally {
+    btn.textContent = 'Run Phase 6';
     btn.disabled = false;
   }
 }

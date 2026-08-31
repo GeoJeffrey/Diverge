@@ -101,12 +101,21 @@ def main():
     except Exception as e:
         logger.error(f"[PHASE 5 FAILED]: {e}")
 
+    # ── Phase 6: Explainability & Narrative Lineage Pipeline 
+    logger.info("--- [PHASE 6] Executing Explainability & Narrative Lineage Pipeline ---")
+    try:
+        import run_phase6
+        run_phase6.run(db_path=db_path)
+        logger.info("[PHASE 6] Explainability & narrative lineage pipeline complete.")
+    except Exception as e:
+        logger.error(f"[PHASE 6 FAILED]: {e}")
+
     # ── Final Combined Summary Report ─────────────────────────
     print_master_summary(db_path)
 
 
 def print_master_summary(db_path: Path):
-    """Print single unified summary report across all 5 phases."""
+    """Print single unified summary report across all 6 phases."""
     print("\n" + "=" * 70)
     print("DIVERGE MASTER PIPELINE — COMBINED SUMMARY REPORT")
     print("=" * 70)
@@ -129,13 +138,16 @@ def print_master_summary(db_path: Path):
     for t in phase2_tables:
         print(f"  {t:<25} {all_table_counts.get(t, 0):>8,} rows")
 
-    # 3. Phase 3, 4 & 5 Summary
-    print("\n3. PHASE 3, 4 & 5: INDICES, INTEGRITY & COMPOSITE STORAGE")
+    # 3. Phase 3-6 Summary
+    print("\n3. PHASE 3 - 6: INDICES, INTEGRITY, COMPOSITE & EXPLAINABILITY STORAGE")
     print("-" * 40)
     print(f"  consumer_sentiment       {all_table_counts.get('consumer_sentiment', 0):>8,} rows")
     print(f"  index_values             {all_table_counts.get('index_values', 0):>8,} rows")
     print(f"  coordination_scores      {all_table_counts.get('coordination_scores', 0):>8,} rows")
     print(f"  ticker_window_metrics    {all_table_counts.get('ticker_window_metrics', 0):>8,} rows")
+    print(f"  duplicate_pairs          {all_table_counts.get('duplicate_pairs', 0):>8,} rows")
+    print(f"  reasoning_trace          {all_table_counts.get('reasoning_trace', 0):>8,} rows")
+    print(f"  narrative_phylogeny      {all_table_counts.get('narrative_phylogeny', 0):>8,} rows")
     print("=" * 70 + "\n")
 
 

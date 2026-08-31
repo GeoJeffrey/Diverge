@@ -147,6 +147,44 @@ CREATE TABLE IF NOT EXISTS ticker_window_metrics (
 
 CREATE INDEX IF NOT EXISTS idx_twm_ticker_time
     ON ticker_window_metrics (ticker, window_start_utc);
+
+CREATE TABLE IF NOT EXISTS reasoning_trace (
+    trace_id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    ticker             TEXT NOT NULL,
+    window_start_utc   TEXT NOT NULL,
+    post_id            TEXT NOT NULL,
+    contributed_to     TEXT NOT NULL,
+    weight             REAL NOT NULL,
+    created_at         TEXT NOT NULL,
+    FOREIGN KEY (post_id) REFERENCES raw_posts(post_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_trace_ticker_time
+    ON reasoning_trace (ticker, window_start_utc);
+
+CREATE TABLE IF NOT EXISTS duplicate_pairs (
+    ticker             TEXT NOT NULL,
+    window_start_utc   TEXT NOT NULL,
+    post_id_a          TEXT NOT NULL,
+    post_id_b          TEXT NOT NULL,
+    similarity         REAL NOT NULL,
+    PRIMARY KEY (ticker, window_start_utc, post_id_a, post_id_b)
+);
+
+CREATE TABLE IF NOT EXISTS narrative_phylogeny (
+    ticker                  TEXT NOT NULL,
+    window_start_utc        TEXT NOT NULL,
+    window_end_utc          TEXT,
+    parent_window_start_utc TEXT,
+    mutation_type           TEXT NOT NULL,
+    mutation_detail         TEXT,
+    composite_delta         REAL,
+    computed_at             TEXT NOT NULL,
+    PRIMARY KEY (ticker, window_start_utc)
+);
+
+CREATE INDEX IF NOT EXISTS idx_phylogeny_ticker_time
+    ON narrative_phylogeny (ticker, window_start_utc);
 """
 
 
@@ -597,7 +635,7 @@ def get_post_timing_for_ticker(
 
 
 def count_all_tables(db_path: Path = config.DB_PATH) -> Dict[str, int]:
-    """Return dictionary of row counts for all Phase 1-5 tables."""
+    """Return dictionary of row counts for all Phase 1-6 tables."""
     conn = get_connection(db_path)
     tables = [
         "raw_posts",
@@ -609,6 +647,9 @@ def count_all_tables(db_path: Path = config.DB_PATH) -> Dict[str, int]:
         "index_values",
         "coordination_scores",
         "ticker_window_metrics",
+        "reasoning_trace",
+        "duplicate_pairs",
+        "narrative_phylogeny",
     ]
     counts = {}
     for t in tables:
@@ -827,6 +868,152 @@ def get_index_values_and_coordination_for_window(
     rows = conn.execute(query, params).fetchall()
     conn.close()
     return [dict(r) for r in rows]
+
+
+# --- Phase 6 Storage & Query Functions ---
+
+def insert_duplicate_pairs(rows: List[Dict[str, Any]], db_path: Path = config.DB_PATH) -> int:
+    """Insert or replace rows into duplicate_pairs table."""
+    if not rows:
+        return 0
+    conn = get_connection(db_path)
+    before = conn.execute("SELECT COUNT(*) FROM duplicate_pairs").fetchone()[0]
+    with conn:
+        for r in rows:
+            conn.execute(
+                """
+                INSERT OR REPLACE INTO duplicate_pairs
+                    (ticker, window_start_utc, post_id_a, post_id_b, similarity)
+                VALUES (?, ?, ?, ?, ?)
+                """,
+                (
+                    r["ticker"],
+                    r["window_start_utc"],
+                    r["post_id_a"],
+                    r["post_id_b"],
+                    r.get("similarity", 1.0),
+                ),
+            )
+    after = conn.execute("SELECT COUNT(*) FROM duplicate_pairs").fetchone()[0]
+    conn.close()
+    return after - before
+
+
+def get_duplicate_pairs_for_window(
+    ticker: str,
+    window_start_utc: str,
+    db_path: Path = config.DB_PATH,
+) -> List[Dict[str, Any]]:
+    """Fetch duplicate pairs for a given ticker and window."""
+    conn = get_connection(db_path)
+    conn.row_factory = sqlite3.Row
+    query = """
+        SELECT * FROM duplicate_pairs
+        WHERE ticker = ? AND window_start_utc = ?
+    """
+    rows = conn.execute(query, (ticker.upper(), window_start_utc)).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def insert_reasoning_traces(rows: List[Dict[str, Any]], db_path: Path = config.DB_PATH) -> int:
+    """Insert rows into reasoning_trace table."""
+    if not rows:
+        return 0
+    conn = get_connection(db_path)
+    before = conn.execute("SELECT COUNT(*) FROM reasoning_trace").fetchone()[0]
+    now_iso = datetime.now(timezone.utc).isoformat()
+    with conn:
+        for r in rows:
+            conn.execute(
+                """
+                INSERT INTO reasoning_trace
+                    (ticker, window_start_utc, post_id, contributed_to, weight, created_at)
+                VALUES (?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    r["ticker"],
+                    r["window_start_utc"],
+                    r["post_id"],
+                    r["contributed_to"],
+                    r.get("weight", 1.0),
+                    r.get("created_at", now_iso),
+                ),
+            )
+    after = conn.execute("SELECT COUNT(*) FROM reasoning_trace").fetchone()[0]
+    conn.close()
+    return after - before
+
+
+def get_reasoning_traces_for_window(
+    ticker: str,
+    window_start_utc: str,
+    db_path: Path = config.DB_PATH,
+) -> List[Dict[str, Any]]:
+    """Fetch reasoning_trace rows joined with raw_posts for a given ticker and window."""
+    conn = get_connection(db_path)
+    conn.row_factory = sqlite3.Row
+    query = """
+        SELECT rt.trace_id, rt.ticker, rt.window_start_utc, rt.post_id, rt.contributed_to,
+               rt.weight, rt.created_at, rp.raw_text, rp.account_id, rp.platform, rp.upvotes
+        FROM reasoning_trace rt
+        LEFT JOIN raw_posts rp ON rt.post_id = rp.post_id
+        WHERE rt.ticker = ? AND rt.window_start_utc = ?
+        ORDER BY rt.contributed_to ASC, rt.weight DESC
+    """
+    rows = conn.execute(query, (ticker.upper(), window_start_utc)).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def insert_narrative_phylogeny(rows: List[Dict[str, Any]], db_path: Path = config.DB_PATH) -> int:
+    """Insert or replace rows into narrative_phylogeny table."""
+    if not rows:
+        return 0
+    conn = get_connection(db_path)
+    before = conn.execute("SELECT COUNT(*) FROM narrative_phylogeny").fetchone()[0]
+    now_iso = datetime.now(timezone.utc).isoformat()
+    with conn:
+        for r in rows:
+            conn.execute(
+                """
+                INSERT OR REPLACE INTO narrative_phylogeny
+                    (ticker, window_start_utc, window_end_utc, parent_window_start_utc,
+                     mutation_type, mutation_detail, composite_delta, computed_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    r["ticker"],
+                    r["window_start_utc"],
+                    r.get("window_end_utc"),
+                    r.get("parent_window_start_utc"),
+                    r["mutation_type"],
+                    r.get("mutation_detail", "{}"),
+                    r.get("composite_delta"),
+                    r.get("computed_at", now_iso),
+                ),
+            )
+    after = conn.execute("SELECT COUNT(*) FROM narrative_phylogeny").fetchone()[0]
+    conn.close()
+    return after - before
+
+
+def get_narrative_phylogeny_for_ticker(
+    ticker: str,
+    db_path: Path = config.DB_PATH,
+) -> List[Dict[str, Any]]:
+    """Fetch narrative_phylogeny rows for a ticker ordered chronologically."""
+    conn = get_connection(db_path)
+    conn.row_factory = sqlite3.Row
+    query = """
+        SELECT * FROM narrative_phylogeny
+        WHERE ticker = ?
+        ORDER BY window_start_utc ASC
+    """
+    rows = conn.execute(query, (ticker.upper(),)).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
 
 
 

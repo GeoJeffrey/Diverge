@@ -111,7 +111,31 @@ class DivergeDashboardHandler(BaseHTTPRequestHandler):
                 "phase5": {
                     "ticker_window_metrics": safe_count("ticker_window_metrics"),
                 },
+                "phase6": {
+                    "reasoning_trace": safe_count("reasoning_trace"),
+                    "duplicate_pairs": safe_count("duplicate_pairs"),
+                    "narrative_phylogeny": safe_count("narrative_phylogeny"),
+                },
             })
+            return
+
+        # ── /api/reasoning-trace (Phase 6 Audit Trail) ────────
+        if path.startswith("/api/reasoning-trace"):
+            query_params = parse_qs(parsed.query)
+            ticker = query_params.get("ticker", [""])[0]
+            wstart = query_params.get("window_start", [""])[0]
+            from diverge_scraper import render_prototype
+            panel_data = render_prototype.reasoning_trace_panel(ticker, wstart, db_path=DB_PATH)
+            self.send_json(panel_data)
+            return
+
+        # ── /api/narrative-phylogeny (Phase 6 Narrative Lineage) ─
+        if path.startswith("/api/narrative-phylogeny"):
+            query_params = parse_qs(parsed.query)
+            ticker = query_params.get("ticker", [""])[0]
+            from diverge_scraper import render_prototype
+            tree_data = render_prototype.narrative_phylogeny_tree(ticker, db_path=DB_PATH)
+            self.send_json(tree_data)
             return
 
         # ── /api/composite-metrics ──────────────────────────────
@@ -351,6 +375,13 @@ class DivergeDashboardHandler(BaseHTTPRequestHandler):
                 import run_phase5
                 inserted = run_phase5.run(db_path=DB_PATH)
                 self.send_json({"status": "success", "message": f"Phase 5 completed ({inserted} ticker_window_metrics rows)."})
+            except Exception as e:
+                self.send_json({"status": "error", "message": str(e)}, status=500)
+        elif self.path == "/api/run-phase6":
+            try:
+                import run_phase6
+                inserted = run_phase6.run(db_path=DB_PATH)
+                self.send_json({"status": "success", "message": f"Phase 6 completed ({inserted} reasoning_trace rows)."})
             except Exception as e:
                 self.send_json({"status": "error", "message": str(e)}, status=500)
         else:
