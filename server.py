@@ -1,4 +1,4 @@
-﻿"""
+"""
 server.py
 
 Diverge Phase 1 + Phase 2 Web Dashboard Server.
@@ -96,16 +96,16 @@ class DivergeDashboardHandler(BaseHTTPRequestHandler):
             conn = sqlite3.connect(DB_PATH)
             storage.get_connection(DB_PATH)  # ensure tables exist
 
-            platform_counts = dict(conn.execute(
-                "SELECT platform, COUNT(*) FROM raw_posts GROUP BY platform"
-            ).fetchall())
-            total_raw = sum(platform_counts.values())
-
             def safe_count(table):
                 try:
                     return conn.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
                 except Exception:
                     return 0
+
+            platform_counts = dict(conn.execute(
+                "SELECT platform, COUNT(*) FROM raw_posts GROUP BY platform"
+            ).fetchall())
+            total_raw = sum(platform_counts.values())
 
             sentiment_dist = dict(conn.execute(
                 "SELECT sentiment_label, COUNT(*) FROM text_features GROUP BY sentiment_label"
@@ -119,8 +119,8 @@ class DivergeDashboardHandler(BaseHTTPRequestHandler):
                 "SELECT COUNT(*) FROM text_features WHERE is_sarcastic = 1"
             ).fetchone()[0] if safe_count("text_features") > 0 else 0
 
-            conn.close()
-            self.send_json({
+            # Collect all counts BEFORE closing the connection
+            payload = {
                 "total_raw_posts": total_raw,
                 "platform_counts": platform_counts,
                 "tickers": list(config.TICKERS.keys()),
@@ -149,7 +149,9 @@ class DivergeDashboardHandler(BaseHTTPRequestHandler):
                     "duplicate_pairs": safe_count("duplicate_pairs"),
                     "narrative_phylogeny": safe_count("narrative_phylogeny"),
                 },
-            })
+            }
+            conn.close()
+            self.send_json(payload)
             return
 
         # Ã¢â€â‚¬Ã¢â€â‚¬ Phase 7 Mode API Endpoints Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
@@ -157,22 +159,22 @@ class DivergeDashboardHandler(BaseHTTPRequestHandler):
         if path == "/api/simple":
             qp = parse_qs(parsed_url.query)
             t = qp.get("ticker", [""])[0]
-            w = qp.get("window", [""])[0]
-            if not t or not w:
-                self.send_json({"error": "ticker and window query params required"}, status=400)
+            w = qp.get("window", [""])[0] or None  # None triggers latest-window lookup
+            if not t:
+                self.send_json({"error": "ticker query param required"}, status=400)
                 return
             from diverge.output import mode_api
             status, data = mode_api.handle_get_simple(t, w, db_path=DB_PATH)
             self.send_json(data, status=status)
             return
 
-        # /api/advanced?ticker=INFY&window=2026-06-02T...
+        # /api/advanced?ticker=INFY&window=2026-06-02T... (window is optional)
         if path == "/api/advanced":
             qp = parse_qs(parsed_url.query)
             t = qp.get("ticker", [""])[0]
-            w = qp.get("window", [""])[0]
-            if not t or not w:
-                self.send_json({"error": "ticker and window query params required"}, status=400)
+            w = qp.get("window", [""])[0] or None  # None triggers latest-window lookup
+            if not t:
+                self.send_json({"error": "ticker query param required"}, status=400)
                 return
             from diverge.output import mode_api
             status, data = mode_api.handle_get_advanced(t, w, db_path=DB_PATH)

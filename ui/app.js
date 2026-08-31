@@ -1,4 +1,4 @@
-﻿/*
+/*
  * app.js
  * Client-side logic for Diverge UI.
  * simple.html sets data-page="simple" on <body>.
@@ -44,25 +44,35 @@ async function loadAdvancedMode() {
   const wstart = params.get('window') || '';
 
   document.getElementById('title-ticker').textContent = `${ticker} — Advanced Diagnostics`;
-  document.getElementById('title-sub').textContent = `Window: ${wstart || 'Latest Available'}`;
+  document.getElementById('title-sub').textContent = `Loading detailed diagnostics for ${ticker}…`;
 
-  const res = await fetch(`/api/advanced?ticker=${encodeURIComponent(ticker)}&window=${encodeURIComponent(wstart)}`).then(r => r.json());
+  let res;
+  try {
+    res = await fetch(`/api/advanced?ticker=${encodeURIComponent(ticker)}&window=${encodeURIComponent(wstart)}`).then(r => r.json());
+  } catch (e) {
+    document.getElementById('title-sub').textContent = `Network error: ${e.message}`;
+    return;
+  }
+
   if (res.error) {
     document.getElementById('title-sub').textContent = `Error: ${res.error}`;
     return;
   }
 
-  // Populate indices
-  const fmt = (v) => v !== null && v !== undefined ? (typeof v === 'number' ? v.toFixed(3) : v) : 'NULL';
+  // Populate indices — guard all values for null/undefined
+  const fmt = (v, decimals = 3) => (v !== null && v !== undefined) ? Number(v).toFixed(decimals) : 'NULL';
   document.getElementById('val-rn').textContent    = fmt(res.indices?.rn);
   document.getElementById('val-cirg').textContent  = fmt(res.indices?.cirg);
   document.getElementById('val-cli').textContent   = fmt(res.indices?.cli);
   document.getElementById('val-cassi').textContent = fmt(res.indices?.cassi);
   document.getElementById('val-vdi').textContent   = fmt(res.indices?.vdi);
 
-  // Coordination & Trust
-  document.getElementById('val-coord').textContent = res.coordination?.coordination_score !== null ? res.coordination.coordination_score.toFixed(1) : 'NULL';
-  document.getElementById('val-trust').textContent = `Trust Flag: ${res.coordination?.confidence_flag || 'N/A'}`;
+  // Coordination & Trust — guard against null coordination_score
+  const coordScore = res.coordination?.coordination_score;
+  document.getElementById('val-coord').textContent =
+    (coordScore !== null && coordScore !== undefined) ? Number(coordScore).toFixed(1) : 'NULL';
+  document.getElementById('val-trust').textContent =
+    `Trust Flag: ${res.coordination?.confidence_flag || 'N/A'}`;
 
   const flagsContainer = document.getElementById('risk-flags-container');
   if (res.risk_flags && res.risk_flags.length) {
@@ -71,42 +81,56 @@ async function loadAdvancedMode() {
     flagsContainer.innerHTML = '<span style="font-size:12px;color:var(--text2)">No active risk flags</span>';
   }
 
+  // Update subtitle with composite score summary
+  const composite = res.composite_score;
+  document.getElementById('title-sub').textContent =
+    `Window: ${res.window_start_utc ? res.window_start_utc.slice(0,16).replace('T',' ') : 'N/A'} · ` +
+    `Score: ${(composite !== null && composite !== undefined) ? Number(composite).toFixed(1) : 'N/A'} · ` +
+    `Dominant: ${res.dominant_index || 'N/A'} · Confidence: ${res.aggregation_confidence || 'N/A'}`;
+
   // Phylogeny Strip
   const phyloStrip = document.getElementById('phylo-strip');
   if (!res.phylogeny_context || !res.phylogeny_context.length) {
     phyloStrip.innerHTML = '<span style="color:var(--text2);font-size:13px">No narrative phylogeny history recorded yet.</span>';
   } else {
     phyloStrip.innerHTML = res.phylogeny_context.map(p => {
-      const chipClass = p.mutation_type === 'composite_reversal' ? 'chip-reversal' : p.mutation_type === 'dominant_index_shift' ? 'chip-shift' : '';
+      const chipClass = p.mutation_type === 'composite_reversal' ? 'chip-reversal'
+                      : p.mutation_type === 'dominant_index_shift' ? 'chip-shift' : '';
+      const delta = p.composite_delta;
       return `
         <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;display:flex;flex-direction:column;gap:4px">
           <div style="font-size:10px;color:var(--text2);font-family:'JetBrains Mono'">${p.window_start_utc.slice(0,16).replace('T',' ')}</div>
           <div><span class="chip ${chipClass}">${p.mutation_type}</span></div>
-          <div style="font-size:11px;color:var(--text2)">Delta: ${p.composite_delta !== null ? (p.composite_delta > 0 ? '+' : '') + p.composite_delta : '—'}</div>
+          <div style="font-size:11px;color:var(--text2)">Δ: ${delta !== null && delta !== undefined ? (delta > 0 ? '+' : '') + delta : '—'}</div>
         </div>
       `;
-    }).join('<div style="color:var(--text2)">→</div>');
+    }).join('<div style="color:var(--text2);font-size:18px;padding:0 4px">→</div>');
   }
 
-  // Reasoning Traces
+  // Reasoning Traces — collect all categories into flat list
   const tbody = document.getElementById('traces-body');
-  const categories = res.trace?.categories || {};
+  const traceData = res.trace || {};
+  const categories = traceData.categories || {};
   const allTraces = [];
   Object.keys(categories).forEach(cat => {
-    categories[cat].forEach(t => allTraces.push({ category: cat, ...t }));
+    (categories[cat] || []).forEach(t => allTraces.push({ category: cat, ...t }));
   });
 
   if (!allTraces.length) {
-    tbody.innerHTML = '<tr><td colspan="4" style="color:var(--text2)">No reasoning traces recorded for this window.</td></tr>';
+    tbody.innerHTML = `<tr><td colspan="4" style="color:var(--text2);padding:24px;text-align:center">
+      ${(traceData.total_traces || 0) === 0
+        ? 'No reasoning traces for this window. Run Phase 6 to generate audit traces.'
+        : 'No categorised traces found.'}
+    </td></tr>`;
     return;
   }
 
-  tbody.innerHTML = allTraces.map(t => `
+  tbody.innerHTML = allTraces.slice(0, 100).map(t => `
     <tr>
-      <td><span class="chip">${t.category}</span></td>
-      <td class="mono">${t.weight.toFixed(3)}</td>
-      <td><span class="chip" style="background:rgba(16,185,129,0.15);color:var(--green);border-color:var(--green)">${t.platform}</span></td>
-      <td style="font-size:12px;line-height:1.4">${t.text_preview}</td>
+      <td><span class="chip">${t.category || '—'}</span></td>
+      <td class="mono">${(t.weight !== null && t.weight !== undefined) ? Number(t.weight).toFixed(3) : '—'}</td>
+      <td><span class="chip" style="background:rgba(16,185,129,0.15);color:var(--green);border-color:var(--green)">${t.platform || 'unknown'}</span></td>
+      <td style="font-size:12px;line-height:1.4">${t.text_preview || '—'}</td>
     </tr>
   `).join('');
 }
