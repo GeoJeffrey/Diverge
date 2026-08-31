@@ -1,106 +1,120 @@
-# Diverge — Phase 1 Data Collection Module
+# Diverge — Financial Narrative Sentiment & Timing Pipeline
 
-A zero-API, zero-auth financial narrative sentiment data collection pipeline for **Diverge**.
+A zero-API, zero-auth financial narrative sentiment data collection, feature extraction, and real-time dashboard framework for **Diverge**.
 
-This module gathers financial discussions, news, search trends, and social media commentary mentioning tracked tickers (e.g. `TATASTEEL`, `RELIANCE`, `INFY`, `TCS`, `HDFCBANK`).
+This module gathers financial discussions, news, search trends, and social media commentary mentioning tracked Indian tickers (`TATASTEEL`, `RELIANCE`, `INFY`, `TCS`, `HDFCBANK`), extracts timing, periodicity, and sentiment features, and serves a live multi-tab web dashboard.
 
 ---
 
-## Zero-Config Setup & Principles
+## 🚀 Quick Start
 
-### What "No API" Means
-No official platform APIs, developer account registrations, OAuth credentials, or SDK libraries (`praw`, `telethon`, `tweepy`) are used. 
-
-Instead, scrapers rely exclusively on **raw HTTP requests**, **public JSON endpoints**, **RSS XML feeds**, and **public web HTML parsing**.
-
-### Zero API Key Configuration
-No `.env` file or API key configuration is required to execute the pipeline. You can clone the project, install dependencies, and run immediately:
+### 1. Install Dependencies
 
 ```bash
-# 1. Install dependencies
 pip install -r requirements.txt
+```
 
-# 2. Run data collection pipeline
+### 2. Run Data Collection (Phase 1)
+
+Scrape public data across Reddit, StockTwits, Telegram channels, Google Trends, and RSS news feeds into `diverge_raw.db`:
+
+```bash
 python main.py
 # OR
 python -m diverge_scraper.main
 ```
 
----
+### 3. Run Feature Extraction (Phase 2)
 
-## Source Architecture & ToS / Fragility Tradeoffs
+Extract posting frequency metrics, time-bin aggregated sentiment, periodicity statistics (KS-test, ACF peak lag, Fourier dominant frequencies), capitulation flags, sarcasm detection, and sentiment distributions:
 
-> [!WARNING]  
-> **Legal & ToS Gray Area Notice**  
-> Fetching public web pages, preview HTML, or undocumented JSON endpoints without official API credentials sits in a legal/ToS gray area. While technically reachable without authentication, these methods can violate platform Terms of Service (ToS) and are significantly more fragile than official APIs. Platforms may introduce rate limits, IP blocks, CAPTCHA challenges, or structure changes without prior notice.
-
-### 1. Reddit (Public JSON Endpoints)
-- **Endpoint**: `https://www.reddit.com/r/{subreddit}/new.json?limit=100` and post comment endpoints.
-- **Header**: Custom honest User-Agent (`DivergeResearchBot/0.1 (student project)`).
-- **Tradeoffs & Fragility**: Undocumented public endpoint. Reddit strictly rate-limits or blocks unauthenticated user-agents or IPs without warning.
-
-### 2. StockTwits (Public Stream API)
-- **Endpoint**: `https://api.stocktwits.com/api/2/streams/symbol/{symbol}.json`
-- **Tradeoffs & Fragility**: Public stream endpoint capped at roughly 200 requests/hour for anonymous requests. Exceeding limits results in HTTP 429 errors.
-
-### 3. Telegram (Public Channel HTML Web Previews)
-- **Endpoint**: `https://t.me/s/{channel_username}`
-- **Tradeoffs & Fragility**: Only works for **PUBLIC** Telegram channels. Displays only a limited recent-message window (no full historical backlog). Dependent on BeautifulSoup HTML class stability (`tgme_widget_message_text`, `tgme_widget_message_date time`).
-
-### 4. Google Trends (`pytrends`)
-- **Library**: `pytrends` querying Google Trends endpoints (`geo="IN"`).
-- **Tradeoffs & Fragility**: Fetches search interest scores (0-100). Google frequently rate-limits unauthenticated traffic or issues CAPTCHAs under automated polling.
-
-### 5. RSS News Feeds
-- **Feeds**: Moneycontrol Top News, Economic Times Markets, Reuters Business via `feedparser`.
-- **Tradeoffs & Fragility**: Feeds are officially intended for public syndication. Low fragility, but articles are limited to titles and summary descriptions. Uses deterministic SHA-256 hashes (`stable_id(link)`) for primary key generation.
-
----
-
-## Project Structure
-
-```
-/diverge_scraper
-  ├── __init__.py
-  ├── config.py                 # Central config: tickers, synonym regexes, rate limits, retention
-  ├── utils.py                  # Shared helpers: match_ticker, to_iso_utc, stable_id, robots.txt
-  ├── storage.py                # SQLite storage: single `raw_posts` table with INSERT OR IGNORE
-  ├── reddit_noapi_scraper.py   # Reddit public JSON scraper
-  ├── stocktwits_noapi_scraper.py # StockTwits public stream scraper
-  ├── telegram_noapi_scraper.py # Telegram public HTML preview scraper
-  ├── trends_scraper.py         # Google Trends interest scraper (pytrends)
-  ├── rss_news_scraper.py       # Financial RSS feeds scraper (feedparser)
-  ├── main.py                   # Sequential orchestrator with error handling & text retention purge
-  └── tests/
-      └── test_scrapers.py      # Comprehensive offline unit tests with mocked HTTP responses
+```bash
+python run_phase2.py
 ```
 
+### 4. Launch the Web Dashboard
+
+Start the local dashboard server and REST API:
+
+```bash
+python server.py [--port 8000]
+```
+
+Open **[http://localhost:8000](http://localhost:8000)** in your browser to view live stats, platform breakdown, sentiment distribution, and trigger pipeline executions on-demand.
+
 ---
 
-## Database Schema
+## 🏗️ Project Architecture & Structure
 
-All scrapers write into a single SQLite database (`diverge_raw.db`), table `raw_posts`:
+```
+Diverge/
+├── dashboard.html                  # Multi-tab interactive web dashboard (HTML/JS/CSS)
+├── server.py                        # HTTP dashboard server & REST API endpoints
+├── run_phase2.py                    # Phase 2 pipeline orchestrator
+├── main.py                          # Phase 1 scraper orchestrator
+├── check_distribution.py            # Data distribution diagnostics script
+├── view_data.py                     # Database preview utility script
+├── diverge_raw.db                   # SQLite database (auto-generated)
+├── requirements.txt                 # Project python dependencies
+├── README.md                        # Documentation
+└── diverge_scraper/                 # Core package
+    ├── __init__.py
+    ├── config.py                    # Central configuration (tickers, regex, retention limits)
+    ├── utils.py                     # Helpers (ticker matching, UTC conversion, stable SHA-256 IDs)
+    ├── storage.py                   # SQLite storage layer & schema migrations
+    ├── reddit_noapi_scraper.py      # Reddit public JSON scraper
+    ├── stocktwits_noapi_scraper.py    # StockTwits public stream scraper
+    ├── telegram_noapi_scraper.py    # Telegram public HTML web preview scraper
+    ├── trends_scraper.py            # Google Trends scraper (pytrends)
+    ├── rss_news_scraper.py          # Financial RSS feed parser (feedparser)
+    ├── timing_features.py           # Phase 2: Post interval & time-bin aggregator
+    ├── periodicity_analysis.py      # Phase 2: KS-test, ACF peak lag, FFT periodicity
+    ├── text_features.py             # Phase 2: Sentiment scoring, sarcasm & capitulation flags
+    └── tests/
+        ├── test_scrapers.py         # Phase 1 offline unit tests (mocked HTTP)
+        └── test_phase2.py           # Phase 2 feature extraction unit tests
+```
 
-| Column | Type | Description |
+---
+
+## 🛡️ Zero-Config & "No API" Principles
+
+- **No Official API Keys / Credentials**: No API keys, OAuth credentials, or SDK dependencies (`praw`, `telethon`, `tweepy`) are required.
+- **Raw Web Ingestion**: Uses standard HTTP requests, public JSON endpoints, RSS XML feeds, and HTML web previews.
+- **Auto Database Initialization**: SQLite schema and tables are automatically initialized upon execution.
+
+---
+
+## 📊 Database Schema
+
+All scrapers and feature engines write into a single SQLite database (`diverge_raw.db`):
+
+| Table | Description | Key Fields |
 | :--- | :--- | :--- |
-| `post_id` | `TEXT PRIMARY KEY` | Unique deterministic post/comment identifier |
-| `account_id` | `TEXT NOT NULL` | Author username or platform channel handle |
-| `timestamp_utc` | `TEXT NOT NULL` | Standardized ISO 8601 UTC timestamp |
-| `community` | `TEXT` | Subreddit, stream, or channel name |
-| `ticker` | `TEXT` | Matched ticker symbol (e.g. `TATASTEEL`) |
-| `raw_text` | `TEXT` | Body text / headline description |
-| `upvotes` | `INTEGER` | Likes, score, or Google Trends interest score (0-100) |
-| `platform` | `TEXT NOT NULL` | Source (`reddit`, `stocktwits`, `telegram`, `google_trends`, `rss_news`) |
-| `scraped_at` | `TEXT NOT NULL` | Ingestion timestamp in UTC ISO format |
-
-`insert_many()` executes `INSERT OR IGNORE INTO raw_posts` to guarantee deduplication upon repeated runs.
+| `raw_posts` | Stored raw scraped posts & news items | `post_id`, `ticker`, `platform`, `raw_text`, `upvotes`, `timestamp_utc` |
+| `post_timing` | Calculated post time intervals & delays | `post_id`, `time_since_prev_sec`, `time_to_next_sec`, `is_burst_start` |
+| `ticker_time_bins` | Aggregated metrics per time window | `ticker`, `bin_start_utc`, `post_count`, `avg_sentiment` |
+| `text_features` | Sentiment, capitulation & sarcasm scores | `post_id`, `sentiment_score`, `sentiment_label`, `is_sarcastic`, `capitulation_flag` |
+| `periodicity_stats` | Statistical periodicity & Fourier analysis | `ticker`, `ks_statistic`, `acf_peak_lag_minutes`, `onset_dispersion_index` |
 
 ---
 
-## Running Offline Unit Tests
+## 🧪 Running Offline Unit Tests
 
-To verify parsers, storage deduplication, and retention logic without network access:
+To run the complete test suite without making external network requests:
 
 ```bash
 python -m unittest discover -s diverge_scraper/tests
 ```
+
+---
+
+## 🌐 Server REST API Endpoints
+
+- `GET /` or `/dashboard.html` — Serves the interactive web dashboard.
+- `GET /api/stats` — Summary counts, platform distribution, and Phase 2 statistics.
+- `GET /api/posts` — Filterable raw posts with pagination (`?ticker=...&platform=...&limit=50`).
+- `GET /api/text-features` — Sentiment distribution, sarcasm flags, and capitulation indicators.
+- `GET /api/periodicity` — Statistical analysis & periodicity metrics.
+- `POST /api/run-scraper` — Triggers full Phase 1 scraping pipeline on-demand.
+- `POST /api/run-phase2` — Triggers Phase 2 feature extraction pipeline on-demand.
