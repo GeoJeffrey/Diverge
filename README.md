@@ -1,4 +1,4 @@
-﻿# Diverge â€” Financial Narrative Sentiment, Timing, Indices, Integrity & Lineage Pipeline
+﻿# Diverge Financial Narrative Sentiment, Timing, Indices, Integrity & Lineage Pipeline
 
 A zero-API, zero-auth financial narrative sentiment data collection, feature extraction, index calculation, integrity/coordination scoring, composite aggregation, explainability audit trail, and real-time dashboard framework for **Diverge**.
 
