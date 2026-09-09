@@ -1,180 +1,167 @@
-﻿# Diverge Financial Narrative Sentiment, Timing, Indices, Integrity & Lineage Pipeline
+# Diverge — Financial Narrative Sentiment, Timing, Indices, Integrity & Lineage Pipeline
 
-A zero-API, zero-auth financial narrative sentiment data collection, feature extraction, index calculation, integrity/coordination scoring, composite aggregation, explainability audit trail, and real-time dashboard framework for **Diverge**.
+A zero-API, zero-auth financial narrative sentiment intelligence system, feature extraction pipeline, index calculation engine, integrity/coordination scorer, composite aggregator, explainability audit trail, and real-time dual-mode dashboard framework.
 
-This module gathers financial discussions, news, search trends, and social media commentary mentioning tracked Indian tickers (`TATASTEEL`, `RELIANCE`, `INFY`, `TCS`, `HDFCBANK`), extracts timing, periodicity, and sentiment features, computes 5 raw financial indices, evaluates 5-component integrity/coordination scores per window, aggregates 0-100 composite scores, generates post-level audit reasoning traces and narrative phylogeny lineage trees, and serves a live multi-tab web dashboard.
+Diverge monitors public social commentary, search trends, consumer app reviews, and market news across 16 major Indian and global equities (`TATASTEEL`, `RELIANCE`, `INFY`, `TCS`, `HDFCBANK`, `ICICIBANK`, `SBIN`, `BHARTIARTL`, `ITC`, `LT`, `WIPRO`, `AAPL`, `TSLA`, `NVDA`, `MSFT`, `AMZN`). It extracts temporal and NLP features, evaluates 5 distinct financial indices, benchmarks coordinated inorganic activity, collapses metrics into calibrated 0–100 composite confidence scores, and produces full post-level explainability traces with narrative evolution phylogeny trees.
 
 ---
 
-## ðŸš€ Quick Start & Usage
+## 🚀 Quick Start & Usage
 
-### 1. Install Dependencies
+### 1. Installation
+
+Clone the repository and install dependencies:
 
 ```bash
+git clone https://github.com/GeoJeffrey/Diverge.git
+cd Diverge
 pip install -r requirements.txt
+pip install -e .
 ```
 
-### 2. (Optional) Seed 60 Days of Historical Data
+### 2. Run the Full End-to-End Pipeline
 
-To populate 60 days of historical data for comprehensive offline testing across all 6 phases:
-
-```bash
-python seed_historical_data.py
-```
-
-### 3. Execute Master Pipeline (Phase 1 -> 2 -> 3 -> 4 -> 5 -> 6)
-
-Run the full end-to-end data ingestion, feature extraction, indices calculation, integrity scoring, composite aggregation, and explainability pipeline in one command:
+Execute the master pipeline across all phases (Phase 1 Ingestion → Phase 2 Features → Phase 3 Indices → Phase 4 Integrity → Phase 5 Composite → Phase 6 Explainability):
 
 ```bash
 python run_all.py
 ```
 
-To run Phase 2 -> 6 processing against existing database data without re-scraping live sources:
+To run Phases 2 through 6 against existing live database records without re-scraping:
 
 ```bash
 python run_all.py --skip-scrape
 ```
 
-### 4. Run Individual Phase Modules
+### 3. Launch Web Dashboard & REST API
 
-- **Phase 1 Data Collection**:
-  ```bash
-  python main.py
-  ```
-- **Phase 2 Feature Extraction**:
-  ```bash
-  python run_phase2.py
-  ```
-- **Phase 3 Financial Indices**:
-  ```bash
-  python run_phase3.py
-  ```
-- **Phase 4 Integrity & Coordination Scoring**:
-  ```bash
-  python run_phase4.py
-  ```
-- **Phase 5 Composite Aggregation**:
-  ```bash
-  python run_phase5.py
-  ```
-- **Phase 6 Explainability & Lineage**:
-  ```bash
-  python run_phase6.py
-  ```
-
-### 5. Launch the Web Dashboard Server
-
-Start the local dashboard server and REST API:
+Start the dashboard server:
 
 ```bash
-python server.py [--port 8000]
+python run_server.py [--port 8000]
 ```
 
-Open **[http://localhost:8000](http://localhost:8000)** in your browser to view live stats, platform breakdown, sentiment distribution, Phase 3 indices, Phase 5 composite scores, and Phase 6 narrative lineage & reasoning trace audit logs.
+Open **[http://localhost:8000](http://localhost:8000)** in your browser:
+- **Simple Mode**: Intuitive consumer-friendly cards, sentiment dial, dominant narrative driver, and qualitative risk indicators.
+- **Advanced Mode**: Full audit view including 5-metric radar/table breakdown, coordination trust dampening, post-level reasoning traces, and narrative phylogeny tree.
+- **REST APIs**: `/api/stats`, `/api/tickers`, `/api/simple`, `/api/advanced`, `/api/reasoning-trace`, `/api/phylogeny`.
 
 ---
 
-## ðŸ” Phase 6 Explainability & Lineage Engine
+## 🏗️ Architecture & Pipeline Phases
 
-Phase 6 produces a complete **post-level audit trail** (`reasoning_trace`) and **narrative evolution lineage tree** (`narrative_phylogeny`) for every aggregated metric window:
-
-1. **Reasoning Trace Audit Trail (`reasoning_trace`)**:
-   - `rn_onset`: First-mention posts driving reproduction rate onset.
-   - `cassi_sentiment`: Top sentiment magnitude posts driving cross-asset VAR.
-   - `vdi_divergence`: Top sentiment posts per language (`en` / `hi-en-mixed`).
-   - `cli_capitulation`: Posts flagged with capitulation.
-   - `duplicate_flag`: MinHash post pairs crossing >90% similarity from `duplicate_pairs`.
-   - `sentiment_variance_outlier`: Posts closest to window mean sentiment (unnaturally unanimous).
-2. **Narrative Phylogeny Lineage Tree (`narrative_phylogeny`)**:
-   - Tracks window-to-window narrative transitions: `composite_reversal`, `dominant_index_shift`, `new_risk_flag`, `flag_resolved`, `stable`.
-   - Handles data gaps automatically by linking to the most recent prior valid window.
-3. **Phase 7 Data Contracts (`render_prototype.py`)**:
-   - `reasoning_trace_panel(ticker, window_start)`: Grouped JSON audit trail items with 140-char text previews.
-   - `narrative_phylogeny_tree(ticker)`: Chronological parent-child lineage tree for UI rendering.
+```
+┌───────────────────────────────────────────────────────────────────────────┐
+│                           1. Ingestion Layer                              │
+│   StockTwits  │  Reddit  │  Telegram  │  Google Trends  │  RSS Feeds     │
+└─────────────────────────────────────┬─────────────────────────────────────┘
+                                      ▼
+┌───────────────────────────────────────────────────────────────────────────┐
+│                     2. Feature Extraction & NLP Track                     │
+│  FinBERT Sentiment  │  Sarcasm Heuristic  │  Capitulation Continuous Signal │
+│  Conviction/Hedge Ratio  │  FFT & Periodicity  │  MinHash Deduplication   │
+└─────────────────────────────────────┬─────────────────────────────────────┘
+                                      ▼
+┌───────────────────────────────────────────────────────────────────────────┐
+│                        3. Financial Indices Engine                        │
+│   • CLI   (Capitulation Leak Index)                                       │
+│   • VDI   (Vernacular Divergence Index - Multilingual & Cross-Platform)    │
+│   • CASSI (Cross-Asset Sentiment Spillover Index - VAR & Correlation)     │
+│   • Rn    (Narrative Reproduction Number - Epidemic Viral Transmission)   │
+│   • CIRG  (Consumer-Investor Rating Gap)                                  │
+└─────────────────────────────────────┬─────────────────────────────────────┘
+                                      ▼
+┌───────────────────────────────────────────────────────────────────────────┐
+│                      4. Integrity & Coordination Scorer                   │
+│   Periodicity KS-Stat  │  ACF Peak Strength  │  Duplicate Density Ratio   │
+│   Sentiment Variance   │  News Reaction Dampening (High / Mod / Low Trust)│
+└─────────────────────────────────────┬─────────────────────────────────────┘
+                                      ▼
+┌───────────────────────────────────────────────────────────────────────────┐
+│                       5. Composite Aggregation Engine                     │
+│   Normalized Core Weighted Combination  │  CIRG / CLI Asymmetric Modifiers │
+│   Confidence Dampening (0–100 Score)    │  Dominant Index Identification  │
+└─────────────────────────────────────┬─────────────────────────────────────┘
+                                      ▼
+┌───────────────────────────────────────────────────────────────────────────┐
+│                     6. Explainability & Lineage Audit                     │
+│   Post-Level Reasoning Traces  │  Parent-Child Narrative Phylogeny Tree   │
+└─────────────────────────────────────┬─────────────────────────────────────┘
+                                      ▼
+┌───────────────────────────────────────────────────────────────────────────┐
+│                       7. Output & Interactive Server                      │
+│   Simple Mode UI  │  Advanced Diagnostics Mode  │  Fast REST Endpoints    │
+└───────────────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
-## ðŸ—ï¸ Project Structure
+## 📊 Phase 3 Financial Indices Explained
+
+1. **CLI (Capitulation Leak Index)**:
+   Measures retail despair, liquidations, and stop-loss panic. Utilizes expanded capitulation phrase lexicons coupled with continuous soft confidence scoring and negative sentiment density to ensure sensitive, continuous tracking without artificial zero floors.
+
+2. **VDI (Vernacular Divergence Index)**:
+   Measures divergence in sentiment between language groups (e.g. English vs. Hinglish/Devanagari). Incorporates cross-platform vernacular divergence (retail social streams vs. institutional news feeds) as a robust proxy when bilingual post volumes are asymmetric.
+
+3. **CASSI (Cross-Asset Sentiment Spillover Index)**:
+   Measures how sentiment shocks in one asset propagate to other equities via Vector Autoregression (VAR) forecast-error variance decomposition, backed by pairwise cross-correlation spillover fallbacks.
+
+4. **Rn (Narrative Reproduction Number)**:
+   Epidemiological viral transmission modeling of narrative spread ($R_n = \beta / \gamma$). Tracks daily new first-mention posters against active decay curves across tiered sample windows.
+
+5. **CIRG (Consumer-Investor Rating Gap)**:
+   Quantifies the delta between retail/institutional investor sentiment and real-world consumer product/app ratings (`Z_investor - Z_consumer`), highlighting overhyped assets or underpriced consumer value.
+
+---
+
+## 🛡️ 100% Live Data Guarantee & Data Integrity
+
+Diverge operates strictly on **verified live data**:
+- **Zero synthetic/seeded posts**: All fake historical post generators have been permanently excised.
+- **Database maintenance**: Use `python scripts/purge_seeded_data.py` to audit or purge any residual seed patterns.
+- **Zero NULL / 0 Guarantees**: Robust statistical fallbacks ensure that sparse ticker windows still produce meaningful scores without crashing or generating uninformative NULL metrics.
+
+---
+
+## 📁 Repository Structure
 
 ```
 Diverge/
-â”œâ”€â”€ dashboard.html                  # Multi-tab interactive web dashboard (HTML/JS/CSS)
-â”œâ”€â”€ server.py                        # HTTP dashboard server & REST API endpoints
-â”œâ”€â”€ run_all.py                       # Master orchestrator (Phase 1 -> 2 -> 3 -> 4 -> 5 -> 6)
-â”œâ”€â”€ run_phase6.py                    # Phase 6 explainability orchestrator
-â”œâ”€â”€ run_phase5.py                    # Phase 5 composite aggregation orchestrator
-â”œâ”€â”€ run_phase4.py                    # Phase 4 integrity scoring orchestrator
-â”œâ”€â”€ run_phase3.py                    # Phase 3 financial indices orchestrator
-â”œâ”€â”€ run_phase2.py                    # Phase 2 feature extraction orchestrator
-â”œâ”€â”€ seed_historical_data.py          # 60-day historical data seeder script
-â”œâ”€â”€ main.py                          # Phase 1 scraper orchestrator
-â”œâ”€â”€ check_distribution.py            # Data distribution verification script
-â”œâ”€â”€ diverge_raw.db                   # SQLite database
-â”œâ”€â”€ requirements.txt                 # Project python dependencies
-â”œâ”€â”€ README.md                        # Documentation
-â””â”€â”€ src/diverge/                 # Core package
-    â”œâ”€â”€ config.py                    # Central configuration
-    â”œâ”€â”€ utils.py                     # Shared helpers
-    â”œâ”€â”€ storage.py                   # SQLite storage layer & schema migrations
-    â”œâ”€â”€ reasoning_trace_builder.py   # Phase 6: Post-level audit trail builder
-    â”œâ”€â”€ phylogeny_builder.py         # Phase 6: Narrative evolution lineage builder
-    â”œâ”€â”€ render_prototype.py          # Phase 6: Data contract JSON structure builders
-    â”œâ”€â”€ aggregate_composite.py       # Phase 5: Composite aggregation engine
-    â”œâ”€â”€ duplicate_detection.py       # Phase 4: MinHash near-duplicate post & pairs detection
-    â”œâ”€â”€ sentiment_variance.py        # Phase 4: Sentiment variance & baseline normalization
-    â”œâ”€â”€ coordination_score.py        # Phase 4: Combined coordination score calculator
-    â”œâ”€â”€ reddit_noapi_scraper.py      # Reddit public JSON scraper
-    â”œâ”€â”€ stocktwits_noapi_scraper.py    # StockTwits public stream scraper
-    â”œâ”€â”€ telegram_noapi_scraper.py    # Telegram public HTML web preview scraper
-    â”œâ”€â”€ trends_scraper.py            # Google Trends scraper (pytrends)
-    â”œâ”€â”€ rss_news_scraper.py          # Financial RSS feed parser
-    â”œâ”€â”€ consumer_reviews_scraper.py  # Consumer reviews rating scraper
-    â”œâ”€â”€ timing_features.py           # Phase 2: Post interval & time-bin aggregator
-    â”œâ”€â”€ periodicity_analysis.py      # Phase 2: KS-test, ACF peak lag, FFT periodicity
-    â”œâ”€â”€ text_features.py             # Phase 2: Sentiment scoring, sarcasm & capitulation flags
-    â”œâ”€â”€ cli_index.py                 # Phase 3: Capitulation Leak Index
-    â”œâ”€â”€ vdi_index.py                 # Phase 3: Vernacular Divergence Index
-    â”œâ”€â”€ cassi_index.py               # Phase 3: Cross-Asset Sentiment Spillover Index
-    â”œâ”€â”€ rn_index.py                  # Phase 3: Effective Reproduction Number Index
-    â”œâ”€â”€ cirg_index.py                # Phase 3: Consumer-Investor Rating Gap Index
-    â””â”€â”€ tests/
-        â”œâ”€â”€ test_scrapers.py         # Phase 1 offline unit tests
-        â”œâ”€â”€ test_phase2.py           # Phase 2 unit tests
-        â”œâ”€â”€ test_phase3.py           # Phase 3 unit tests
-        â”œâ”€â”€ test_phase4.py           # Phase 4 unit tests
-        â”œâ”€â”€ test_phase5.py           # Phase 5 unit tests
-        â””â”€â”€ test_phase6.py           # Phase 6 unit tests
+├── dashboard.html             # Interactive web dashboard (Simple & Advanced modes)
+├── server.py                  # HTTP server & REST API implementation
+├── run_server.py              # Server launcher script
+├── run_all.py                 # Master orchestrator (Phases 1–6)
+├── pyproject.toml             # Python package configuration
+├── requirements.txt           # Package dependencies
+├── README.md                  # Project documentation
+├── scripts/                   # Operator utilities & audit tools
+│   ├── check_counts.py        # Database table row-count inspector
+│   ├── check_distribution.py  # Platform & feature distribution validator
+│   ├── daily_volume_report.py # 24-hour ingestion volume summary
+│   ├── purge_seeded_data.py   # Database maintenance & seed-purging utility
+│   ├── validate_endpoints.py  # End-to-end REST API health checker
+│   └── view_data.py           # CLI browser for raw ingested posts
+├── src/diverge/               # Core Diverge Python package
+│   ├── config.py              # Configuration constants & ticker universe
+│   ├── storage.py             # SQLite schema, queries, and connection handling
+│   ├── utils.py               # Time parsing (ISO/RFC), deduplication & hashing
+│   ├── scrapers/              # Phase 1: Public zero-API ingestion scrapers
+│   ├── features/              # Phase 2: NLP sentiment, timing & periodicity
+│   ├── indices/               # Phase 3: CLI, VDI, CASSI, Rn, CIRG engines
+│   ├── integrity/             # Phase 4: Coordination scoring & trust flags
+│   ├── aggregation/           # Phase 5: Composite 0–100 score engine
+│   ├── explainability/        # Phase 6: Post-level traces & phylogeny tree
+│   └── output/                # Phase 7: Dual-mode payload generation
+└── tests/                     # Test suite (63 unit tests across all phases)
 ```
 
 ---
 
-## ðŸ“Š Database Schema
+## 🧪 Testing
 
-All scrapers, feature engines, index calculators, integrity scorers, composite aggregators, and explainability builders write into a single SQLite database (`diverge_raw.db`):
-
-| Table | Description | Key Fields |
-| :--- | :--- | :--- |
-| `raw_posts` | Stored raw scraped posts & news items | `post_id`, `ticker`, `platform`, `raw_text`, `upvotes`, `timestamp_utc` |
-| `post_timing` | Calculated post time intervals & delays | `post_id`, `delta_seconds`, `is_first_mention` |
-| `ticker_time_bins` | Aggregated metrics per time window | `ticker`, `bin_start_utc`, `post_count` |
-| `text_features` | Sentiment, capitulation & sarcasm scores | `post_id`, `sentiment_score`, `is_sarcastic`, `capitulation_flag`, `language` |
-| `periodicity_stats` | Statistical periodicity & Fourier analysis | `ticker`, `window_start_utc`, `ks_statistic`, `acf_peak_lag_minutes` |
-| `consumer_sentiment` | Public consumer brand/app review scores | `id`, `ticker`, `timestamp_utc`, `review_sentiment_score`, `source` |
-| `index_values` | Computed raw Phase 3 financial indices | `ticker`, `window_start_utc`, `cli`, `vdi`, `cassi`, `rn`, `cirg` |
-| `coordination_scores` | Phase 4 Integrity & trust scores | `ticker`, `window_start_utc`, `coordination_score`, `confidence_flag` |
-| `ticker_window_metrics` | Phase 5 Aggregated composite metrics | `ticker`, `window_start_utc`, `composite_score`, `dominant_index`, `risk_flags` |
-| `duplicate_pairs` | Phase 4/6 Flagged near-duplicate post pairs | `ticker`, `window_start_utc`, `post_id_a`, `post_id_b`, `similarity` |
-| `reasoning_trace` | Phase 6 Post-level audit trail records | `trace_id`, `ticker`, `window_start_utc`, `post_id`, `contributed_to`, `weight` |
-| `narrative_phylogeny` | Phase 6 Narrative evolution lineage tree | `ticker`, `window_start_utc`, `parent_window_start_utc`, `mutation_type` |
-
----
-
-## ðŸ§ª Running Offline Unit Tests
-
-To run the complete 60-test suite without making external network requests:
+Run the full offline test suite across all feature extractors, index calculators, aggregation rules, and output payloads:
 
 ```bash
-python -m unittest discover -s src/diverge/tests
+pytest tests/ -v
 ```
-
