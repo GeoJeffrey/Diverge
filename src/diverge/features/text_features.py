@@ -26,9 +26,9 @@ from .. import config, storage, utils
 
 logger = utils.setup_logger("text_features")
 
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ---------------------------------------------------------
 # Lexicons
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ---------------------------------------------------------
 CAPITULATION_PHRASES = [
     r"sold\s+everything",
     r"i['\s]?m\s+out",
@@ -108,7 +108,7 @@ SARCASM_LOSS_SIGNALS = [
     r"\bwrecked\b",
     r"\bstonks\b",         # ironic usage of "stonks"
 ]
-ROCKET_EMOJI_PATTERN = re.compile(r"[\U0001F680\U0001F4C8]")  # ðŸš€ðŸ“ˆ
+ROCKET_EMOJI_PATTERN = re.compile(r"[\U0001F680\U0001F4C8]")  # ˆ
 NFA_PATTERN = re.compile(
     r"(not\s+financial\s+advice|nfa\b|do\s+your\s+own\s+research|dyor\b)", re.IGNORECASE
 )
@@ -121,9 +121,9 @@ HINDI_ROMAN_MARKERS = re.compile(
 )
 
 
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ---------------------------------------------------------
 # FinBERT / Sentiment Model
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ---------------------------------------------------------
 _sentiment_pipeline = None
 
 
@@ -176,7 +176,7 @@ def _keyword_sentiment(text: str) -> tuple[float, str]:
 def score_sentiment_batch(texts: List[str], pipe=None) -> List[tuple[float, str]]:
     """
     Score a batch of texts for sentiment.
-    With FinBERT: maps positiveâ†’bullish, negativeâ†’bearish, neutralâ†’neutral.
+    With FinBERT: maps positive->bullish, negative->bearish, neutral->neutral.
     Without FinBERT: falls back to keyword matching.
     Returns list of (score, label) tuples.
     """
@@ -204,9 +204,9 @@ def score_sentiment_batch(texts: List[str], pipe=None) -> List[tuple[float, str]
     return results
 
 
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ---------------------------------------------------------
 # Capitulation Detection
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ---------------------------------------------------------
 _cap_patterns = [re.compile(p, re.IGNORECASE) for p in CAPITULATION_PHRASES]
 
 
@@ -232,9 +232,9 @@ def detect_capitulation(text: str) -> tuple[int, float]:
     return flag, round(confidence, 4)
 
 
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ---------------------------------------------------------
 # Sarcasm Calibration
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ---------------------------------------------------------
 _certainty_high = [re.compile(p, re.IGNORECASE) for p in SARCASM_CERTAINTY_HIGH]
 _loss_signals = [re.compile(p, re.IGNORECASE) for p in SARCASM_LOSS_SIGNALS]
 
@@ -246,7 +246,7 @@ def detect_sarcasm(text: str) -> int:
       - High-certainty language co-occurs with explicit loss signals (contradictory pattern)
       - Rocket emoji(s) appear with loss signals
       - NFA disclaimer co-occurs with high-certainty language
-    Returns 0 or 1. Documented as a heuristic â€” not a trained classifier.
+    Returns 0 or 1. Documented as a heuristic — not a trained classifier.
     """
     if not text:
         return 0
@@ -269,7 +269,7 @@ def irony_adjusted(sentiment_score: float, is_sarcastic: int) -> float:
     """
     Heuristic sarcasm correction: when sarcasm is detected, dampen the sentiment
     toward zero by 70% rather than fully flipping it. This is intentionally conservative
-    because rule-based sarcasm detection has low precision â€” a full flip would introduce
+    because rule-based sarcasm detection has low precision — a full flip would introduce
     more noise than the dampening. Document as a heuristic pending a labeled sarcasm corpus.
     """
     if not is_sarcastic:
@@ -277,9 +277,9 @@ def irony_adjusted(sentiment_score: float, is_sarcastic: int) -> float:
     return round(sentiment_score * 0.3, 4)
 
 
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ---------------------------------------------------------
 # Conviction-Hedge Ratio
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ---------------------------------------------------------
 _certainty_pats = [re.compile(p, re.IGNORECASE) for p in CERTAINTY_TERMS]
 _hedge_pats = [re.compile(p, re.IGNORECASE) for p in HEDGE_TERMS]
 
@@ -304,16 +304,16 @@ def conviction_hedge_ratio(text: str) -> Optional[float]:
     return round(certainty_count / hedge_count, 4)
 
 
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ---------------------------------------------------------
 # Language Detection
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ---------------------------------------------------------
 def detect_language(text: str) -> str:
     """
     Detect language of post text.
     Priority:
-      1. Devanagari Unicode range â†’ 'hi-en-mixed' (code-mix assumed with stock context)
-      2. Romanized Hindi markers heuristic â†’ 'hi-en-mixed'
-      3. langdetect library â†’ 'en' or detected ISO code
+      1. Devanagari Unicode range -> 'hi-en-mixed' (code-mix assumed with stock context)
+      2. Romanized Hindi markers heuristic -> 'hi-en-mixed'
+      3. langdetect library -> 'en' or detected ISO code
     Returns: 'en', 'hi-en-mixed', or ISO 639-1 code.
     """
     if not text or not text.strip():
@@ -334,9 +334,9 @@ def detect_language(text: str) -> str:
         return "en"
 
 
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ---------------------------------------------------------
 # Main Feature Extraction
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ---------------------------------------------------------
 def extract_features_for_posts(posts: List[tuple], pipe=None) -> List[Dict[str, Any]]:
     """
     Given list of (post_id, raw_text, ticker) tuples, compute all text features.

@@ -4,10 +4,10 @@ periodicity_analysis.py
 Phase 2 Timing Track: Periodicity Analysis
 Reads ticker_time_bins and post_timing (populated by timing_features.py).
 For each ticker, in rolling 2-hour windows, computes:
-  1. KS Test â€” inter-arrival times vs exponential distribution fit
-  2. Autocorrelation (ACF) â€” peak lag and strength
-  3. FFT â€” dominant frequency in minutes (null if no significant peak)
-  4. Onset Dispersion Index â€” variance-to-mean ratio of first-mentions per sub-bucket
+  1. KS Test — inter-arrival times vs exponential distribution fit
+  2. Autocorrelation (ACF) — peak lag and strength
+  3. FFT — dominant frequency in minutes (null if no significant peak)
+  4. Onset Dispersion Index — variance-to-mean ratio of first-mentions per sub-bucket
 
 Minimum sample guard: windows with < MIN_POSTS_PER_WINDOW posts are skipped with a warning.
 """

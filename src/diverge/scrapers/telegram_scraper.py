@@ -6,7 +6,7 @@ telegram_noapi_scraper.py
 # This approach uses plain HTML web parsing without any Telegram API, login, or api_id/api_hash.
 # NOTE: This only works for PUBLIC Telegram channels, and preview pages display a limited
 # recent-message window (not full historical message backlog). Scraping public HTML pages
-# sits in a legal/ToS gray area â€” verify channel privacy and check robots.txt.
+# sits in a legal/ToS gray area — verify channel privacy and check robots.txt.
 """
 
 import time

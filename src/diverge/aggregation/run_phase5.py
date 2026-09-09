@@ -29,7 +29,7 @@ def run(db_path: Path = config.DB_PATH, recompute_all: bool = False) -> int:
     Returns count of inserted/updated ticker_window_metrics rows.
     """
     logger.info("=" * 60)
-    logger.info("DIVERGE PHASE 5 â€” COMPOSITE AGGREGATION PIPELINE")
+    logger.info("DIVERGE PHASE 5 — COMPOSITE AGGREGATION PIPELINE")
     logger.info("=" * 60)
 
     # Fetch joined index_values and coordination_scores
@@ -69,7 +69,7 @@ def run(db_path: Path = config.DB_PATH, recompute_all: bool = False) -> int:
     inserted = storage.insert_ticker_window_metrics(metrics_rows, db_path=db_path)
     logger.info(f"Saved {inserted} rows to ticker_window_metrics table.")
 
-    # â”€â”€ Summary Report â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- Summary Report -----------------------------------------
     print_summary_report(len(raw_windows), inserted, stats, metrics_rows)
     return inserted
 
@@ -77,7 +77,7 @@ def run(db_path: Path = config.DB_PATH, recompute_all: bool = False) -> int:
 def print_summary_report(total_processed: int, total_saved: int, stats: Dict[str, int], rows: List[Dict[str, Any]]) -> None:
     """Print Phase 5 Composite Aggregation Summary Table."""
     print("\n" + "=" * 70)
-    print("DIVERGE PHASE 5 â€” COMPOSITE AGGREGATION SUMMARY")
+    print("DIVERGE PHASE 5 — COMPOSITE AGGREGATION SUMMARY")
     print("=" * 70)
     print(f"Total Windows Processed:    {total_processed}")
     print(f"Total Metrics Saved:        {total_saved}")

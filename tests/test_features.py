@@ -6,7 +6,7 @@ Phase 2 Unit Tests:
  - Periodicity analysis: KS test and ACF peak strength comparison between
    (a) irregular/organic timestamps and (b) clearly periodic/fixed-interval timestamps
 
-All tests are offline â€” no network, no FinBERT model download required.
+All tests are offline — no network, no FinBERT model download required.
 Test database files are cleaned up after each test.
 """
 
@@ -19,9 +19,9 @@ from pathlib import Path
 from typing import List
 
 
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# --------------------------------------------------------------
 # Text Features Unit Tests
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# --------------------------------------------------------------
 class TestCapitulationDetection(unittest.TestCase):
     """Tests for lexicon-based capitulation detection."""
 
@@ -80,21 +80,21 @@ class TestConvictionHedgeRatio(unittest.TestCase):
         self.assertIsNone(result)
 
     def test_high_certainty_low_hedge(self):
-        """More certainty terms than hedge terms â†’ ratio > 1."""
+        """More certainty terms than hedge terms -> ratio > 1."""
         text = "I am 100% guaranteed this will go up, definitely all in, absolutely no doubt."
         result = self.ratio(text)
         self.assertIsNotNone(result)
         self.assertGreater(result, 1.0)
 
     def test_high_hedge_low_certainty(self):
-        """More hedge terms than certainty terms â†’ ratio < 1."""
+        """More hedge terms than certainty terms -> ratio < 1."""
         text = "This might work, could go up or maybe not. Not financial advice. DYOR. I think perhaps."
         result = self.ratio(text)
         self.assertIsNotNone(result)
         self.assertLess(result, 1.0)
 
     def test_equal_terms(self):
-        """Equal certainty and hedge count â†’ ratio ~1.0."""
+        """Equal certainty and hedge count -> ratio ~1.0."""
         text = "Definitely going up, maybe it might not. 100% guaranteed, could be wrong."
         result = self.ratio(text)
         self.assertIsNotNone(result)
@@ -102,7 +102,7 @@ class TestConvictionHedgeRatio(unittest.TestCase):
         self.assertAlmostEqual(result, 1.0, delta=1.5)
 
     def test_only_hedge_no_certainty(self):
-        """Only hedge terms present â†’ ratio = 0.0."""
+        """Only hedge terms present -> ratio = 0.0."""
         text = "This might fail, could be bad, maybe not financial advice, perhaps."
         result = self.ratio(text)
         self.assertIsNotNone(result)
@@ -117,17 +117,17 @@ class TestSarcasmDetection(unittest.TestCase):
         self.detect = detect_sarcasm
 
     def test_contradictory_certainty_and_loss(self):
-        """High-certainty language with explicit loss signal â†’ sarcastic."""
+        """High-certainty language with explicit loss signal -> sarcastic."""
         text = "Absolutely guaranteed gains! I only lost -$10,000 last week."
         self.assertEqual(self.detect(text), 1)
 
     def test_nfa_with_high_certainty(self):
-        """'Not financial advice' with certainty language â†’ sarcastic."""
+        """'Not financial advice' with certainty language -> sarcastic."""
         text = "Not financial advice but this is 100% guaranteed to moon, definitely no doubt."
         self.assertEqual(self.detect(text), 1)
 
     def test_plain_bullish_text_not_sarcastic(self):
-        """Plain bullish text with no contradictions â†’ not sarcastic."""
+        """Plain bullish text with no contradictions -> not sarcastic."""
         text = "NVDA earnings beat expectations. Holding for the long term."
         self.assertEqual(self.detect(text), 0)
 
@@ -168,9 +168,9 @@ class TestLanguageDetection(unittest.TestCase):
         self.assertEqual(self.detect(""), "en")
 
 
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# --------------------------------------------------------------
 # Periodicity Analysis Unit Tests
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# --------------------------------------------------------------
 def _make_test_db(db_path: Path, ticker_a_times: List[datetime], ticker_b_times: List[datetime]):
     """
     Build a minimal test SQLite database with raw_posts, post_timing, and ticker_time_bins
@@ -305,7 +305,7 @@ class TestPeriodicityAnalysis(unittest.TestCase):
         """
         PERIODIC ticker should have measurably higher ACF peak strength than ORGANIC.
         The periodic posts (every 5 min) produce a strong autocorrelation at lag=5 min.
-        For the ORGANIC ticker we only assert it has valid windows â€” irregular spacing
+        For the ORGANIC ticker we only assert it has valid windows — irregular spacing
         naturally produces lower but non-zero ACF peaks.
         """
         periodic_stats = self._get_stats_for_ticker("PERIODIC")
@@ -334,7 +334,7 @@ class TestPeriodicityAnalysis(unittest.TestCase):
     def test_periodic_ticker_has_higher_ks_statistic(self):
         """
         PERIODIC ticker (non-Poisson, fixed interval) should deviate more from exponential
-        distribution than ORGANIC (Poisson-like random arrivals) â†’ higher KS statistic.
+        distribution than ORGANIC (Poisson-like random arrivals) -> higher KS statistic.
         """
         periodic_stats = self._get_stats_for_ticker("PERIODIC")
         organic_stats = self._get_stats_for_ticker("ORGANIC")
@@ -357,7 +357,7 @@ class TestPeriodicityAnalysis(unittest.TestCase):
         """
         from diverge.features.periodicity_analysis import analyse_ticker, MIN_POSTS_PER_WINDOW
         base = datetime(2024, 1, 15, 0, 0, 0, tzinfo=timezone.utc)
-        # Only 5 posts â€” all windows should be skipped
+        # Only 5 posts — all windows should be skipped
         sparse_times = [(base + timedelta(minutes=i * 10), 1) for i in range(5)]
         results = analyse_ticker("SPARSE", sparse_times, [])
         self.assertEqual(results, [], "Should skip all sparse windows")

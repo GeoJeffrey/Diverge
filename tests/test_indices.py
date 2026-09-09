@@ -27,7 +27,7 @@ from diverge.scrapers import consumer_reviews_scraper
 
 class TestPhase3Indices(unittest.TestCase):
 
-    # â”€â”€ 1. CLI Index Tests â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- 1. CLI Index Tests ------------------------------------
     def test_cli_calculation(self):
         # 3 out of 10 posts have capitulation_flag = 1 -> ratio should be 0.30
         posts = [{"capitulation_flag": 1 if i < 3 else 0} for i in range(10)]
@@ -38,7 +38,7 @@ class TestPhase3Indices(unittest.TestCase):
         cli_val = cli_index.compute_cli_for_posts([])
         self.assertIsNone(cli_val)
 
-    # â”€â”€ 2. VDI Index Tests â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- 2. VDI Index Tests ------------------------------------
     def test_vdi_zscore_math_and_null_guard(self):
         # Enforce <20 posts guard
         small_en = [0.5] * 10
@@ -58,7 +58,7 @@ class TestPhase3Indices(unittest.TestCase):
         # Z_en = (0.8 - 0.5)/0.1 = 3.0, Z_hi = (0.2 - 0.5)/0.1 = -3.0 -> VDI = 6.0
         self.assertAlmostEqual(vdi_val, 6.0, places=2)
 
-    # â”€â”€ 3. CASSI Index Tests â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- 3. CASSI Index Tests ----------------------------------
     def test_cassi_cross_attribution(self):
         # Generate 40 days of synthetic data
         np.random.seed(42)
@@ -91,7 +91,7 @@ class TestPhase3Indices(unittest.TestCase):
         res = cassi_index.compute_cassi_from_dataframe(df_small)
         self.assertIsNone(res.get("A"))
 
-    # â”€â”€ 4. Rn Index Tests â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- 4. Rn Index Tests -------------------------------------
     def test_rn_accelerating_vs_decelerating(self):
         # Accelerating onset series (1, 2, 4, 8, 16, 32, 64) -> Rn > 1.0
         acc_onsets = [1, 2, 4, 8, 16, 32, 64]
@@ -111,7 +111,7 @@ class TestPhase3Indices(unittest.TestCase):
         self.assertIsNone(rn_val)
         self.assertEqual(conf, 0.0)
 
-    # â”€â”€ 5. CIRG Index Tests â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- 5. CIRG Index Tests -----------------------------------
     def test_cirg_zscore_math_and_null_guard(self):
         # Guard: missing consumer review data returns None
         inv_scores = [0.8, 0.7, 0.9]

@@ -29,7 +29,7 @@ class TestPhase7OutputModes(unittest.TestCase):
         except Exception:
             pass
 
-    # â”€â”€ 1. Simple Mode Tests â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- 1. Simple Mode Tests ------------------------------------
     def test_simple_mode_buckets_and_sentences(self):
         metrics = [
             # Building window (>= 65) with hype flag
@@ -80,7 +80,7 @@ class TestPhase7OutputModes(unittest.TestCase):
         self.assertEqual(view4["verdict_label"], "insufficient_data")
         self.assertEqual(view4["why_sentence"], "Not enough data yet for a reliable reading.")
 
-    # â”€â”€ 2. Advanced Mode Tests â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- 2. Advanced Mode Tests ----------------------------------
     def test_advanced_mode_raw_preservation(self):
         metrics = [{
             "ticker": "TCS", "window_start_utc": "2026-01-01T00:00:00Z",
@@ -100,7 +100,7 @@ class TestPhase7OutputModes(unittest.TestCase):
         self.assertIsNone(adv["indices"]["cirg"])
         self.assertEqual(adv["indices"]["cli"], 0.12)
 
-    # â”€â”€ 3. Mode API Tests â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- 3. Mode API Tests ---------------------------------------
     def test_mode_api_status_codes(self):
         metrics = [
             {"ticker": "AAPL", "window_start_utc": "2026-01-01T00:00:00Z", "composite_score": 88.0, "dominant_index": "rn", "risk_flags": "[]"},

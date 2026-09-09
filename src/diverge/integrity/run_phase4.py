@@ -33,7 +33,7 @@ def run(db_path: Path = config.DB_PATH) -> int:
     Returns count of updated coordination_scores rows.
     """
     logger.info("=" * 60)
-    logger.info("DIVERGE PHASE 4 â€” INTEGRITY & COORDINATION SCORING")
+    logger.info("DIVERGE PHASE 4 — INTEGRITY & COORDINATION SCORING")
     logger.info("=" * 60)
 
     pstats = storage.get_periodicity_stats_for_window(db_path=db_path)
@@ -68,7 +68,7 @@ def run(db_path: Path = config.DB_PATH) -> int:
     inserted = storage.insert_coordination_scores(score_rows, db_path=db_path)
     logger.info(f"Saved {inserted} coordination_scores rows to storage.")
 
-    # â”€â”€ Print Phase 4 Summary Report â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- Print Phase 4 Summary Report ---------------------------
     print_summary_report(score_rows)
     return inserted
 
@@ -76,7 +76,7 @@ def run(db_path: Path = config.DB_PATH) -> int:
 def print_summary_report(rows: List[Dict[str, Any]]) -> None:
     """Print trust classification summary table per ticker."""
     print("\n" + "=" * 70)
-    print("DIVERGE PHASE 4 â€” INTEGRITY & TRUST CLASSIFICATION SUMMARY")
+    print("DIVERGE PHASE 4 — INTEGRITY & TRUST CLASSIFICATION SUMMARY")
     print("=" * 70)
     print(f"{'Ticker':<12} {'High Trust':<12} {'Moderate':<12} {'Low Trust':<12} {'Insufficient Data':<18}")
     print("-" * 70)

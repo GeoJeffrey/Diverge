@@ -41,7 +41,7 @@ def run(db_path: Path = config.DB_PATH) -> int:
     Returns count of updated index_values rows.
     """
     logger.info("=" * 60)
-    logger.info("DIVERGE PHASE 3 â€” FINANCIAL INDICES PIPELINE")
+    logger.info("DIVERGE PHASE 3 — FINANCIAL INDICES PIPELINE")
     logger.info("=" * 60)
 
     tickers = list(config.TICKERS.keys())
@@ -65,7 +65,7 @@ def run(db_path: Path = config.DB_PATH) -> int:
         for t in tickers
     }
 
-    # â”€â”€ 1. CLI (Capitulation Leak Index) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- 1. CLI (Capitulation Leak Index) ----------------------
     logger.info("--- [1/5] Calculating CLI (Capitulation Leak Index) ---")
     for t in tickers:
         try:
@@ -75,7 +75,7 @@ def run(db_path: Path = config.DB_PATH) -> int:
         except Exception as e:
             logger.error(f"Failed CLI for {t}: {e}")
 
-    # â”€â”€ 2. VDI (Vernacular Divergence Index) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- 2. VDI (Vernacular Divergence Index) ------------------
     logger.info("--- [2/5] Calculating VDI (Vernacular Divergence Index) ---")
     for t in tickers:
         try:
@@ -85,7 +85,7 @@ def run(db_path: Path = config.DB_PATH) -> int:
         except Exception as e:
             logger.error(f"Failed VDI for {t}: {e}")
 
-    # â”€â”€ 3. CASSI (Cross-Asset Sentiment Spillover Index) â”€â”€â”€â”€â”€â”€
+    # -- 3. CASSI (Cross-Asset Sentiment Spillover Index) ------
     logger.info("--- [3/5] Calculating CASSI (Cross-Asset Sentiment Spillover Index) ---")
     try:
         cassi_dict = cassi_index.compute_cassi(tickers, window_start_utc=None, window_end_utc=now_iso, db_path=db_path)
@@ -96,7 +96,7 @@ def run(db_path: Path = config.DB_PATH) -> int:
     except Exception as e:
         logger.error(f"Failed CASSI calculation: {e}")
 
-    # â”€â”€ 4. Rn (Effective Reproduction Number Index) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- 4. Rn (Effective Reproduction Number Index) -----------
     logger.info("--- [4/5] Calculating Rn (Effective Reproduction Number Index) ---")
     for t in tickers:
         try:
@@ -107,7 +107,7 @@ def run(db_path: Path = config.DB_PATH) -> int:
         except Exception as e:
             logger.error(f"Failed Rn for {t}: {e}")
 
-    # â”€â”€ 5. CIRG (Consumer-Investor Rating Gap Index) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- 5. CIRG (Consumer-Investor Rating Gap Index) ----------
     logger.info("--- [5/5] Executing Consumer Reviews Scraper & Calculating CIRG ---")
     try:
         consumer_reviews_scraper.run(db_path=db_path)
@@ -127,7 +127,7 @@ def run(db_path: Path = config.DB_PATH) -> int:
     inserted = storage.insert_index_values(rows_to_insert, db_path=db_path)
     logger.info(f"Saved {inserted} index_values rows to storage.")
 
-    # â”€â”€ Print Phase 3 Summary Table â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- Print Phase 3 Summary Table ---------------------------
     print_summary_table(index_results)
     return inserted
 
@@ -135,7 +135,7 @@ def run(db_path: Path = config.DB_PATH) -> int:
 def print_summary_table(results: Dict[str, Dict[str, Any]]) -> None:
     """Print clean formatted ticker x index summary table showing real values vs NULL."""
     print("\n" + "=" * 70)
-    print("DIVERGE PHASE 3 â€” INDEX VALUES SUMMARY (REAL VS NULL)")
+    print("DIVERGE PHASE 3 — INDEX VALUES SUMMARY (REAL VS NULL)")
     print("=" * 70)
     header = f"{'Ticker':<12} {'CLI':<10} {'VDI':<10} {'CASSI':<10} {'Rn (Conf)':<14} {'CIRG':<10}"
     print(header)

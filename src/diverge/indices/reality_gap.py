@@ -5,7 +5,7 @@ Consumer-Investor Rating Gap (CIRG) index calculation.
 CIRG = Z(investor sentiment) - Z(consumer review sentiment score).
 
 GUARD: No review data for a ticker -> returns None (null),
-logs as "no CIRG coverage for this ticker" (expected for non-consumer-facing names like IT services â€” not an error).
+logs as "no CIRG coverage for this ticker" (expected for non-consumer-facing names like IT services — not an error).
 """
 
 from pathlib import Path

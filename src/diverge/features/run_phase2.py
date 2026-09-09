@@ -24,10 +24,10 @@ logger = utils.setup_logger("phase2_orchestrator")
 
 def main():
     logger.info("=" * 60)
-    logger.info("DIVERGE PHASE 2 â€” FEATURE EXTRACTION PIPELINE")
+    logger.info("DIVERGE PHASE 2 — FEATURE EXTRACTION PIPELINE")
     logger.info("=" * 60)
 
-    # â”€â”€ Track 1: Timing Features â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- Track 1: Timing Features ------------------------------
     logger.info("--- [1/3] Timing Features (inter-arrival deltas, first-mention flags, 5-min bins) ---")
     try:
         timing_counts = timing_features.run()
@@ -38,7 +38,7 @@ def main():
     except Exception as e:
         logger.error(f"FAILED timing_features.run(): {e}")
 
-    # â”€â”€ Track 2: Periodicity Analysis â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- Track 2: Periodicity Analysis -------------------------
     logger.info("--- [2/3] Periodicity Analysis (KS test, ACF, FFT, onset dispersion) ---")
     try:
         pstat_rows = periodicity_analysis.run()
@@ -46,7 +46,7 @@ def main():
     except Exception as e:
         logger.error(f"FAILED periodicity_analysis.run(): {e}")
 
-    # â”€â”€ Track 3: Text Features â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- Track 3: Text Features --------------------------------
     logger.info("--- [3/3] Text Feature Extraction (FinBERT sentiment, capitulation, sarcasm, language) ---")
     try:
         text_rows = text_features.run()
@@ -54,9 +54,9 @@ def main():
     except Exception as e:
         logger.error(f"FAILED text_features.run(): {e}")
 
-    # â”€â”€ Final Summary â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- Final Summary -----------------------------------------
     logger.info("=" * 60)
-    logger.info("DIVERGE PHASE 2 â€” DATABASE SUMMARY")
+    logger.info("DIVERGE PHASE 2 — DATABASE SUMMARY")
     logger.info("=" * 60)
     try:
         counts = storage.count_phase2_tables()

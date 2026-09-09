@@ -14,7 +14,7 @@ from diverge.aggregation.aggregate_composite import aggregate_composite_row
 
 class TestPhase5CompositeAggregation(unittest.TestCase):
 
-    # â”€â”€ Test 1: All 3 core indices present, high_trust â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- Test 1: All 3 core indices present, high_trust ----------------
     def test_all_core_indices_present_high_trust(self):
         data = {
             "ticker": "AAPL",
@@ -29,7 +29,7 @@ class TestPhase5CompositeAggregation(unittest.TestCase):
         self.assertGreater(res["composite_score"], 50.0)
         self.assertEqual(res["dominant_index"], "rn")
 
-    # â”€â”€ Test 2: Only Rn available (cassi/vdi null) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- Test 2: Only Rn available (cassi/vdi null) ------------------
     def test_only_rn_available_not_diluted(self):
         data_single = {
             "ticker": "TCS",
@@ -45,7 +45,7 @@ class TestPhase5CompositeAggregation(unittest.TestCase):
         self.assertAlmostEqual(res["composite_score"], round(expected_raw, 1), places=1)
         self.assertEqual(res["dominant_index"], "rn")
 
-    # â”€â”€ Test 3: All 3 core indices null â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- Test 3: All 3 core indices null ------------------------------
     def test_all_core_indices_null(self):
         data_null = {
             "ticker": "WIPRO",
@@ -61,7 +61,7 @@ class TestPhase5CompositeAggregation(unittest.TestCase):
         self.assertEqual(json.loads(res["risk_flags"]), [])
         self.assertEqual(res["aggregation_confidence"], "insufficient_data")
 
-    # â”€â”€ Test 4: High CIRG (2.0) vs cirg=None baseline â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- Test 4: High CIRG (2.0) vs cirg=None baseline ----------------
     def test_high_cirg_hype_outrunning_reality(self):
         base_data = {
             "ticker": "RELIANCE",
@@ -81,7 +81,7 @@ class TestPhase5CompositeAggregation(unittest.TestCase):
         self.assertIn("hype_outrunning_reality", flags)
         self.assertLess(res_cirg["composite_score"], res_base["composite_score"])
 
-    # â”€â”€ Test 5: Low CIRG (-2.0) informational-only check â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- Test 5: Low CIRG (-2.0) informational-only check ------------
     def test_low_cirg_informational_only(self):
         base_data = {
             "ticker": "HDFCBANK",
@@ -102,7 +102,7 @@ class TestPhase5CompositeAggregation(unittest.TestCase):
         # Low CIRG MUST NOT adjust score (informational only)
         self.assertEqual(res_low_cirg["composite_score"], res_base["composite_score"])
 
-    # â”€â”€ Test 6: High CLI (0.8) vs cli=0.0 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- Test 6: High CLI (0.8) vs cli=0.0 -----------------------------
     def test_high_cli_capitulation_signal(self):
         base_data = {
             "ticker": "INFY",
@@ -120,7 +120,7 @@ class TestPhase5CompositeAggregation(unittest.TestCase):
         self.assertIn("capitulation_signal", flags)
         self.assertLess(res_cli["composite_score"], res_base["composite_score"])
 
-    # â”€â”€ Test 7: Low trust confidence dampening â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- Test 7: Low trust confidence dampening -----------------------
     def test_low_trust_confidence_dampening(self):
         data_high = {
             "ticker": "NVDA",
@@ -139,7 +139,7 @@ class TestPhase5CompositeAggregation(unittest.TestCase):
         diff_low = abs(res_low["composite_score"] - 50.0)
         self.assertLess(diff_low, diff_high)
 
-    # â”€â”€ Test 8: Insufficient data guard check â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- Test 8: Insufficient data guard check ------------------------
     def test_insufficient_data_forced_null(self):
         data = {
             "ticker": "TSLA",
@@ -152,7 +152,7 @@ class TestPhase5CompositeAggregation(unittest.TestCase):
         res = aggregate_composite_row(data)
         self.assertIsNone(res["composite_score"])
 
-    # â”€â”€ Test 9: Tie-break between rn and cassi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- Test 9: Tie-break between rn and cassi ----------------------
     def test_tie_break_rn_vs_cassi(self):
         # Construct inputs where w_rn * abs(rn_norm) == w_cassi * abs(cassi_norm)
         # base weights: rn=0.55, cassi=0.30

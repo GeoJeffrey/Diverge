@@ -20,8 +20,8 @@ logger = utils.setup_logger("simple_mode")
 
 TRUST_LABEL_MAP = {
     "high_trust": "High confidence",
-    "moderate": "Moderate confidence â€” treat with caution",
-    "low_trust": "Low confidence â€” possible manipulation detected",
+    "moderate": "Moderate confidence — treat with caution",
+    "low_trust": "Low confidence — possible manipulation detected",
     "insufficient_data": "Not enough data",
 }
 
@@ -116,12 +116,12 @@ def get_simple_view(
         flag_clauses.append("capitulation signals detected across social channels")
 
     if flag_clauses:
-        why_sentence = f"{base_clause} â€” {'; '.join(flag_clauses)}."
+        why_sentence = f"{base_clause} — {'; '.join(flag_clauses)}."
     else:
         why_sentence = base_clause
 
     # 4. Trust Label
-    trust_label = TRUST_LABEL_MAP.get(conf_flag, "Moderate confidence â€” treat with caution")
+    trust_label = TRUST_LABEL_MAP.get(conf_flag, "Moderate confidence — treat with caution")
 
     return {
         "ticker": ticker.upper(),

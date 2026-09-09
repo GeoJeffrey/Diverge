@@ -32,7 +32,7 @@ class TestPhase6Explainability(unittest.TestCase):
         except Exception:
             pass
 
-    # â”€â”€ 1. Duplicate Pairs Storage Test â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- 1. Duplicate Pairs Storage Test -------------------------
     def test_duplicate_pairs_storage(self):
         posts = [
             {"post_id": "p1", "account_id": "user_a", "raw_text": "TATASTEEL target is 200 buy now breakout rocket"},
@@ -51,7 +51,7 @@ class TestPhase6Explainability(unittest.TestCase):
         self.assertEqual(pairs[0]["post_id_a"], "p1")
         self.assertEqual(pairs[0]["post_id_b"], "p2")
 
-    # â”€â”€ 2. Reasoning Trace Builder & Empty Guard Test â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- 2. Reasoning Trace Builder & Empty Guard Test -----------
     def test_reasoning_trace_builder_rn_onset(self):
         # Insert raw post and timing row
         raw = [{
@@ -99,7 +99,7 @@ class TestPhase6Explainability(unittest.TestCase):
         # Should complete gracefully without raising
         self.assertIsInstance(traces, list)
 
-    # â”€â”€ 3. Narrative Phylogeny Builder Test â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- 3. Narrative Phylogeny Builder Test ---------------------
     def test_phylogeny_builder_5_mutations_and_gap(self):
         # Construct synthetic 5-window sequence covering all 5 mutation_types and gap skipping
         metrics = [
@@ -130,7 +130,7 @@ class TestPhase6Explainability(unittest.TestCase):
         w6 = next(p for p in phylo if p["window_start_utc"] == "2026-01-01T10:00:00Z")
         self.assertEqual(w6["mutation_type"], "composite_reversal")
 
-    # â”€â”€ 4. Render Prototype Test â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- 4. Render Prototype Test --------------------------------
     def test_render_prototype_contracts(self):
         panel = render_prototype.reasoning_trace_panel("AAPL", "2026-01-01T00:00:00Z", db_path=self.db_path)
         self.assertIn("categories", panel)

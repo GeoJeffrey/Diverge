@@ -14,7 +14,7 @@ from diverge.integrity import coordination_score, duplicate_detection, sentiment
 
 class TestPhase4IntegrityScoring(unittest.TestCase):
 
-    # â”€â”€ 1. Duplicate Detection Tests â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- 1. Duplicate Detection Tests --------------------------
     def test_duplicate_detection_minhash(self):
         # 3 near-identical posts from different accounts
         near_identical = [
@@ -35,7 +35,7 @@ class TestPhase4IntegrityScoring(unittest.TestCase):
         # 3 out of 6 posts are near-duplicates -> ratio should be 0.50
         self.assertAlmostEqual(ratio, 0.50, places=2)
 
-    # â”€â”€ 2. Sentiment Variance Tests â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- 2. Sentiment Variance Tests ---------------------------
     def test_sentiment_variance_detection(self):
         # Near-identical sentiment values (suspiciously low variance)
         low_var_scores = [0.85, 0.85, 0.86, 0.85, 0.84, 0.85]
@@ -50,7 +50,7 @@ class TestPhase4IntegrityScoring(unittest.TestCase):
         self.assertLess(var_low, var_high)
         self.assertLess(norm_low, norm_high)
 
-    # â”€â”€ 3. Coordination Score Combiner Tests â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- 3. Coordination Score Combiner Tests ------------------
     def test_coordination_score_organic_vs_manipulated(self):
         # Organic Case: low KS, low ACF, low dispersion, 0 duplicates, high sentiment variance -> high_trust (< 40)
         res_organic = coordination_score.calculate_coordination_score(

@@ -35,12 +35,12 @@ def main():
     args = parser.parse_args()
 
     logger.info("=" * 70)
-    logger.info("DIVERGE MASTER PIPELINE â€” END-TO-END EXECUTION")
+    logger.info("DIVERGE MASTER PIPELINE — END-TO-END EXECUTION")
     logger.info("=" * 70)
 
     db_path = config.DB_PATH
 
-    # â”€â”€ Phase 1: Data Collection Scrapers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- Phase 1: Data Collection Scrapers --------------------
     if getattr(args, "skip_scrape", False):
         logger.info("[PHASE 1] --skip-scrape flag set. Skipping live scrapers execution.")
     else:
@@ -60,7 +60,7 @@ def main():
     else:
         logger.info(f"Database contains {total_raw} raw posts across {len(raw_count)} platforms.")
 
-    # â”€â”€ Phase 2: Feature Extraction â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- Phase 2: Feature Extraction ---------------------------
     logger.info("--- [PHASE 2] Executing Feature Extraction Pipeline ---")
     try:
         run_phase2.main()
@@ -73,7 +73,7 @@ def main():
     if phase2_counts.get("text_features", 0) == 0 and phase2_counts.get("post_timing", 0) == 0:
         logger.warning("WARNING: Phase 2 tables (text_features/post_timing) are empty. Phase 3 indices will return NULL.")
 
-    # â”€â”€ Phase 3: Financial Indices â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- Phase 3: Financial Indices ----------------------------
     logger.info("--- [PHASE 3] Executing Financial Indices Pipeline ---")
     try:
         run_phase3.run(db_path=db_path)
@@ -81,7 +81,7 @@ def main():
     except Exception as e:
         logger.error(f"[PHASE 3 FAILED]: {e}")
 
-    # â”€â”€ Phase 4: Integrity & Coordination Scoring â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- Phase 4: Integrity & Coordination Scoring -----------
     logger.info("--- [PHASE 4] Executing Integrity & Coordination Scoring Pipeline ---")
     try:
         from diverge.integrity import run_phase4
@@ -90,7 +90,7 @@ def main():
     except Exception as e:
         logger.error(f"[PHASE 4 FAILED]: {e}")
 
-    # â”€â”€ Phase 5: Composite Aggregation Pipeline â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- Phase 5: Composite Aggregation Pipeline -------------
     logger.info("--- [PHASE 5] Executing Composite Aggregation Pipeline ---")
     try:
         from diverge.aggregation import run_phase5
@@ -99,7 +99,7 @@ def main():
     except Exception as e:
         logger.error(f"[PHASE 5 FAILED]: {e}")
 
-    # â”€â”€ Phase 6: Explainability & Narrative Lineage Pipeline 
+    # -- Phase 6: Explainability & Narrative Lineage Pipeline 
     logger.info("--- [PHASE 6] Executing Explainability & Narrative Lineage Pipeline ---")
     try:
         from diverge.explainability import run_phase6
@@ -108,14 +108,14 @@ def main():
     except Exception as e:
         logger.error(f"[PHASE 6 FAILED]: {e}")
 
-    # â”€â”€ Final Combined Summary Report â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- Final Combined Summary Report -------------------------
     print_master_summary(db_path)
 
 
 def print_master_summary(db_path: Path):
     """Print single unified summary report across all 6 phases."""
     print("\n" + "=" * 70)
-    print("DIVERGE MASTER PIPELINE â€” COMBINED SUMMARY REPORT")
+    print("DIVERGE MASTER PIPELINE — COMBINED SUMMARY REPORT")
     print("=" * 70)
 
     # 1. Phase 1 Summary

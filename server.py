@@ -61,7 +61,7 @@ class DivergeDashboardHandler(BaseHTTPRequestHandler):
         path = parsed_url.path
         params = urllib.parse.parse_qs(parsed_url.query)
 
-        # Ã¢â€â‚¬Ã¢â€â‚¬ Serve HTML & Static Files Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+        # -"-"- Serve HTML & Static Files -"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-
         if path in ("/", "/dashboard.html"):
             if HTML_FILE.exists():
                 with open(HTML_FILE, "r", encoding="utf-8") as f:
@@ -91,7 +91,7 @@ class DivergeDashboardHandler(BaseHTTPRequestHandler):
                 self.send_html("<h1>Static file not found</h1>", status=404)
                 return
 
-        # Ã¢â€â‚¬Ã¢â€â‚¬ /api/stats Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+        # -"-"- /api/stats -"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-
         if path == "/api/stats":
             conn = sqlite3.connect(DB_PATH)
             storage.get_connection(DB_PATH)  # ensure tables exist
@@ -154,7 +154,7 @@ class DivergeDashboardHandler(BaseHTTPRequestHandler):
             self.send_json(payload)
             return
 
-        # Ã¢â€â‚¬Ã¢â€â‚¬ Phase 7 Mode API Endpoints Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+        # -"-"- Phase 7 Mode API Endpoints -"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-
         # /api/simple?ticker=INFY&window=2026-06-02T...
         if path == "/api/simple":
             qp = parse_qs(parsed_url.query)
@@ -199,7 +199,7 @@ class DivergeDashboardHandler(BaseHTTPRequestHandler):
             self.send_json(data, status=status)
             return
 
-        # Ã¢â€â‚¬Ã¢â€â‚¬ /api/reasoning-trace (Phase 6 Audit Trail) Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+        # -"-"- /api/reasoning-trace (Phase 6 Audit Trail) -"-"-"-"-"-"-"-"-
         if path.startswith("/api/reasoning-trace"):
             query_params = parse_qs(parsed_url.query)
             ticker = query_params.get("ticker", [""])[0]
@@ -209,7 +209,7 @@ class DivergeDashboardHandler(BaseHTTPRequestHandler):
             self.send_json(panel_data)
             return
 
-        # Ã¢â€â‚¬Ã¢â€â‚¬ /api/narrative-phylogeny (Phase 6 Narrative Lineage) Ã¢â€â‚¬
+        # -"-"- /api/narrative-phylogeny (Phase 6 Narrative Lineage) -"-
         if path.startswith("/api/narrative-phylogeny"):
             query_params = parse_qs(parsed_url.query)
             ticker = query_params.get("ticker", [""])[0]
@@ -218,7 +218,7 @@ class DivergeDashboardHandler(BaseHTTPRequestHandler):
             self.send_json(tree_data)
             return
 
-        # Ã¢â€â‚¬Ã¢â€â‚¬ /api/composite-metrics Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+        # -"-"- /api/composite-metrics -"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-
         if path.startswith("/api/composite-metrics"):
             query_params = parse_qs(parsed_url.query)
             ticker_filter = query_params.get("ticker", [None])[0]
@@ -241,7 +241,7 @@ class DivergeDashboardHandler(BaseHTTPRequestHandler):
             self.send_json({"metrics": data})
             return
 
-        # Ã¢â€â‚¬Ã¢â€â‚¬ /api/posts (raw_posts + joined text_features) Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+        # -"-"- /api/posts (raw_posts + joined text_features) -"-"-"-"-"-"-
         if path == "/api/posts":
             ticker  = params.get("ticker",   [None])[0]
             platform = params.get("platform", [None])[0]
@@ -290,7 +290,7 @@ class DivergeDashboardHandler(BaseHTTPRequestHandler):
             self.send_json({"posts": [dict(r) for r in rows], "total": total_row, "count": len(rows)})
             return
 
-        # Ã¢â€â‚¬Ã¢â€â‚¬ /api/text-features Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+        # -"-"- /api/text-features -"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-
         if path == "/api/text-features":
             ticker   = params.get("ticker",    [None])[0]
             sentiment = params.get("sentiment", [None])[0]
@@ -329,7 +329,7 @@ class DivergeDashboardHandler(BaseHTTPRequestHandler):
             self.send_json({"features": [dict(r) for r in rows], "total": total_row, "count": len(rows)})
             return
 
-        # Ã¢â€â‚¬Ã¢â€â‚¬ /api/timing Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+        # -"-"- /api/timing -"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-
         if path == "/api/timing":
             ticker = params.get("ticker", [None])[0]
             limit  = int(params.get("limit", [100])[0])
@@ -357,7 +357,7 @@ class DivergeDashboardHandler(BaseHTTPRequestHandler):
             self.send_json({"timing": [dict(r) for r in rows], "total": total_row})
             return
 
-        # Ã¢â€â‚¬Ã¢â€â‚¬ /api/time-bins Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+        # -"-"- /api/time-bins -"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-
         if path == "/api/time-bins":
             ticker = params.get("ticker", [None])[0]
             limit  = int(params.get("limit", [200])[0])
@@ -376,7 +376,7 @@ class DivergeDashboardHandler(BaseHTTPRequestHandler):
             self.send_json({"bins": [dict(r) for r in rows]})
             return
 
-        # Ã¢â€â‚¬Ã¢â€â‚¬ /api/periodicity Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+        # -"-"- /api/periodicity -"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-"-
         if path == "/api/periodicity":
             ticker = params.get("ticker", [None])[0]
             limit  = int(params.get("limit", [100])[0])
@@ -402,7 +402,7 @@ class DivergeDashboardHandler(BaseHTTPRequestHandler):
             self.send_json({"periodicity": [dict(r) for r in rows], "total": total_row})
             return
 
-        # Ã¢â€â‚¬Ã¢â€â‚¬ /api/index-values (Phase 3 Financial Indices) Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+        # -"-"- /api/index-values (Phase 3 Financial Indices) -"-"-"-"-"-
         if path == "/api/index-values":
             ticker = params.get("ticker", [None])[0]
 

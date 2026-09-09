@@ -18,7 +18,7 @@ from diverge import config; DB_PATH = config.DB_PATH
 conn = sqlite3.connect(DB_PATH)
 
 print("=" * 56)
-print("DIVERGE â€” DATA DISTRIBUTION CHECK")
+print("DIVERGE — DATA DISTRIBUTION CHECK")
 print("=" * 56)
 
 # Phase 1 tables

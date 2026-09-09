@@ -32,10 +32,10 @@ def run(db_path: Path = config.DB_PATH, recompute_all: bool = False) -> int:
     Returns total reasoning_trace rows inserted.
     """
     logger.info("=" * 60)
-    logger.info("DIVERGE PHASE 6 â€” EXPLAINABILITY & NARRATIVE LINEAGE")
+    logger.info("DIVERGE PHASE 6 — EXPLAINABILITY & NARRATIVE LINEAGE")
     logger.info("=" * 60)
 
-    # â”€â”€ 1. Duplicate Pairs Backfill â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- 1. Duplicate Pairs Backfill --------------------------------
     logger.info("--- [1/3] Backfilling duplicate_pairs table ---")
     windows = storage.get_index_values_and_coordination_for_window(db_path=db_path)
     dup_pairs_created = 0
@@ -62,7 +62,7 @@ def run(db_path: Path = config.DB_PATH, recompute_all: bool = False) -> int:
     dup_total = conn.execute("SELECT COUNT(*) FROM duplicate_pairs").fetchone()[0]
     logger.info(f"Duplicate pairs stored: {dup_total} rows.")
 
-    # â”€â”€ 2. Reasoning Trace Builder â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- 2. Reasoning Trace Builder ---------------------------------
     logger.info("--- [2/3] Building reasoning_trace audit records ---")
     metrics = [dict(r) for r in conn.execute("SELECT * FROM ticker_window_metrics WHERE composite_score IS NOT NULL").fetchall()]
     conn.close()
@@ -87,7 +87,7 @@ def run(db_path: Path = config.DB_PATH, recompute_all: bool = False) -> int:
             except Exception as e:
                 logger.error(f"Failed reasoning trace for {ticker} at {start_utc}: {e}")
 
-    # â”€â”€ 3. Narrative Phylogeny Builder â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- 3. Narrative Phylogeny Builder ------------------------------
     logger.info("--- [3/3] Building narrative_phylogeny lineage tree ---")
     tickers = list(config.TICKERS.keys())
     phylo_total = 0
@@ -107,7 +107,7 @@ def run(db_path: Path = config.DB_PATH, recompute_all: bool = False) -> int:
 
     logger.info(f"Saved {phylo_total} narrative_phylogeny rows across tickers.")
 
-    # â”€â”€ Print Summary Report â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- Print Summary Report ---------------------------------------
     avg_posts_per_trace = round(total_traces / max(len(metrics), 1), 2)
     print_summary_report(len(metrics), total_traces, avg_posts_per_trace, phylo_summary)
     return trace_rows_inserted
@@ -121,7 +121,7 @@ def print_summary_report(
 ) -> None:
     """Print Phase 6 Summary Report."""
     print("\n" + "=" * 70)
-    print("DIVERGE PHASE 6 â€” EXPLAINABILITY & NARRATIVE LINEAGE SUMMARY")
+    print("DIVERGE PHASE 6 — EXPLAINABILITY & NARRATIVE LINEAGE SUMMARY")
     print("=" * 70)
     print(f"Total Traced Windows:       {total_metrics}")
     print(f"Total Reasoning Traces:     {total_traces}")
