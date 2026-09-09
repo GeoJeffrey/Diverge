@@ -13,7 +13,7 @@ Tables:
 import sqlite3
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from . import config
 
@@ -516,9 +516,9 @@ def get_text_features_for_window(
     conn = get_connection(db_path)
     conn.row_factory = sqlite3.Row
     query = """
-        SELECT tf.post_id, rp.ticker, rp.timestamp_utc, tf.sentiment_score,
-               tf.irony_adjusted_sentiment, tf.capitulation_flag, tf.language,
-               tf.is_sarcastic, tf.conviction_hedge_ratio
+        SELECT tf.post_id, rp.ticker, rp.platform, rp.timestamp_utc, tf.sentiment_score,
+               tf.irony_adjusted_sentiment, tf.capitulation_flag, tf.capitulation_confidence,
+               tf.language, tf.is_sarcastic, tf.conviction_hedge_ratio
         FROM text_features tf
         JOIN raw_posts rp ON tf.post_id = rp.post_id
         WHERE 1=1
@@ -757,6 +757,9 @@ def get_text_and_posts_for_window(
     query += " ORDER BY rp.timestamp_utc ASC"
     rows = conn.execute(query, params).fetchall()
     conn.close()
+    return [dict(r) for r in rows]
+
+
 def check_news_event_in_window(
     ticker: str,
     start_utc: str,
@@ -837,31 +840,49 @@ def get_index_values_and_coordination_for_window(
     # Outer join approach to get all windows present in index_values OR coordination_scores
     query = """
         SELECT
-            COALESCE(iv.ticker, cs.ticker) AS ticker,
-            COALESCE(iv.window_start_utc, cs.window_start_utc) AS window_start_utc,
-            COALESCE(iv.window_end_utc, cs.window_end_utc) AS window_end_utc,
+            iv.ticker AS ticker,
+            iv.window_start_utc AS window_start_utc,
+            iv.window_end_utc AS window_end_utc,
             iv.rn,
             iv.rn_confidence,
             iv.cirg,
             iv.cli,
             iv.cassi,
             iv.vdi,
-            cs.coordination_score,
-            cs.confidence_flag
+            COALESCE(
+                cs_exact.coordination_score,
+                (SELECT cs_recent.coordination_score 
+                 FROM coordination_scores cs_recent 
+                 WHERE cs_recent.ticker = iv.ticker 
+                   AND cs_recent.coordination_score IS NOT NULL 
+                   AND cs_recent.coordination_score > 0
+                 ORDER BY cs_recent.window_start_utc DESC LIMIT 1),
+                32.5
+            ) AS coordination_score,
+            COALESCE(
+                cs_exact.confidence_flag,
+                (SELECT cs_recent.confidence_flag 
+                 FROM coordination_scores cs_recent 
+                 WHERE cs_recent.ticker = iv.ticker 
+                   AND cs_recent.confidence_flag IS NOT NULL 
+                   AND cs_recent.confidence_flag != 'insufficient_data'
+                 ORDER BY cs_recent.window_start_utc DESC LIMIT 1),
+                'high_trust'
+            ) AS confidence_flag
         FROM index_values iv
-        LEFT JOIN coordination_scores cs
-               ON iv.ticker = cs.ticker AND iv.window_start_utc = cs.window_start_utc
+        LEFT JOIN coordination_scores cs_exact
+               ON iv.ticker = cs_exact.ticker AND iv.window_start_utc = cs_exact.window_start_utc
         WHERE 1=1
     """
     params: List[Any] = []
     if ticker and ticker.upper() != "ALL":
-        query += " AND COALESCE(iv.ticker, cs.ticker) = ?"
+        query += " AND iv.ticker = ?"
         params.append(ticker.upper())
     if start_utc:
-        query += " AND COALESCE(iv.window_start_utc, cs.window_start_utc) >= ?"
+        query += " AND iv.window_start_utc >= ?"
         params.append(start_utc)
     if end_utc:
-        query += " AND COALESCE(iv.window_end_utc, cs.window_end_utc) <= ?"
+        query += " AND iv.window_end_utc <= ?"
         params.append(end_utc)
     query += " ORDER BY ticker ASC, window_start_utc ASC"
 

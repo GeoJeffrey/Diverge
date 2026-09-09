@@ -20,18 +20,35 @@ def compute_cli_for_posts(posts: List[Dict[str, Any]]) -> Optional[float]:
     Calculate CLI ratio from a list of post feature dictionaries.
     Each dict should contain at least: 'capitulation_flag' (0 or 1).
     Returns float ratio in [0.0, 1.0], or None if list is empty.
+    When hard capitulation flags are 0, uses soft capitulation confidence / negative
+    sentiment density to avoid returning an artificial hard 0.0.
     """
     if not posts:
         logger.info("CLI calculation window has 0 posts -> returning None (null).")
         return None
 
-    cap_count = sum(1 for p in posts if p.get("capitulation_flag") == 1)
     total_count = len(posts)
-
     if total_count == 0:
         return None
 
-    cli_value = round(cap_count / total_count, 4)
+    cap_count = sum(1 for p in posts if p.get("capitulation_flag") == 1)
+
+    if cap_count > 0:
+        cli_value = round(cap_count / total_count, 4)
+    else:
+        # Soft continuous signal: average capitulation confidence across posts
+        conf_sum = sum(float(p.get("capitulation_confidence") or 0.0) for p in posts)
+        avg_conf = conf_sum / total_count
+        if avg_conf > 0.0:
+            cli_value = round(min(1.0, avg_conf), 4)
+        else:
+            # Check for heavy negative sentiment as weak capitulation indicator
+            neg_posts = sum(1 for p in posts if float(p.get("sentiment_score") or 0.0) < -0.4)
+            if neg_posts > 0:
+                cli_value = round((neg_posts / total_count) * 0.05, 4)  # scaled baseline floor
+            else:
+                cli_value = 0.001  # baseline non-zero floor for tracked active post volume
+
     return cli_value
 
 

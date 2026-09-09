@@ -37,8 +37,18 @@ def compute_cirg_from_scores(
         logger.info("No investor sentiment data for this ticker in window. Returning None.")
         return None
 
-    inv_b_mean, inv_b_std = investor_baseline if investor_baseline else (None, None)
-    rev_b_mean, rev_b_std = review_baseline if review_baseline else (None, None)
+    # When no external baselines are provided, use the pooled (combined)
+    # mean and std as the reference so each group's z-score reflects its
+    # divergence from the overall sentiment — not from itself (which is always 0).
+    if investor_baseline is None and review_baseline is None:
+        pooled = np.array(investor_scores + review_scores, dtype=float)
+        pooled_mean = float(np.mean(pooled))
+        pooled_std = float(np.std(pooled)) if len(pooled) > 1 else 0.0
+        inv_b_mean, inv_b_std = pooled_mean, pooled_std
+        rev_b_mean, rev_b_std = pooled_mean, pooled_std
+    else:
+        inv_b_mean, inv_b_std = investor_baseline if investor_baseline else (None, None)
+        rev_b_mean, rev_b_std = review_baseline if review_baseline else (None, None)
 
     z_investor = calculate_z_score(investor_scores, inv_b_mean, inv_b_std)
     z_review = calculate_z_score(review_scores, rev_b_mean, rev_b_std)

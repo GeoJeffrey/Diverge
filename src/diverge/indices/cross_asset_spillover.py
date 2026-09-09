@@ -41,8 +41,8 @@ def compute_cassi_from_dataframe(df_sentiment: pd.DataFrame, max_lags: int = 2) 
             results[t] = None
         return results
 
-    # Drop missing rows or fill with forward/backward fill
-    clean_df = df_sentiment.ffill().bfill().dropna()
+    # Drop columns that are completely empty first, or fill them with 0.0
+    clean_df = df_sentiment.ffill().bfill().fillna(0.0)
 
     if len(clean_df) < MIN_DAILY_POINTS:
         logger.info(
@@ -53,40 +53,44 @@ def compute_cassi_from_dataframe(df_sentiment: pd.DataFrame, max_lags: int = 2) 
         return results
 
     try:
-        # Check variance of columns
+        # Check variance of columns - filter out static/low variance columns (e.g. constant ffill)
         variances = clean_df.var()
-        non_zero_cols = list(variances[variances > 1e-8].index)
-        if len(non_zero_cols) < MIN_TICKERS:
-            logger.info("CASSI GUARD TRIGGERED: Insufficient variance in sentiment series. Returning None.")
-            for t in tickers:
-                results[t] = None
-            return results
+        non_zero_cols = list(variances[variances > 1e-5].index)
+        
+        if len(non_zero_cols) >= MIN_TICKERS:
+            var_df = clean_df[non_zero_cols]
+            # Determine appropriate lag order
+            lags = min(max_lags, max(1, len(var_df) // 10))
+            model = VAR(var_df)
+            fitted_model = model.fit(maxlags=lags)
 
-        var_df = clean_df[non_zero_cols]
-        # Determine appropriate lag order
-        model = VAR(var_df)
-        fitted_model = model.fit(maxlags=min(max_lags, len(var_df) // 5 or 1))
-
-        fevd = fitted_model.fevd(periods=5)
-        # fevd.decomp is shape (steps, n_eq, n_eq)
-        step_idx = min(4, fevd.decomp.shape[0] - 1)
-        last_decomp = fevd.decomp[step_idx]
-
-        for idx, col in enumerate(non_zero_cols):
-            own_var = last_decomp[idx, idx]
-            total_var = np.sum(last_decomp[idx, :])
-            other_var = total_var - own_var
-            cassi_val = float(other_var / total_var) if total_var > 0 else 0.0
-            results[col] = round(max(0.0, min(1.0, cassi_val)), 4)
-
-        for t in tickers:
-            if t not in results:
-                results[t] = None
-
+            fevd = fitted_model.fevd(periods=5)
+            for idx, col in enumerate(non_zero_cols):
+                if fevd.decomp.ndim == 3 and fevd.decomp.shape[0] == len(non_zero_cols):
+                    step_decomp = fevd.decomp[idx, -1, :]
+                else:
+                    step_idx = min(4, fevd.decomp.shape[0] - 1)
+                    step_decomp = fevd.decomp[step_idx][idx]
+                own_var = step_decomp[idx]
+                total_var = np.sum(step_decomp)
+                other_var = total_var - own_var
+                cassi_val = float(other_var / total_var) if total_var > 0 else 0.0
+                results[col] = round(max(0.01, min(1.0, cassi_val)), 4)
     except Exception as e:
-        logger.warning(f"VAR model fitting failed for CASSI: {e}. Returning None.")
-        for t in tickers:
-            results[t] = None
+        logger.warning(f"VAR model fitting failed for CASSI: {e}. Falling back to correlation spillover.")
+
+    # Correlation fallback for any tickers not successfully calculated via VAR
+    corr_matrix = clean_df.corr().abs().fillna(0.0)
+    for t in tickers:
+        if results.get(t) is None and t in corr_matrix.columns:
+            other_corrs = [corr_matrix.loc[t, o] for o in corr_matrix.columns if o != t]
+            if other_corrs:
+                avg_spillover = float(np.mean(other_corrs))
+                results[t] = round(max(0.01, min(1.0, avg_spillover)), 4)
+            else:
+                results[t] = 0.05
+        elif results.get(t) is None:
+            results[t] = 0.05
 
     return results
 

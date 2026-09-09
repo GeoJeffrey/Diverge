@@ -35,7 +35,7 @@ CAPITULATION_PHRASES = [
     r"lesson\s+learned",
     r"never\s+again",
     r"done\s+with\s+this",
-    r"panic\s+sold",
+    r"panic\s+sold?",
     r"cut\s+my\s+losses",
     r"got\s+wrecked",
     r"lost\s+it\s+all",
@@ -47,8 +47,20 @@ CAPITULATION_PHRASES = [
     r"closing\s+everything",
     r"this\s+broke\s+me",
     r"burnt\s+to\s+the\s+ground",
+    r"dumping\s+(it|all|shares)",
+    r"stop\s*loss\s+hit",
+    r"huge\s+loss",
+    r"heavy\s+loss",
+    r"bleeding\s+heavily",
+    r"bag\s*holder",
+    r"ruined",
+    r"wipe\s*out",
+    r"selling\s+at\s+a\s+loss",
+    r"can['\s]?t\s+take\s+this",
+    r"blood\s+bath",
+    r"falling\s+knife",
 ]
-CAPITULATION_THRESHOLD = 0.015  # ratio of matched phrase tokens / total words
+CAPITULATION_THRESHOLD = 0.012  # ratio of matched phrase tokens / total words
 
 CERTAINTY_TERMS = [
     r"\bguaranteed\b",

@@ -125,7 +125,7 @@ def compute_coordination_for_window(
     """
     Fetch posts, duplicate ratio, sentiment variance, periodicity stats, and compute coordination score.
     """
-    posts = storage.get_text_and_posts_for_window(ticker, window_start_utc, window_end_utc, db_path=db_path)
+    posts = storage.get_text_and_posts_for_window(ticker, window_start_utc, window_end_utc, db_path=db_path) or []
     total_posts = len(posts)
 
     dup_ratio = duplicate_detection.compute_duplicate_ratio(posts)
