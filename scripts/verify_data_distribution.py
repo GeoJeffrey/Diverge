@@ -2,7 +2,7 @@ import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / 'src'))
 """
-check_distribution.py
+verify_data_distribution.py
 
 Phase 1 + Phase 2 distribution verification script.
 Confirms:

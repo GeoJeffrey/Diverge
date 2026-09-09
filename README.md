@@ -136,12 +136,12 @@ Diverge/
 ├── requirements.txt           # Package dependencies
 ├── README.md                  # Project documentation
 ├── scripts/                   # Operator utilities & audit tools
-│   ├── check_counts.py        # Database table row-count inspector
-│   ├── check_distribution.py  # Platform & feature distribution validator
-│   ├── daily_volume_report.py # 24-hour ingestion volume summary
-│   ├── purge_seeded_data.py   # Database maintenance & seed-purging utility
-│   ├── validate_endpoints.py  # End-to-end REST API health checker
-│   └── view_data.py           # CLI browser for raw ingested posts
+│   ├── inspect_table_counts.py       # Database table row-count inspector
+│   ├── verify_data_distribution.py   # Platform & feature distribution validator
+│   ├── daily_volume_report.py        # 24-hour ingestion volume summary
+│   ├── purge_seeded_data.py          # Database maintenance & seed-purging utility
+│   ├── validate_endpoints.py         # End-to-end REST API health checker
+│   └── browse_raw_posts.py           # CLI browser for raw ingested posts
 ├── src/diverge/               # Core Diverge Python package
 │   ├── config.py              # Configuration constants & ticker universe
 │   ├── storage.py             # SQLite schema, queries, and connection handling

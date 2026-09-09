@@ -1,8 +1,8 @@
 """
-check_counts.py
+inspect_table_counts.py
 
 Quick operator utility: prints row counts for all Diverge database tables.
-Usage: python scripts/check_counts.py
+Usage: python scripts/inspect_table_counts.py
 """
 import sys
 from pathlib import Path

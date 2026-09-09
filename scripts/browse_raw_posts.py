@@ -2,15 +2,15 @@ import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / 'src'))
 """
-view_data.py
+browse_raw_posts.py
 
 Helper script to easily view and inspect raw scraped posts stored in `diverge_raw.db`.
 
 Usage:
-  python view_data.py             # View 10 most recent posts
-  python view_data.py --limit 20  # View 20 most recent posts
-  python view_data.py --ticker RELIANCE # Filter by ticker
-  python view_data.py --platform telegram # Filter by platform
+  python scripts/browse_raw_posts.py             # View 10 most recent posts
+  python scripts/browse_raw_posts.py --limit 20  # View 20 most recent posts
+  python scripts/browse_raw_posts.py --ticker RELIANCE # Filter by ticker
+  python scripts/browse_raw_posts.py --platform telegram # Filter by platform
 """
 
 import argparse
