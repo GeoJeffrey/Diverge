@@ -78,9 +78,13 @@ Diverge/
      # Linux / macOS
      export DATABASE_URL="postgresql+psycopg2://postgres:postgres@localhost:5432/diverge"
      ```
-     Apply database migrations:
+     Apply database migrations (Note: Migrations run automatically on Railway container startup, but can also be applied manually):
      ```bash
      alembic upgrade head
+     ```
+     To run migrations against Railway PostgreSQL from your local terminal:
+     ```bash
+     DATABASE_URL="<your_railway_postgres_connection_url>" alembic upgrade head
      ```
    - **SQLite Fallback**: If `DATABASE_URL` is unset, Diverge automatically stores data in `data/diverge_raw.db`.
 

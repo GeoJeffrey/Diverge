@@ -5,11 +5,43 @@ Main FastAPI application for the Diverge API.
 Mounts all routers and configures CORS, title, and version per the frozen openapi.json contract.
 """
 
+import logging
 import os
+from contextlib import asynccontextmanager
+from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .routers import health, auth, tickers
+
+logger = logging.getLogger("diverge.api")
+
+
+def run_db_migrations() -> None:
+    """Execute Alembic migrations up to head automatically on startup."""
+    try:
+        from alembic.config import Config
+        from alembic import command
+
+        project_root = Path(__file__).resolve().parent.parent.parent.parent
+        ini_path = project_root / "alembic.ini"
+        if ini_path.exists():
+            alembic_cfg = Config(str(ini_path))
+            alembic_cfg.set_main_option("script_location", str(project_root / "migrations"))
+            logger.info("Running automatic Alembic migrations on startup...")
+            command.upgrade(alembic_cfg, "head")
+            logger.info("Alembic migrations applied successfully.")
+    except Exception as exc:
+        logger.warning(f"Could not auto-apply Alembic migrations on startup: {exc}")
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Ensure database schema is up-to-date
+    run_db_migrations()
+    yield
+
 
 app = FastAPI(
     title="Diverge API",
@@ -19,6 +51,7 @@ app = FastAPI(
         "sentiment tracking, multi-index calculation, integrity scoring, "
         "and reasoning trace explainability."
     ),
+    lifespan=lifespan,
 )
 
 # Explicit CORS origins (disallowing wildcard when credentials/auth tokens are involved)
