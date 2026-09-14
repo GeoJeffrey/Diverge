@@ -22,25 +22,35 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 logger = utils.setup_logger("stocktwits_noapi_scraper")
 
 
-def fetch_symbol_stream(symbol: str) -> Optional[Dict[str, Any]]:
+def fetch_symbol_stream(symbol: str, max_retries: int = 3) -> Optional[Dict[str, Any]]:
     """
-    Fetch public stream message objects for a given stock symbol.
+    Fetch public stream message objects for a given stock symbol with retry/backoff.
     """
     url = f"https://api.stocktwits.com/api/2/streams/symbol/{symbol}.json"
     headers = {
         "User-Agent": config.USER_AGENT,
         "Accept": "application/json",
     }
-    try:
-        resp = requests.get(url, headers=headers, timeout=10, verify=False)
-        if resp.status_code == 200:
-            return resp.json()
-        else:
-            logger.warning(f"StockTwits HTTP {resp.status_code} for symbol {symbol}")
-            return None
-    except Exception as e:
-        logger.error(f"Error fetching StockTwits stream for {symbol}: {e}")
-        return None
+    for attempt in range(max_retries):
+        try:
+            resp = requests.get(url, headers=headers, timeout=10, verify=False)
+            if resp.status_code == 200:
+                return resp.json()
+            elif resp.status_code == 429:
+                wait_time = (attempt + 1) * 3.0
+                logger.warning(
+                    f"StockTwits HTTP 429 rate limit for {symbol}. Waiting {wait_time}s (attempt {attempt + 1}/{max_retries})..."
+                )
+                time.sleep(wait_time)
+            else:
+                logger.warning(f"StockTwits HTTP {resp.status_code} for symbol {symbol}")
+                if attempt < max_retries - 1:
+                    time.sleep(2.0)
+        except Exception as e:
+            logger.error(f"Error fetching StockTwits stream for {symbol} (attempt {attempt + 1}): {e}")
+            if attempt < max_retries - 1:
+                time.sleep(2.0)
+    return None
 
 
 def parse_stocktwits_messages(symbol: str, data: Dict[str, Any]) -> List[Dict[str, Any]]:

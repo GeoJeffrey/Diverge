@@ -20,9 +20,9 @@ from .. import config, storage, utils
 logger = utils.setup_logger("telegram_noapi_scraper")
 
 
-def fetch_channel_html(channel_username: str) -> Optional[str]:
+def fetch_channel_html(channel_username: str, max_retries: int = 3) -> Optional[str]:
     """
-    Fetch public HTML preview page for a Telegram channel.
+    Fetch public HTML preview page for a Telegram channel with retry/backoff.
     """
     url = f"https://t.me/s/{channel_username}"
     if not utils.is_allowed_by_robots(url):
@@ -30,16 +30,26 @@ def fetch_channel_html(channel_username: str) -> Optional[str]:
         return None
 
     headers = {"User-Agent": config.USER_AGENT}
-    try:
-        resp = requests.get(url, headers=headers, timeout=10)
-        if resp.status_code == 200:
-            return resp.text
-        else:
-            logger.warning(f"Telegram HTTP {resp.status_code} for t.me/s/{channel_username}")
-            return None
-    except Exception as e:
-        logger.error(f"Error fetching Telegram preview for {channel_username}: {e}")
-        return None
+    for attempt in range(max_retries):
+        try:
+            resp = requests.get(url, headers=headers, timeout=10)
+            if resp.status_code == 200:
+                return resp.text
+            elif resp.status_code == 429:
+                wait_time = (attempt + 1) * 3.0
+                logger.warning(
+                    f"Telegram HTTP 429 rate limit for {channel_username}. Waiting {wait_time}s (attempt {attempt + 1}/{max_retries})..."
+                )
+                time.sleep(wait_time)
+            else:
+                logger.warning(f"Telegram HTTP {resp.status_code} for t.me/s/{channel_username}")
+                if attempt < max_retries - 1:
+                    time.sleep(2.0)
+        except Exception as e:
+            logger.error(f"Error fetching Telegram preview for {channel_username} (attempt {attempt + 1}): {e}")
+            if attempt < max_retries - 1:
+                time.sleep(2.0)
+    return None
 
 
 def parse_telegram_html(channel_username: str, html_content: str) -> List[Dict[str, Any]]:

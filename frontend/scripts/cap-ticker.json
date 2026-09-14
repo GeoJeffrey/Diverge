@@ -1,0 +1,715 @@
+{
+  "step": "ticker",
+  "pageUrl": "http://127.0.0.1:5173/ticker/INFY",
+  "email": "wire.step4b.20260914152704@example.com",
+  "captures": [
+    {
+      "url": "http://localhost:8000/auth/login",
+      "method": "POST",
+      "status": 200,
+      "body": {
+        "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1NDQzNDhkZi02NjI5LTQwNDQtOWQ1Yy01YTcwMzA4MzZhOWMiLCJlbWFpbCI6IndpcmUuc3RlcDRiLjIwMjYwOTE0MTUyNzA0QGV4YW1wbGUuY29tIiwiZXhwIjoxNzg5Mzg0MTI2LCJ0eXBlIjoiYWNjZXNzIn0.aZOphNPFHVtERZGHYo9tQLuGs-AVUvAkSHkOr4-sQn8",
+        "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1NDQzNDhkZi02NjI5LTQwNDQtOWQ1Yy01YTcwMzA4MzZhOWMiLCJleHAiOjE3ODk5ODUzMjYsInR5cGUiOiJyZWZyZXNoIn0.lDIKd1DVUgXJ91xtA25riDwWPzDDIlnCV-25twLSPOw",
+        "token_type": "Bearer",
+        "expires_in": 3600
+      },
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "http://127.0.0.1:5173/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+        "accept": "application/json",
+        "sec-ch-ua": "\"Google Chrome\";v=\"153\", \"Not_A Brand\";v=\"8\", \"Chromium\";v=\"153\"",
+        "content-type": "application/json",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "http://localhost:8000/auth/me",
+      "method": "GET",
+      "status": 200,
+      "body": {
+        "id": "544348df-6629-4044-9d5c-5a7030836a9c",
+        "email": "wire.step4b.20260914152704@example.com",
+        "full_name": "Wire Test",
+        "role": "standard",
+        "created_at": "2026-09-14T09:57:13.768973+00:00"
+      },
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1NDQzNDhkZi02NjI5LTQwNDQtOWQ1Yy01YTcwMzA4MzZhOWMiLCJlbWFpbCI6IndpcmUuc3RlcDRiLjIwMjYwOTE0MTUyNzA0QGV4YW1wbGUuY29tIiwiZXhwIjoxNzg5Mzg0MTI2LCJ0eXBlIjoiYWNjZXNzIn0.aZOphNPFHVtERZGHYo9tQLuGs-AVUvAkSHkOr4-sQn8",
+        "referer": "http://127.0.0.1:5173/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+        "accept": "application/json",
+        "sec-ch-ua": "\"Google Chrome\";v=\"153\", \"Not_A Brand\";v=\"8\", \"Chromium\";v=\"153\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "http://localhost:8000/ticker/INFY/simple",
+      "method": "GET",
+      "status": 200,
+      "body": {
+        "id": "INFY",
+        "symbol": "INFY",
+        "name": "Infosys Ltd.",
+        "sector": "Information Technology",
+        "score": 61.3,
+        "verdict_label": "mixed",
+        "why_sentence": "Narrative momentum driven by virality rate (Rn 1.43). - consumer sentiment indicates market may be underpricing reality.",
+        "trust_label": "High confidence",
+        "window_start_utc": "2026-06-16T09:37:19.591414+00:00"
+      },
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1NDQzNDhkZi02NjI5LTQwNDQtOWQ1Yy01YTcwMzA4MzZhOWMiLCJlbWFpbCI6IndpcmUuc3RlcDRiLjIwMjYwOTE0MTUyNzA0QGV4YW1wbGUuY29tIiwiZXhwIjoxNzg5Mzg0MTI2LCJ0eXBlIjoiYWNjZXNzIn0.aZOphNPFHVtERZGHYo9tQLuGs-AVUvAkSHkOr4-sQn8",
+        "referer": "http://127.0.0.1:5173/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+        "accept": "application/json",
+        "sec-ch-ua": "\"Google Chrome\";v=\"153\", \"Not_A Brand\";v=\"8\", \"Chromium\";v=\"153\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "http://localhost:8000/ticker/INFY",
+      "method": "GET",
+      "status": 200,
+      "body": {
+        "symbol": "INFY",
+        "name": "Infosys Ltd.",
+        "sector": "Information Technology",
+        "window_start_utc": "2026-06-16T09:37:19.591414+00:00",
+        "window_end_utc": "2026-09-14T09:37:19.591414+00:00",
+        "composite_score": 61.3,
+        "dominant_index": "rn",
+        "risk_flags": [
+          "consumer_reality_underpriced"
+        ],
+        "aggregation_confidence": "high_trust",
+        "indices": {
+          "rn": {
+            "label": "Contagion Core",
+            "score": 1.4267,
+            "available": true,
+            "coverage_note": null
+          },
+          "cirg": {
+            "label": "Reality Check",
+            "score": -1.7629,
+            "available": true,
+            "coverage_note": null
+          },
+          "cli": {
+            "label": "Capitulation Signal",
+            "score": 0.0054,
+            "available": true,
+            "coverage_note": null
+          },
+          "cassi": {
+            "label": "Cross-Market Spillover",
+            "score": 0.2377,
+            "available": true,
+            "coverage_note": null
+          },
+          "vdi": {
+            "label": "Language Divergence",
+            "score": 0.0445,
+            "available": true,
+            "coverage_note": null
+          }
+        },
+        "coordination": {
+          "label": "Trust Score",
+          "coordination_score": 32.5,
+          "confidence_flag": "high_trust",
+          "available": true,
+          "coverage_note": null
+        },
+        "phylogeny_context": [
+          {
+            "window_start_utc": "2026-06-11T19:42:48.506073+00:00",
+            "mutation_type": "stable",
+            "mutation_detail": {
+              "status": "stable"
+            },
+            "composite_delta": 0
+          },
+          {
+            "window_start_utc": "2026-06-11T19:44:12.309031+00:00",
+            "mutation_type": "stable",
+            "mutation_detail": {
+              "status": "stable"
+            },
+            "composite_delta": 1.1
+          },
+          {
+            "window_start_utc": "2026-06-16T09:37:19.591414+00:00",
+            "mutation_type": "stable",
+            "mutation_detail": {
+              "status": "stable"
+            },
+            "composite_delta": 6.7
+          }
+        ]
+      },
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1NDQzNDhkZi02NjI5LTQwNDQtOWQ1Yy01YTcwMzA4MzZhOWMiLCJlbWFpbCI6IndpcmUuc3RlcDRiLjIwMjYwOTE0MTUyNzA0QGV4YW1wbGUuY29tIiwiZXhwIjoxNzg5Mzg0MTI2LCJ0eXBlIjoiYWNjZXNzIn0.aZOphNPFHVtERZGHYo9tQLuGs-AVUvAkSHkOr4-sQn8",
+        "referer": "http://127.0.0.1:5173/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+        "accept": "application/json",
+        "sec-ch-ua": "\"Google Chrome\";v=\"153\", \"Not_A Brand\";v=\"8\", \"Chromium\";v=\"153\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "http://localhost:8000/ticker/INFY/simple",
+      "method": "GET",
+      "status": 200,
+      "body": {
+        "id": "INFY",
+        "symbol": "INFY",
+        "name": "Infosys Ltd.",
+        "sector": "Information Technology",
+        "score": 61.3,
+        "verdict_label": "mixed",
+        "why_sentence": "Narrative momentum driven by virality rate (Rn 1.43). - consumer sentiment indicates market may be underpricing reality.",
+        "trust_label": "High confidence",
+        "window_start_utc": "2026-06-16T09:37:19.591414+00:00"
+      },
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1NDQzNDhkZi02NjI5LTQwNDQtOWQ1Yy01YTcwMzA4MzZhOWMiLCJlbWFpbCI6IndpcmUuc3RlcDRiLjIwMjYwOTE0MTUyNzA0QGV4YW1wbGUuY29tIiwiZXhwIjoxNzg5Mzg0MTI2LCJ0eXBlIjoiYWNjZXNzIn0.aZOphNPFHVtERZGHYo9tQLuGs-AVUvAkSHkOr4-sQn8",
+        "referer": "http://127.0.0.1:5173/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+        "accept": "application/json",
+        "sec-ch-ua": "\"Google Chrome\";v=\"153\", \"Not_A Brand\";v=\"8\", \"Chromium\";v=\"153\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "http://localhost:8000/ticker/INFY",
+      "method": "GET",
+      "status": 200,
+      "body": {
+        "symbol": "INFY",
+        "name": "Infosys Ltd.",
+        "sector": "Information Technology",
+        "window_start_utc": "2026-06-16T09:37:19.591414+00:00",
+        "window_end_utc": "2026-09-14T09:37:19.591414+00:00",
+        "composite_score": 61.3,
+        "dominant_index": "rn",
+        "risk_flags": [
+          "consumer_reality_underpriced"
+        ],
+        "aggregation_confidence": "high_trust",
+        "indices": {
+          "rn": {
+            "label": "Contagion Core",
+            "score": 1.4267,
+            "available": true,
+            "coverage_note": null
+          },
+          "cirg": {
+            "label": "Reality Check",
+            "score": -1.7629,
+            "available": true,
+            "coverage_note": null
+          },
+          "cli": {
+            "label": "Capitulation Signal",
+            "score": 0.0054,
+            "available": true,
+            "coverage_note": null
+          },
+          "cassi": {
+            "label": "Cross-Market Spillover",
+            "score": 0.2377,
+            "available": true,
+            "coverage_note": null
+          },
+          "vdi": {
+            "label": "Language Divergence",
+            "score": 0.0445,
+            "available": true,
+            "coverage_note": null
+          }
+        },
+        "coordination": {
+          "label": "Trust Score",
+          "coordination_score": 32.5,
+          "confidence_flag": "high_trust",
+          "available": true,
+          "coverage_note": null
+        },
+        "phylogeny_context": [
+          {
+            "window_start_utc": "2026-06-11T19:42:48.506073+00:00",
+            "mutation_type": "stable",
+            "mutation_detail": {
+              "status": "stable"
+            },
+            "composite_delta": 0
+          },
+          {
+            "window_start_utc": "2026-06-11T19:44:12.309031+00:00",
+            "mutation_type": "stable",
+            "mutation_detail": {
+              "status": "stable"
+            },
+            "composite_delta": 1.1
+          },
+          {
+            "window_start_utc": "2026-06-16T09:37:19.591414+00:00",
+            "mutation_type": "stable",
+            "mutation_detail": {
+              "status": "stable"
+            },
+            "composite_delta": 6.7
+          }
+        ]
+      },
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1NDQzNDhkZi02NjI5LTQwNDQtOWQ1Yy01YTcwMzA4MzZhOWMiLCJlbWFpbCI6IndpcmUuc3RlcDRiLjIwMjYwOTE0MTUyNzA0QGV4YW1wbGUuY29tIiwiZXhwIjoxNzg5Mzg0MTI2LCJ0eXBlIjoiYWNjZXNzIn0.aZOphNPFHVtERZGHYo9tQLuGs-AVUvAkSHkOr4-sQn8",
+        "referer": "http://127.0.0.1:5173/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+        "accept": "application/json",
+        "sec-ch-ua": "\"Google Chrome\";v=\"153\", \"Not_A Brand\";v=\"8\", \"Chromium\";v=\"153\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "http://localhost:8000/auth/me",
+      "method": "GET",
+      "status": 200,
+      "body": {
+        "id": "544348df-6629-4044-9d5c-5a7030836a9c",
+        "email": "wire.step4b.20260914152704@example.com",
+        "full_name": "Wire Test",
+        "role": "standard",
+        "created_at": "2026-09-14T09:57:13.768973+00:00"
+      },
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1NDQzNDhkZi02NjI5LTQwNDQtOWQ1Yy01YTcwMzA4MzZhOWMiLCJlbWFpbCI6IndpcmUuc3RlcDRiLjIwMjYwOTE0MTUyNzA0QGV4YW1wbGUuY29tIiwiZXhwIjoxNzg5Mzg0MTI2LCJ0eXBlIjoiYWNjZXNzIn0.aZOphNPFHVtERZGHYo9tQLuGs-AVUvAkSHkOr4-sQn8",
+        "referer": "http://127.0.0.1:5173/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+        "accept": "application/json",
+        "sec-ch-ua": "\"Google Chrome\";v=\"153\", \"Not_A Brand\";v=\"8\", \"Chromium\";v=\"153\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "http://localhost:8000/auth/me",
+      "method": "GET",
+      "status": 200,
+      "body": {
+        "id": "544348df-6629-4044-9d5c-5a7030836a9c",
+        "email": "wire.step4b.20260914152704@example.com",
+        "full_name": "Wire Test",
+        "role": "standard",
+        "created_at": "2026-09-14T09:57:13.768973+00:00"
+      },
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1NDQzNDhkZi02NjI5LTQwNDQtOWQ1Yy01YTcwMzA4MzZhOWMiLCJlbWFpbCI6IndpcmUuc3RlcDRiLjIwMjYwOTE0MTUyNzA0QGV4YW1wbGUuY29tIiwiZXhwIjoxNzg5Mzg0MTI2LCJ0eXBlIjoiYWNjZXNzIn0.aZOphNPFHVtERZGHYo9tQLuGs-AVUvAkSHkOr4-sQn8",
+        "referer": "http://127.0.0.1:5173/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+        "accept": "application/json",
+        "sec-ch-ua": "\"Google Chrome\";v=\"153\", \"Not_A Brand\";v=\"8\", \"Chromium\";v=\"153\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "http://localhost:8000/tickers",
+      "method": "GET",
+      "status": 200,
+      "body": {
+        "total": 16,
+        "tickers": [
+          {
+            "id": "AAPL",
+            "symbol": "AAPL",
+            "name": "Apple Inc.",
+            "sector": "Information Technology",
+            "score": 79.8,
+            "verdict_label": "building",
+            "why_sentence": "Narrative momentum driven by virality rate (Rn 8.08). - consumer sentiment indicates market may be underpricing reality.",
+            "trust_label": "Moderate confidence - treat with caution",
+            "window_start_utc": "2026-06-16T09:37:19.591414+00:00"
+          },
+          {
+            "id": "AMZN",
+            "symbol": "AMZN",
+            "name": "Amazon.com Inc.",
+            "sector": "Consumer Discretionary",
+            "score": 84.9,
+            "verdict_label": "building",
+            "why_sentence": "Narrative momentum driven by virality rate (Rn 3.80). - consumer sentiment indicates market may be underpricing reality.",
+            "trust_label": "High confidence",
+            "window_start_utc": "2026-06-16T09:37:19.591414+00:00"
+          },
+          {
+            "id": "BHARTIARTL",
+            "symbol": "BHARTIARTL",
+            "name": "Bharti Airtel Ltd.",
+            "sector": "Consumer Discretionary",
+            "score": 62.8,
+            "verdict_label": "mixed",
+            "why_sentence": "Narrative momentum driven by virality rate (Rn 10.00). - consumer sentiment indicates market may be underpricing reality.",
+            "trust_label": "High confidence",
+            "window_start_utc": "2026-06-16T09:37:19.591414+00:00"
+          },
+          {
+            "id": "HDFCBANK",
+            "symbol": "HDFCBANK",
+            "name": "HDFC Bank Ltd.",
+            "sector": "Financial Services",
+            "score": 93.2,
+            "verdict_label": "building",
+            "why_sentence": "Narrative momentum driven by virality rate (Rn 7.00).",
+            "trust_label": "High confidence",
+            "window_start_utc": "2026-06-16T09:37:19.591414+00:00"
+          },
+          {
+            "id": "ICICIBANK",
+            "symbol": "ICICIBANK",
+            "name": "ICICI Bank Ltd.",
+            "sector": "Financial Services",
+            "score": 81,
+            "verdict_label": "building",
+            "why_sentence": "Narrative momentum driven by virality rate (Rn 5.00).",
+            "trust_label": "High confidence",
+            "window_start_utc": "2026-06-16T09:37:19.591414+00:00"
+          },
+          {
+            "id": "INFY",
+            "symbol": "INFY",
+            "name": "Infosys Ltd.",
+            "sector": "Information Technology",
+            "score": 61.3,
+            "verdict_label": "mixed",
+            "why_sentence": "Narrative momentum driven by virality rate (Rn 1.43). - consumer sentiment indicates market may be underpricing reality.",
+            "trust_label": "High confidence",
+            "window_start_utc": "2026-06-16T09:37:19.591414+00:00"
+          },
+          {
+            "id": "ITC",
+            "symbol": "ITC",
+            "name": "ITC Ltd.",
+            "sector": "Consumer Goods",
+            "score": 93.7,
+            "verdict_label": "building",
+            "why_sentence": "Narrative momentum driven by virality rate (Rn 5.00).",
+            "trust_label": "High confidence",
+            "window_start_utc": "2026-06-16T09:37:19.591414+00:00"
+          },
+          {
+            "id": "LT",
+            "symbol": "LT",
+            "name": "Larsen & Toubro Ltd.",
+            "sector": "Conglomerate",
+            "score": 60.2,
+            "verdict_label": "mixed",
+            "why_sentence": "Narrative momentum driven by virality rate (Rn 1.75). - consumer sentiment indicates market may be underpricing reality.",
+            "trust_label": "High confidence",
+            "window_start_utc": "2026-06-16T09:37:19.591414+00:00"
+          },
+          {
+            "id": "MSFT",
+            "symbol": "MSFT",
+            "name": "Microsoft Corp.",
+            "sector": "Information Technology",
+            "score": 92.5,
+            "verdict_label": "building",
+            "why_sentence": "Narrative momentum driven by virality rate (Rn 2.35). - consumer sentiment indicates market may be underpricing reality.",
+            "trust_label": "High confidence",
+            "window_start_utc": "2026-06-16T09:37:19.591414+00:00"
+          },
+          {
+            "id": "NVDA",
+            "symbol": "NVDA",
+            "name": "NVIDIA Corp.",
+            "sector": "Information Technology",
+            "score": 79.7,
+            "verdict_label": "building",
+            "why_sentence": "Narrative momentum driven by virality rate (Rn 3.46). - consumer sentiment indicates market may be underpricing reality.",
+            "trust_label": "Moderate confidence - treat with caution",
+            "window_start_utc": "2026-06-16T09:37:19.591414+00:00"
+          },
+          {
+            "id": "RELIANCE",
+            "symbol": "RELIANCE",
+            "name": "Reliance Industries Ltd.",
+            "sector": "Energy",
+            "score": 77.4,
+            "verdict_label": "building",
+            "why_sentence": "Cross-asset sentiment spillover (CASSI 1.00) driving retail interest. - consumer sentiment indicates market may be underpricing reality.",
+            "trust_label": "High confidence",
+            "window_start_utc": "2026-06-16T09:37:19.591414+00:00"
+          },
+          {
+            "id": "SBIN",
+            "symbol": "SBIN",
+            "name": "State Bank of India",
+            "sector": "Financial Services",
+            "score": 98.7,
+            "verdict_label": "building",
+            "why_sentence": "Narrative momentum driven by virality rate (Rn 5.00).",
+            "trust_label": "High confidence",
+            "window_start_utc": "2026-06-16T09:37:19.591414+00:00"
+          },
+          {
+            "id": "TATASTEEL",
+            "symbol": "TATASTEEL",
+            "name": "Tata Steel Ltd.",
+            "sector": "Basic Materials",
+            "score": 68.9,
+            "verdict_label": "building",
+            "why_sentence": "Narrative momentum driven by virality rate (Rn 5.00). - consumer sentiment indicates market may be underpricing reality.",
+            "trust_label": "High confidence",
+            "window_start_utc": "2026-06-16T09:37:19.591414+00:00"
+          },
+          {
+            "id": "TCS",
+            "symbol": "TCS",
+            "name": "Tata Consultancy Services Ltd.",
+            "sector": "Information Technology",
+            "score": 100,
+            "verdict_label": "building",
+            "why_sentence": "Narrative momentum driven by virality rate (Rn 5.00). - consumer sentiment indicates market may be underpricing reality.",
+            "trust_label": "High confidence",
+            "window_start_utc": "2026-06-16T09:37:19.591414+00:00"
+          },
+          {
+            "id": "TSLA",
+            "symbol": "TSLA",
+            "name": "Tesla Inc.",
+            "sector": "Automotive",
+            "score": 75.7,
+            "verdict_label": "building",
+            "why_sentence": "Narrative momentum driven by virality rate (Rn 7.41). - consumer sentiment indicates market may be underpricing reality.",
+            "trust_label": "Moderate confidence - treat with caution",
+            "window_start_utc": "2026-06-16T09:37:19.591414+00:00"
+          },
+          {
+            "id": "WIPRO",
+            "symbol": "WIPRO",
+            "name": "Wipro Ltd.",
+            "sector": "Information Technology",
+            "score": 62.8,
+            "verdict_label": "mixed",
+            "why_sentence": "Narrative momentum driven by virality rate (Rn 5.00). - consumer sentiment indicates market may be underpricing reality.",
+            "trust_label": "High confidence",
+            "window_start_utc": "2026-06-16T09:37:19.591414+00:00"
+          }
+        ]
+      },
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1NDQzNDhkZi02NjI5LTQwNDQtOWQ1Yy01YTcwMzA4MzZhOWMiLCJlbWFpbCI6IndpcmUuc3RlcDRiLjIwMjYwOTE0MTUyNzA0QGV4YW1wbGUuY29tIiwiZXhwIjoxNzg5Mzg0MTI2LCJ0eXBlIjoiYWNjZXNzIn0.aZOphNPFHVtERZGHYo9tQLuGs-AVUvAkSHkOr4-sQn8",
+        "referer": "http://127.0.0.1:5173/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+        "accept": "application/json",
+        "sec-ch-ua": "\"Google Chrome\";v=\"153\", \"Not_A Brand\";v=\"8\", \"Chromium\";v=\"153\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "http://localhost:8000/tickers",
+      "method": "GET",
+      "status": 200,
+      "body": {
+        "total": 16,
+        "tickers": [
+          {
+            "id": "AAPL",
+            "symbol": "AAPL",
+            "name": "Apple Inc.",
+            "sector": "Information Technology",
+            "score": 79.8,
+            "verdict_label": "building",
+            "why_sentence": "Narrative momentum driven by virality rate (Rn 8.08). - consumer sentiment indicates market may be underpricing reality.",
+            "trust_label": "Moderate confidence - treat with caution",
+            "window_start_utc": "2026-06-16T09:37:19.591414+00:00"
+          },
+          {
+            "id": "AMZN",
+            "symbol": "AMZN",
+            "name": "Amazon.com Inc.",
+            "sector": "Consumer Discretionary",
+            "score": 84.9,
+            "verdict_label": "building",
+            "why_sentence": "Narrative momentum driven by virality rate (Rn 3.80). - consumer sentiment indicates market may be underpricing reality.",
+            "trust_label": "High confidence",
+            "window_start_utc": "2026-06-16T09:37:19.591414+00:00"
+          },
+          {
+            "id": "BHARTIARTL",
+            "symbol": "BHARTIARTL",
+            "name": "Bharti Airtel Ltd.",
+            "sector": "Consumer Discretionary",
+            "score": 62.8,
+            "verdict_label": "mixed",
+            "why_sentence": "Narrative momentum driven by virality rate (Rn 10.00). - consumer sentiment indicates market may be underpricing reality.",
+            "trust_label": "High confidence",
+            "window_start_utc": "2026-06-16T09:37:19.591414+00:00"
+          },
+          {
+            "id": "HDFCBANK",
+            "symbol": "HDFCBANK",
+            "name": "HDFC Bank Ltd.",
+            "sector": "Financial Services",
+            "score": 93.2,
+            "verdict_label": "building",
+            "why_sentence": "Narrative momentum driven by virality rate (Rn 7.00).",
+            "trust_label": "High confidence",
+            "window_start_utc": "2026-06-16T09:37:19.591414+00:00"
+          },
+          {
+            "id": "ICICIBANK",
+            "symbol": "ICICIBANK",
+            "name": "ICICI Bank Ltd.",
+            "sector": "Financial Services",
+            "score": 81,
+            "verdict_label": "building",
+            "why_sentence": "Narrative momentum driven by virality rate (Rn 5.00).",
+            "trust_label": "High confidence",
+            "window_start_utc": "2026-06-16T09:37:19.591414+00:00"
+          },
+          {
+            "id": "INFY",
+            "symbol": "INFY",
+            "name": "Infosys Ltd.",
+            "sector": "Information Technology",
+            "score": 61.3,
+            "verdict_label": "mixed",
+            "why_sentence": "Narrative momentum driven by virality rate (Rn 1.43). - consumer sentiment indicates market may be underpricing reality.",
+            "trust_label": "High confidence",
+            "window_start_utc": "2026-06-16T09:37:19.591414+00:00"
+          },
+          {
+            "id": "ITC",
+            "symbol": "ITC",
+            "name": "ITC Ltd.",
+            "sector": "Consumer Goods",
+            "score": 93.7,
+            "verdict_label": "building",
+            "why_sentence": "Narrative momentum driven by virality rate (Rn 5.00).",
+            "trust_label": "High confidence",
+            "window_start_utc": "2026-06-16T09:37:19.591414+00:00"
+          },
+          {
+            "id": "LT",
+            "symbol": "LT",
+            "name": "Larsen & Toubro Ltd.",
+            "sector": "Conglomerate",
+            "score": 60.2,
+            "verdict_label": "mixed",
+            "why_sentence": "Narrative momentum driven by virality rate (Rn 1.75). - consumer sentiment indicates market may be underpricing reality.",
+            "trust_label": "High confidence",
+            "window_start_utc": "2026-06-16T09:37:19.591414+00:00"
+          },
+          {
+            "id": "MSFT",
+            "symbol": "MSFT",
+            "name": "Microsoft Corp.",
+            "sector": "Information Technology",
+            "score": 92.5,
+            "verdict_label": "building",
+            "why_sentence": "Narrative momentum driven by virality rate (Rn 2.35). - consumer sentiment indicates market may be underpricing reality.",
+            "trust_label": "High confidence",
+            "window_start_utc": "2026-06-16T09:37:19.591414+00:00"
+          },
+          {
+            "id": "NVDA",
+            "symbol": "NVDA",
+            "name": "NVIDIA Corp.",
+            "sector": "Information Technology",
+            "score": 79.7,
+            "verdict_label": "building",
+            "why_sentence": "Narrative momentum driven by virality rate (Rn 3.46). - consumer sentiment indicates market may be underpricing reality.",
+            "trust_label": "Moderate confidence - treat with caution",
+            "window_start_utc": "2026-06-16T09:37:19.591414+00:00"
+          },
+          {
+            "id": "RELIANCE",
+            "symbol": "RELIANCE",
+            "name": "Reliance Industries Ltd.",
+            "sector": "Energy",
+            "score": 77.4,
+            "verdict_label": "building",
+            "why_sentence": "Cross-asset sentiment spillover (CASSI 1.00) driving retail interest. - consumer sentiment indicates market may be underpricing reality.",
+            "trust_label": "High confidence",
+            "window_start_utc": "2026-06-16T09:37:19.591414+00:00"
+          },
+          {
+            "id": "SBIN",
+            "symbol": "SBIN",
+            "name": "State Bank of India",
+            "sector": "Financial Services",
+            "score": 98.7,
+            "verdict_label": "building",
+            "why_sentence": "Narrative momentum driven by virality rate (Rn 5.00).",
+            "trust_label": "High confidence",
+            "window_start_utc": "2026-06-16T09:37:19.591414+00:00"
+          },
+          {
+            "id": "TATASTEEL",
+            "symbol": "TATASTEEL",
+            "name": "Tata Steel Ltd.",
+            "sector": "Basic Materials",
+            "score": 68.9,
+            "verdict_label": "building",
+            "why_sentence": "Narrative momentum driven by virality rate (Rn 5.00). - consumer sentiment indicates market may be underpricing reality.",
+            "trust_label": "High confidence",
+            "window_start_utc": "2026-06-16T09:37:19.591414+00:00"
+          },
+          {
+            "id": "TCS",
+            "symbol": "TCS",
+            "name": "Tata Consultancy Services Ltd.",
+            "sector": "Information Technology",
+            "score": 100,
+            "verdict_label": "building",
+            "why_sentence": "Narrative momentum driven by virality rate (Rn 5.00). - consumer sentiment indicates market may be underpricing reality.",
+            "trust_label": "High confidence",
+            "window_start_utc": "2026-06-16T09:37:19.591414+00:00"
+          },
+          {
+            "id": "TSLA",
+            "symbol": "TSLA",
+            "name": "Tesla Inc.",
+            "sector": "Automotive",
+            "score": 75.7,
+            "verdict_label": "building",
+            "why_sentence": "Narrative momentum driven by virality rate (Rn 7.41). - consumer sentiment indicates market may be underpricing reality.",
+            "trust_label": "Moderate confidence - treat with caution",
+            "window_start_utc": "2026-06-16T09:37:19.591414+00:00"
+          },
+          {
+            "id": "WIPRO",
+            "symbol": "WIPRO",
+            "name": "Wipro Ltd.",
+            "sector": "Information Technology",
+            "score": 62.8,
+            "verdict_label": "mixed",
+            "why_sentence": "Narrative momentum driven by virality rate (Rn 5.00). - consumer sentiment indicates market may be underpricing reality.",
+            "trust_label": "High confidence",
+            "window_start_utc": "2026-06-16T09:37:19.591414+00:00"
+          }
+        ]
+      },
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1NDQzNDhkZi02NjI5LTQwNDQtOWQ1Yy01YTcwMzA4MzZhOWMiLCJlbWFpbCI6IndpcmUuc3RlcDRiLjIwMjYwOTE0MTUyNzA0QGV4YW1wbGUuY29tIiwiZXhwIjoxNzg5Mzg0MTI2LCJ0eXBlIjoiYWNjZXNzIn0.aZOphNPFHVtERZGHYo9tQLuGs-AVUvAkSHkOr4-sQn8",
+        "referer": "http://127.0.0.1:5173/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+        "accept": "application/json",
+        "sec-ch-ua": "\"Google Chrome\";v=\"153\", \"Not_A Brand\";v=\"8\", \"Chromium\";v=\"153\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    }
+  ],
+  "htmlSnippet": "<!DOCTYPE html><html lang=\"en\"><head>\n    <script type=\"module\">import { injectIntoGlobalHook } from \"/@react-refresh\";\ninjectIntoGlobalHook(window);\nwindow.$RefreshReg$ = () => {};\nwindow.$RefreshSig$ = () => (type) => type;</script>\n\n    <script type=\"module\" src=\"/@vite/client\"></script>\n\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Diverge — Narrative intelligence</title>\n    <meta name=\"description\" content=\"Plain-language and advanced narrative analysis for tracked equities.\">\n  <style type=\"text/css\" data-vite-dev-id=\"D:/Projects/Project Diverge frontend/src/index.css\">\n@import url(\"https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap\");\n/*! tailwindcss v4.3.3 | MIT License | https://tailwindcss.com */\n@layer properties;\n@layer theme, base, components, utilities;\n@layer theme {\n  :root, :host {\n    --color-white: #fff;\n    --spacing: 0.25rem;\n    --container-xs: 20rem;\n    --container-xl: 36rem;\n    --container-2xl: 42rem;\n    --container-3xl: 48rem;\n    --container-4xl: 56rem;\n    --container-5xl: 64rem;\n    --text-xs: 0.75rem;\n    --text-xs--line-height: calc(1 / 0.75);\n    --text-sm: 0.875rem;\n    --text-sm--line-height: calc(1.25 / 0.875);\n    --text-base: 1rem;\n    --text-base--line-height: calc(1.5 / 1);\n    --text-lg: 1.125rem;\n    --text-lg--line-height: calc(1.75 / 1.125);\n    --text-xl: 1.25rem;\n    --text-xl--line-height: calc(1.75 / 1.25);\n    --text-2xl: 1.5rem;\n    --text-2xl--line-height: calc(2 / 1.5);\n    --text-3xl: 1.875rem;\n    --text-3xl--line-height: calc(2.25 / 1.875);\n    --text-4xl: 2.25rem;\n    --text-4xl--line-height: calc(2.5 / 2.25);\n    --text-5xl: 3rem;\n    --text-5xl--line-height: 1;\n    --text-6xl: 3.75rem;\n    --text-6xl--line-height: 1;\n    --font-weight-medium: 500;\n    --font-weight-semibold: 600;\n    --font-weight-bold: 700;\n    --leading-tight: 1.25;\n    --leading-relaxed"
+}

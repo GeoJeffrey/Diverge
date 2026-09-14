@@ -50,8 +50,8 @@ def parse_feed_entry(feed_name: str, entry: Any) -> List[Dict[str, Any]]:
     }]
 
 
-def scrape_rss_feed(feed_cfg: Dict[str, str]) -> List[Dict[str, Any]]:
-    """Scrape and parse one RSS feed."""
+def scrape_rss_feed(feed_cfg: Dict[str, str], max_retries: int = 3) -> List[Dict[str, Any]]:
+    """Scrape and parse one RSS feed with retry/backoff."""
     feed_name = feed_cfg["name"]
     url = feed_cfg["url"]
     logger.info(f"Parsing RSS feed '{feed_name}' at {url}...")
@@ -60,9 +60,28 @@ def scrape_rss_feed(feed_cfg: Dict[str, str]) -> List[Dict[str, Any]]:
         logger.warning(f"Robots.txt disallows scraping feed URL {url}. Skipping.")
         return []
 
-    feed = feedparser.parse(url)
-    collected = []
+    feed = None
+    for attempt in range(max_retries):
+        try:
+            feed = feedparser.parse(url)
+            if getattr(feed, "status", None) == 429:
+                wait_time = (attempt + 1) * 3.0
+                logger.warning(
+                    f"RSS HTTP 429 rate limit for '{feed_name}'. Waiting {wait_time}s (attempt {attempt + 1}/{max_retries})..."
+                )
+                time.sleep(wait_time)
+                continue
+            if feed and hasattr(feed, "entries"):
+                break
+        except Exception as e:
+            logger.error(f"Error parsing RSS feed '{feed_name}' (attempt {attempt + 1}): {e}")
+            if attempt < max_retries - 1:
+                time.sleep(2.0)
 
+    if not feed or not hasattr(feed, "entries"):
+        return []
+
+    collected = []
     for entry in feed.entries:
         parsed = parse_feed_entry(feed_name, entry)
         collected.extend(parsed)

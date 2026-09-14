@@ -18,17 +18,25 @@ from .. import config, storage, utils
 logger = utils.setup_logger("trends_scraper")
 
 
-def fetch_trends_data(keyword: str, geo: str = config.TRENDS_GEO, timeframe: str = config.TRENDS_TIMEFRAME) -> List[Dict[str, Any]]:
+def fetch_trends_data(keyword: str, geo: str = config.TRENDS_GEO, timeframe: str = config.TRENDS_TIMEFRAME, max_retries: int = 3) -> List[Dict[str, Any]]:
     """
-    Fetch Google Trends interest-over-time for a keyword using pytrends.
+    Fetch Google Trends interest-over-time for a keyword using pytrends with retry/backoff.
     Returns list of dicts matching raw_posts schema format.
     """
     logger.info(f"Fetching Google Trends data for keyword '{keyword}' (geo={geo})...")
-    pytrend = TrendReq(hl="en-US", tz=0, timeout=(10, 25))
-    pytrend.build_payload(kw_list=[keyword], geo=geo, timeframe=timeframe)
+    df = None
+    for attempt in range(max_retries):
+        try:
+            pytrend = TrendReq(hl="en-US", tz=0, timeout=(10, 25))
+            pytrend.build_payload(kw_list=[keyword], geo=geo, timeframe=timeframe)
+            df = pytrend.interest_over_time()
+            break
+        except Exception as e:
+            wait_time = (attempt + 1) * 3.0
+            logger.warning(f"Error fetching Google Trends for '{keyword}' (attempt {attempt + 1}/{max_retries}): {e}. Waiting {wait_time}s...")
+            time.sleep(wait_time)
 
-    df = pytrend.interest_over_time()
-    if df.empty:
+    if df is None or df.empty:
         logger.warning(f"No Google Trends data returned for '{keyword}'")
         return []
 
