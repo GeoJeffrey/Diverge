@@ -12,28 +12,39 @@ from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from alembic.config import Config
+from alembic import command
 
 from .routers import health, auth, tickers
+from ..db.base import Base, engine
+from ..db import models  # Ensure all SQLAlchemy models are registered
 
 logger = logging.getLogger("diverge.api")
 
 
 def run_db_migrations() -> None:
-    """Execute Alembic migrations up to head automatically on startup."""
-    try:
-        from alembic.config import Config
-        from alembic import command
+    """Execute Alembic migrations up to head automatically on startup, falling back to create_all."""
+    project_root = Path(__file__).resolve().parent.parent.parent.parent
+    ini_path = project_root / "alembic.ini"
+    migrations_dir = project_root / "migrations"
 
-        project_root = Path(__file__).resolve().parent.parent.parent.parent
-        ini_path = project_root / "alembic.ini"
-        if ini_path.exists():
+    if ini_path.exists() and migrations_dir.exists():
+        try:
             alembic_cfg = Config(str(ini_path))
-            alembic_cfg.set_main_option("script_location", str(project_root / "migrations"))
+            alembic_cfg.set_main_option("script_location", str(migrations_dir))
             logger.info("Running automatic Alembic migrations on startup...")
             command.upgrade(alembic_cfg, "head")
             logger.info("Alembic migrations applied successfully.")
+            return
+        except Exception as exc:
+            logger.warning(f"Alembic migration failed on startup ({exc}), attempting Base.metadata.create_all fallback...")
+
+    # Fallback to direct table creation if Alembic config is unreachable
+    try:
+        Base.metadata.create_all(bind=engine)
+        logger.info("Tables created or verified via Base.metadata.create_all().")
     except Exception as exc:
-        logger.warning(f"Could not auto-apply Alembic migrations on startup: {exc}")
+        logger.error(f"Failed to verify/create database schema on startup: {exc}")
 
 
 @asynccontextmanager
