@@ -12,3 +12,23 @@ statsmodels>=0.13.5
 numpy>=1.23.0
 datasketch>=1.5.0
 
+# API & Web Server
+fastapi>=0.110.0
+uvicorn[standard]>=0.28.0
+
+# Database & Migrations
+psycopg2-binary>=2.9.9
+sqlalchemy>=2.0.28
+alembic>=1.13.1
+
+# Authentication & Security
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+python-multipart>=0.0.9
+
+# Validation & Types
+email-validator>=2.1.0
+pydantic[email]>=2.6.0
+
+# Background Task Scheduling
+apscheduler>=3.10.4

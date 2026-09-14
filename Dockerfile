@@ -17,8 +17,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Install python dependencies
 COPY requirements.txt pyproject.toml ./
-RUN pip install --no-cache-dir -r requirements.txt \
-    && pip install --no-cache-dir fastapi uvicorn[standard] psycopg2-binary sqlalchemy alembic python-jose[cryptography] passlib[bcrypt] python-multipart
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy source code and docs
 COPY src/ ./src/
