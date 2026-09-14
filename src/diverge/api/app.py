@@ -5,6 +5,7 @@ Main FastAPI application for the Diverge API.
 Mounts all routers and configures CORS, title, and version per the frozen openapi.json contract.
 """
 
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -21,7 +22,7 @@ app = FastAPI(
 )
 
 # Explicit CORS origins (disallowing wildcard when credentials/auth tokens are involved)
-ALLOWED_ORIGINS = [
+DEFAULT_ORIGINS = [
     "http://localhost:5173",  # Vite dev server
     "http://127.0.0.1:5173",
     "http://localhost:3000",  # React / Next.js dev server
@@ -29,6 +30,13 @@ ALLOWED_ORIGINS = [
     "https://diverge.ai",     # Production domain
     "https://app.diverge.ai", # Production app subdomain
 ]
+
+env_cors = os.getenv("ALLOWED_ORIGINS") or os.getenv("CORS_ORIGINS")
+if env_cors:
+    extra_origins = [o.strip() for o in env_cors.split(",") if o.strip()]
+    ALLOWED_ORIGINS = list(dict.fromkeys(DEFAULT_ORIGINS + extra_origins))
+else:
+    ALLOWED_ORIGINS = DEFAULT_ORIGINS
 
 app.add_middleware(
     CORSMiddleware,

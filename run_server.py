@@ -9,6 +9,7 @@ Usage:
 """
 
 import argparse
+import os
 import sys
 from pathlib import Path
 
@@ -19,9 +20,12 @@ import uvicorn
 
 
 def main():
+    default_port = int(os.getenv("PORT", "8000"))
+    default_host = os.getenv("HOST", "0.0.0.0")
+
     parser = argparse.ArgumentParser(description="Diverge API Server")
-    parser.add_argument("--port", type=int, default=8000, help="Port to bind (default: 8000)")
-    parser.add_argument("--host", type=str, default="0.0.0.0", help="Host to bind (default: 0.0.0.0)")
+    parser.add_argument("--port", type=int, default=default_port, help=f"Port to bind (default: {default_port})")
+    parser.add_argument("--host", type=str, default=default_host, help=f"Host to bind (default: {default_host})")
     parser.add_argument("--reload", action="store_true", help="Enable auto-reload for development")
     args = parser.parse_args()
 
