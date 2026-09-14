@@ -52,6 +52,20 @@ app.include_router(auth.router)
 app.include_router(tickers.router)
 
 
+@app.get("/", include_in_schema=False)
+def root_index():
+    """Root entrypoint linking to interactive documentation."""
+    return {
+        "name": "Diverge API",
+        "version": "1.0.0",
+        "status": "online",
+        "docs_url": "/docs",
+        "openapi_url": "/openapi.json",
+        "health_url": "/health",
+        "dashboard_ui": "http://localhost:5173",
+    }
+
+
 def custom_openapi():
     """Guarantee exact zero-drift alignment with the frozen openapi.json specification."""
     if app.openapi_schema:
